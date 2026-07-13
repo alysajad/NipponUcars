@@ -27,10 +27,10 @@ load_dotenv()
 
 app = FastAPI()
 
-# Configure CORS to allow frontend connections
+# Configure CORS for local development with Next.js
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -29,15 +29,17 @@ cloudinary.config(
 
 redis_client = redis.from_url(REDIS_URL)
 
-# Load model ONCE at worker startup for high throughput
-print("[worker] Loading birefnet-lite model...")
-# Using standard u2net if birefnet-lite is missing, but rembg default is u2net
-REMBG_SESSION = new_session("birefnet-lite") 
-print("[worker] Model ready.")
-
+# Load model lazily to prevent OOM and fork issues
+REMBG_SESSION = None
 
 @app.task(bind=True, max_retries=3, default_retry_delay=5)
 def remove_background_task(self, frame_id: str, raw_url: str, inventory_id: str, frame_index: int):
+    global REMBG_SESSION
+    if REMBG_SESSION is None:
+        print("[worker] Loading u2netp model...")
+        REMBG_SESSION = new_session("u2netp")
+        print("[worker] Model ready.")
+
     start = time.monotonic()
     
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
