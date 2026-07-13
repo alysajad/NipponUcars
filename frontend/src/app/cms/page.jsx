@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, Upload, CheckCircle, ChevronLeft } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { publishCar, fetchModels, uploadBulkModels } from '@/api/inventoryApi';
-import { removeBackground } from '@imgly/background-removal';
+import { initCar, uploadFrames, publishCar as publishCarApi, fetchModels, uploadBulkModels } from '@/api/inventoryApi';
 
 const CaptureGuide = ({ frame }) => {
   const angle = frame * 10;
@@ -80,12 +79,16 @@ export default function SalesCMS() {
     name: '', desc: '', specs: '', price: ''
   });
   
-  const [frames, setFrames] = useState(Array(36).fill(null));
+  const [activeCarId, setActiveCarId] = useState(null);
+  const [frames, setFrames] = useState(Array(36).fill(null)); // Stores object URLs for preview
+  const [serverStatuses, setServerStatuses] = useState(Array(36).fill('queued'));
+  
   const [currentCaptureFrame, setCurrentCaptureFrame] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pin, setPin] = useState('');
   const [isUploadingBulk, setIsUploadingBulk] = useState(false);
+  const eventSourceRef = useRef(null);
   
   const { data: models = [], isLoading: modelsLoading } = useQuery({
     queryKey: ['models'],
@@ -95,18 +98,6 @@ export default function SalesCMS() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const publishMutation = useMutation({
-    mutationFn: publishCar,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['inventory'] });
-      router.push('/inventory');
-    },
-    onError: (error) => {
-      console.error(error);
-      alert("Failed to publish car");
-      setStep(2); // Go back to capture step if it fails
-    }
-  });
   const fileInputRef = useRef();
 
   const handleInputChange = (e) => {
@@ -126,13 +117,47 @@ export default function SalesCMS() {
     }
   };
 
-  const startCapture = () => {
+  const startCapture = async () => {
     if (carDetails.name && carDetails.desc && carDetails.price) {
-      setStep(2);
+      try {
+        const res = await initCar(carDetails);
+        setActiveCarId(res.id);
+        
+        // Start listening to SSE
+        const es = new EventSource(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cars/${res.id}/progress`);
+        eventSourceRef.current = es;
+        
+        es.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          setServerStatuses(prev => {
+            const next = [...prev];
+            next[data.frame_index] = data.status;
+            return next;
+          });
+          
+          if (data.status === "done") {
+             setFrames(prev => {
+                const next = [...prev];
+                next[data.frame_index] = data.processed_url;
+                return next;
+             });
+          }
+        };
+        
+        setStep(2);
+      } catch (e) {
+        alert("Failed to initialize car: " + e.message);
+      }
     } else {
       alert("Please fill out basic car details first.");
     }
   };
+
+  useEffect(() => {
+     return () => {
+         if (eventSourceRef.current) eventSourceRef.current.close();
+     };
+  }, []);
 
   const handleBulkUpload = async (e) => {
     const file = e.target.files[0];
@@ -160,91 +185,54 @@ export default function SalesCMS() {
     }
   };
 
-  // Helper to process image: remove background and composite on white
-  const processImage = async (file) => {
-    try {
-      // Create object URL from file
-      const imageUrl = URL.createObjectURL(file);
-      
-      // Perform background removal (returns a Blob)
-      const transparentBlob = await removeBackground(imageUrl);
-      
-      // Convert to Image to draw on canvas
-      const img = new Image();
-      const transparentUrl = URL.createObjectURL(transparentBlob);
-      
-      return new Promise((resolve) => {
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          
-          // Fill pure white background
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          
-          // Draw the transparent car on top
-          ctx.drawImage(img, 0, 0);
-          
-          // Save as JPEG to base64
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-          resolve(dataUrl);
-        };
-        img.src = transparentUrl;
-      });
-    } catch (err) {
-      console.error("Error processing image:", err);
-      return null;
-    }
-  };
-
   const handleFileCapture = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setIsProcessing(true);
     
-    // Process the image
-    const processedBase64 = await processImage(file);
-    
-    if (processedBase64) {
-      const newFrames = [...frames];
-      newFrames[currentCaptureFrame] = processedBase64;
-      setFrames(newFrames);
-      
-      if (currentCaptureFrame < 35) {
-        setCurrentCaptureFrame(prev => prev + 1);
-      }
+    try {
+        const formData = new FormData();
+        formData.append("files", file);
+        
+        // Immediately show a local preview
+        const localPreview = URL.createObjectURL(file);
+        const newFrames = [...frames];
+        newFrames[currentCaptureFrame] = localPreview;
+        setFrames(newFrames);
+        
+        // Upload asynchronously
+        await uploadFrames(activeCarId, formData);
+        
+        if (currentCaptureFrame < 35) {
+          setCurrentCaptureFrame(prev => prev + 1);
+        }
+    } catch (e) {
+        alert("Failed to upload frame");
     }
     
     setIsProcessing(false);
-    // Reset file input so same file can be selected again if needed
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handlePublish = async () => {
-    if (frames.some(f => f === null)) {
-      alert("Please capture all 36 frames before publishing.");
+    if (serverStatuses.some(s => s !== "done")) {
+      alert("Please wait for all 36 frames to finish processing on the server.");
       return;
     }
     
     setStep(3); // Show publishing state
     
-    const newCar = {
-      id: `custom_${Date.now()}`,
-      name: carDetails.name.toUpperCase(),
-      desc: carDetails.desc,
-      specs: carDetails.specs,
-      price: carDetails.price,
-      scale: 1.0,
-      frames: frames // Store the base64 frames directly in the object
-    };
-
-    publishMutation.mutate(newCar);
+    try {
+        await publishCarApi(activeCarId);
+        queryClient.invalidateQueries({ queryKey: ['inventory'] });
+        router.push('/inventory');
+    } catch (e) {
+        alert("Publish failed: " + e.message);
+        setStep(2);
+    }
   };
 
-  // Helper to guide the salesman
   const getCaptureInstruction = () => {
     if (currentCaptureFrame === 0) return "Direct Front";
     if (currentCaptureFrame === 9) return "Right Side Profile";
@@ -340,18 +328,23 @@ export default function SalesCMS() {
 
       {step === 2 && (
         <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', textAlign: 'center' }}>
-          <h3>360° Image Capture</h3>
+          <h3>360° Server Processing</h3>
           <div style={{ background: '#f0f0f0', borderRadius: '8px', padding: '15px', margin: '15px 0' }}>
             <CaptureGuide frame={currentCaptureFrame} />
             <h4 style={{ margin: '0 0 5px 0', color: '#E32636' }}>Frame {currentCaptureFrame + 1} / 36</h4>
             <p style={{ margin: 0, fontWeight: 'bold', fontSize: '1.1rem' }}>{getCaptureInstruction()}</p>
           </div>
 
-          <div style={{ width: '100%', height: '250px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', overflow: 'hidden' }}>
-            {isProcessing ? (
-              <div className="spinner">Processing & Removing Background...</div>
-            ) : frames[currentCaptureFrame] ? (
-              <img src={frames[currentCaptureFrame]} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          <div style={{ width: '100%', height: '250px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', overflow: 'hidden', position: 'relative' }}>
+            {frames[currentCaptureFrame] ? (
+              <>
+                 <img src={frames[currentCaptureFrame]} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                 {serverStatuses[currentCaptureFrame] !== 'done' && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
+                      {serverStatuses[currentCaptureFrame] === 'processing' ? 'Processing on Server...' : 'Queued...'}
+                    </div>
+                 )}
+              </>
             ) : (
               <Camera size={48} color="#ccc" />
             )}
@@ -372,7 +365,7 @@ export default function SalesCMS() {
               Previous
             </button>
             <label htmlFor="camera-input" style={{ ...btnStyle, flex: 2, background: '#E32636', color: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-              <Camera size={18} /> Capture
+              <Camera size={18} /> Upload Frame
             </label>
             <button onClick={() => setCurrentCaptureFrame(Math.min(35, currentCaptureFrame + 1))} disabled={currentCaptureFrame === 35 || isProcessing} style={{ ...btnStyle, flex: 1, background: '#e0e0e0' }}>
               Skip
@@ -380,15 +373,23 @@ export default function SalesCMS() {
           </div>
 
           {frames.filter(f => f !== null).length === 36 && (
-            <button onClick={handlePublish} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', width: '100%', marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-              <Upload size={18} /> Publish to Inventory
+            <button onClick={handlePublish} style={{ ...btnStyle, background: serverStatuses.every(s => s === "done") ? '#1A3B5C' : '#999', color: 'white', width: '100%', marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+              <Upload size={18} /> {serverStatuses.every(s => s === "done") ? "Publish to Inventory" : "Waiting for server..."}
             </button>
           )}
           
           <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: '4px' }}>
-            {frames.map((f, i) => (
-              <div key={i} style={{ aspectRatio: '1', background: f ? '#4CAF50' : '#ddd', borderRadius: '2px', cursor: 'pointer' }} onClick={() => setCurrentCaptureFrame(i)} />
-            ))}
+            {frames.map((f, i) => {
+               let bg = '#ddd';
+               if (f) {
+                   if (serverStatuses[i] === 'done') bg = '#4CAF50';
+                   else if (serverStatuses[i] === 'processing') bg = '#FFC107';
+                   else bg = '#2196F3'; // Queued
+               }
+               return (
+                <div key={i} style={{ aspectRatio: '1', background: bg, borderRadius: '2px', cursor: 'pointer' }} onClick={() => setCurrentCaptureFrame(i)} />
+               );
+            })}
           </div>
         </div>
       )}

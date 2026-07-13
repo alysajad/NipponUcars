@@ -36,24 +36,45 @@ export const fetchModels = async () => {
  * Publishes a new car to the inventory by calling the FastAPI backend.
  * @param {Object} newCar - The car object containing details and 360 frames.
  */
-export const publishCar = async (newCar) => {
+export const initCar = async (newCar) => {
   try {
     const res = await fetch(`${API_BASE_URL}/api/cars`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newCar)
+      body: JSON.stringify(newCar),
     });
-    
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.detail || "Failed to publish car");
-    }
-    
-    const data = await res.json();
-    return data.car;
-  } catch (err) {
-    console.error("Failed to publish car to API:", err);
-    throw err;
+    if (!res.ok) throw new Error("Failed to initialize car");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const uploadFrames = async (carId, formData) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cars/${carId}/frames`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) throw new Error("Failed to upload frames");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const publishCar = async (carId) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cars/${carId}/publish`, {
+      method: "POST"
+    });
+    if (!res.ok) throw new Error("Failed to publish car");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
 };
 

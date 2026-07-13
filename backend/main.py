@@ -10,6 +10,18 @@ from supabase import create_client, Client
 import cloudinary
 import cloudinary.uploader
 from dotenv import load_dotenv
+from sse_starlette.sse import EventSourceResponse
+import redis
+import json
+import asyncio
+from celery import Celery as _Celery
+
+# Lazy reference to the Celery app — we use send_task() so we don't import
+# workers.bg_removal (which loads the heavy rembg model) into the FastAPI process.
+_celery_app = _Celery(
+    "bg_removal",
+    broker=os.environ.get("REDIS_URL", "redis://localhost:6379/0"),
+)
 
 load_dotenv()
 
@@ -33,6 +45,9 @@ supabase: Client = None
 if SUPABASE_URL and SUPABASE_KEY:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+redis_client = redis.from_url(REDIS_URL)
+
 # Configure Cloudinary
 cloudinary.config(
     cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
@@ -45,7 +60,6 @@ class CarPayload(BaseModel):
     desc: str
     specs: str
     price: str
-    frames: list[str]  # List of base64 encoded strings
 
 @app.get("/api/models")
 async def get_car_models():
@@ -121,43 +135,20 @@ async def bulk_upload_models(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
 
 @app.post("/api/cars")
-async def publish_car(car: CarPayload):
+async def init_car(car: CarPayload):
     """
-    Receives a new car entry with 36 base64 images.
-    Uploads images to Cloudinary, then stores the car metadata and image URLs in Supabase.
+    Initializes a new car entry in the database.
+    Frames will be uploaded separately to /api/cars/{id}/frames.
     """
-    if len(car.frames) != 36:
-        raise HTTPException(status_code=400, detail="Exactly 36 frames are required.")
-
     car_id = f"car_{uuid.uuid4().hex[:8]}"
-    uploaded_urls = []
 
-    # 1. Upload images to Cloudinary
-    try:
-        for idx, frame_b64 in enumerate(car.frames):
-            # Cloudinary accepts base64 directly
-            res = cloudinary.uploader.upload(
-                frame_b64,
-                folder=f"inventory/{car_id}",
-                public_id=f"frame_{idx:02d}"
-            )
-            uploaded_urls.append(res.get("secure_url"))
-    except Exception as e:
-        print(f"Cloudinary upload failed: {e}")
-        # For local testing without Cloudinary keys, we mock the URLs
-        if not os.environ.get("CLOUDINARY_API_KEY"):
-            uploaded_urls = car.frames
-        else:
-            raise HTTPException(status_code=500, detail="Failed to upload images to Cloudinary")
-
-    # 2. Save metadata to Supabase
     record = {
         "id": car_id,
         "name": car.name,
         "desc": car.desc,
         "specs": car.specs,
         "price": car.price,
-        "frames": uploaded_urls
+        "frames": [] # Start empty
     }
 
     if supabase:
@@ -168,7 +159,90 @@ async def publish_car(car: CarPayload):
     else:
         raise HTTPException(status_code=500, detail="Supabase not configured")
 
-    return {"status": "success", "car": record}
+    return {"status": "success", "id": car_id}
+
+@app.post("/api/cars/{car_id}/frames")
+async def upload_frames(car_id: str, files: list[UploadFile] = File(...)):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+        
+    results = []
+    # In a real app we'd map these sequentially, but for now we'll just queue them all
+    # We will get the current count of frames to determine the frame index
+    res = supabase.table("listing_frames").select("id", count="exact").eq("inventory_id", car_id).execute()
+    start_index = res.count if res.count else 0
+
+    for i, file in enumerate(files):
+        frame_idx = start_index + i
+        
+        # 1. Upload raw to Cloudinary immediately
+        contents = await file.read()
+        raw_res = cloudinary.uploader.upload(
+            contents,
+            folder=f"inventory/{car_id}/raw",
+            public_id=f"frame_{frame_idx:02d}",
+            resource_type="image",
+            overwrite=True
+        )
+        raw_url = raw_res["secure_url"]
+
+        # 2. Insert frame record in DB
+        frame_res = supabase.table("listing_frames").insert({
+            "inventory_id": car_id,
+            "frame_index": frame_idx,
+            "raw_url": raw_url,
+            "status": "queued"
+        }).execute()
+        frame_id = frame_res.data[0]["id"]
+
+        # 3. Enqueue Celery task
+        task = _celery_app.send_task(
+            "workers.bg_removal.remove_background_task",
+            kwargs={
+                "frame_id": frame_id,
+                "raw_url": raw_url,
+                "inventory_id": car_id,
+                "frame_index": frame_idx
+            }
+        )
+        
+        # Update job_id in DB
+        supabase.table("listing_frames").update({"job_id": task.id}).eq("id", frame_id).execute()
+        
+        results.append({"frame_id": frame_id, "job_id": task.id})
+
+    return {"car_id": car_id, "queued": len(results), "frames": results}
+
+@app.get("/api/cars/{car_id}/progress")
+async def job_progress(car_id: str):
+    async def event_stream():
+        pubsub = redis_client.pubsub()
+        pubsub.subscribe(f"inventory:{car_id}:progress")
+        try:
+            while True:
+                message = pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
+                if message is not None:
+                    yield {"data": message["data"].decode("utf-8")}
+                await asyncio.sleep(0.1)
+        finally:
+            pubsub.unsubscribe(f"inventory:{car_id}:progress")
+
+    return EventSourceResponse(event_stream())
+
+@app.post("/api/cars/{car_id}/publish")
+async def publish_listing(car_id: str):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+        
+    # Gather all finished frames and update the main inventory record
+    frames_res = supabase.table("listing_frames").select("processed_url").eq("inventory_id", car_id).eq("status", "done").order("frame_index").execute()
+    urls = [f["processed_url"] for f in frames_res.data]
+    
+    if not urls:
+        raise HTTPException(status_code=400, detail="No processed frames available")
+        
+    supabase.table("inventory").update({"frames": urls}).eq("id", car_id).execute()
+    return {"status": "published"}
 
 if __name__ == "__main__":
     import uvicorn
