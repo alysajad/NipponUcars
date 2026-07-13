@@ -6,6 +6,8 @@ services:
     buildCommand: "cd backend && pip install -r requirements.txt"
     startCommand: "cd backend && (celery -A workers.celery_app worker --loglevel=info --concurrency=1 -D && uvicorn main:app --host 0.0.0.0 --port $PORT)"
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_KEY
