@@ -2,30 +2,9 @@ services:
   - type: web
     name: ucars-fastapi
     env: python
+    plan: free
     buildCommand: "cd backend && pip install -r requirements.txt"
-    startCommand: "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
-    envVars:
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_KEY
-        sync: false
-      - key: CLOUDINARY_CLOUD_NAME
-        sync: false
-      - key: CLOUDINARY_API_KEY
-        sync: false
-      - key: CLOUDINARY_API_SECRET
-        sync: false
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: ucars-redis
-          property: connectionString
-
-  - type: worker
-    name: ucars-celery
-    env: python
-    buildCommand: "cd backend && pip install -r requirements.txt"
-    startCommand: "cd backend && celery -A workers.celery_app worker --loglevel=info --concurrency=2"
+    startCommand: "cd backend && (celery -A workers.celery_app worker --loglevel=info --concurrency=1 -D && uvicorn main:app --host 0.0.0.0 --port $PORT)"
     envVars:
       - key: SUPABASE_URL
         sync: false
