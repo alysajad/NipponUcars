@@ -1,7 +1,7 @@
 import os
 import uuid
 import base64
-from fastapi import FastAPI, HTTPException, Body, UploadFile, File
+from fastapi import FastAPI, HTTPException, Body, UploadFile, File, BackgroundTasks
 import pandas as pd
 import io
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,14 +14,7 @@ from sse_starlette.sse import EventSourceResponse
 import redis
 import json
 import asyncio
-from celery import Celery as _Celery
-
-# Lazy reference to the Celery app — we use send_task() so we don't import
-# workers.bg_removal (which loads the heavy rembg model) into the FastAPI process.
-_celery_app = _Celery(
-    "bg_removal",
-    broker=os.environ.get("REDIS_URL", "redis://localhost:6379/0"),
-)
+from bg_tasks import remove_background_task
 
 load_dotenv()
 
@@ -165,7 +158,7 @@ async def init_car(car: CarPayload):
     return {"status": "success", "id": car_id}
 
 @app.post("/api/cars/{car_id}/frames")
-async def upload_frames(car_id: str, files: list[UploadFile] = File(...)):
+async def upload_frames(car_id: str, background_tasks: BackgroundTasks, files: list[UploadFile] = File(...)):
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
         
@@ -198,21 +191,16 @@ async def upload_frames(car_id: str, files: list[UploadFile] = File(...)):
         }).execute()
         frame_id = frame_res.data[0]["id"]
 
-        # 3. Enqueue Celery task
-        task = _celery_app.send_task(
-            "workers.bg_removal.remove_background_task",
-            kwargs={
-                "frame_id": frame_id,
-                "raw_url": raw_url,
-                "inventory_id": car_id,
-                "frame_index": frame_idx
-            }
+        # 3. Enqueue FastAPI background task
+        background_tasks.add_task(
+            remove_background_task,
+            frame_id=frame_id,
+            raw_url=raw_url,
+            inventory_id=car_id,
+            frame_index=frame_idx
         )
         
-        # Update job_id in DB
-        supabase.table("listing_frames").update({"job_id": task.id}).eq("id", frame_id).execute()
-        
-        results.append({"frame_id": frame_id, "job_id": task.id})
+        results.append({"frame_id": frame_id})
 
     return {"car_id": car_id, "queued": len(results), "frames": results}
 
