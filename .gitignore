@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+.next/
+out/
+build/
+
+# Python Virtual Environments
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS Files
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Redis data (if any dumped)
+dump.rdb
+
+# Celery
+celerybeat-schedule
+*.pid
