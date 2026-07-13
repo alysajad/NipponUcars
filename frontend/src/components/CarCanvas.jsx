@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState, Suspense, useMemo } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
-import { Environment, ContactShadows } from '@react-three/drei';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { Environment, ContactShadows, useGLTF } from '@react-three/drei';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -10,21 +8,16 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const MODELS = [
-  "/toyota_fortuner_2021-optimized.glb",
-  "/toyota-corolla-e170-2017-compressed.glb",
-  "/2021_tata_safari-compressed.glb",
-  "/2024_toyota_land_cruiser_lc300_vxr_409_tt-compressed.glb",
-  "/toyota_gr_supra-compressed.glb"
+  "https://res.cloudinary.com/vdofesxh/raw/upload/v1783927072/3d_models/hilux-ultra.glb",
+  "https://res.cloudinary.com/vdofesxh/raw/upload/v1783926380/3d_models/toyota_fortuner_2021-optimized.glb",
+  "https://res.cloudinary.com/vdofesxh/raw/upload/v1783926381/3d_models/toyota-corolla-e170-2017-compressed.glb",
+  "https://res.cloudinary.com/vdofesxh/raw/upload/v1783926387/3d_models/2021_tata_safari-compressed.glb",
+  "https://res.cloudinary.com/vdofesxh/raw/upload/v1783926390/3d_models/2024_toyota_land_cruiser_lc300_vxr_409_tt-compressed.glb",
+  "https://res.cloudinary.com/vdofesxh/raw/upload/v1783926394/3d_models/toyota_gr_supra-compressed.glb"
 ];
 
 function useDracoGLTF(path) {
-  const gltf = useLoader(GLTFLoader, path, (loader) => {
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
-    dracoLoader.setDecoderConfig({ type: 'js' });
-    loader.setDRACOLoader(dracoLoader);
-  });
-  return gltf;
+  return useGLTF(path, true, true);
 }
 
 function CarModel({ path, scrollProxy, isActive, initialScale = 1.5, initialY = -1 }) {

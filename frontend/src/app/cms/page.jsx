@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, Upload, CheckCircle, ChevronLeft } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { publishCar, fetchModels } from '@/api/inventoryApi';
+import { publishCar, fetchModels, uploadBulkModels } from '@/api/inventoryApi';
 import { removeBackground } from '@imgly/background-removal';
 
 const CaptureGuide = ({ frame }) => {
@@ -83,6 +83,9 @@ export default function SalesCMS() {
   const [frames, setFrames] = useState(Array(36).fill(null));
   const [currentCaptureFrame, setCurrentCaptureFrame] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pin, setPin] = useState('');
+  const [isUploadingBulk, setIsUploadingBulk] = useState(false);
   
   const { data: models = [], isLoading: modelsLoading } = useQuery({
     queryKey: ['models'],
@@ -128,6 +131,32 @@ export default function SalesCMS() {
       setStep(2);
     } else {
       alert("Please fill out basic car details first.");
+    }
+  };
+
+  const handleBulkUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setIsUploadingBulk(true);
+    try {
+      await uploadBulkModels(file);
+      alert("Models successfully bulk-uploaded!");
+      queryClient.invalidateQueries({ queryKey: ['models'] });
+    } catch (err) {
+      alert("Failed to upload models: " + err.message);
+    } finally {
+      setIsUploadingBulk(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (pin === '1234') {
+      setIsAuthenticated(true);
+    } else {
+      alert('Incorrect PIN');
     }
   };
 
@@ -194,7 +223,7 @@ export default function SalesCMS() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const publishCar = async () => {
+  const handlePublish = async () => {
     if (frames.some(f => f === null)) {
       alert("Please capture all 36 frames before publishing.");
       return;
@@ -224,6 +253,32 @@ export default function SalesCMS() {
     return `Move 10 degrees right (Angle ${currentCaptureFrame * 10}°)`;
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div className="cms-page" style={{ padding: '20px', minHeight: '100vh', background: '#f4f4f4', color: '#333', fontFamily: 'sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', textAlign: 'center', maxWidth: '400px', width: '100%' }}>
+          <h2>Sales Portal Login</h2>
+          <p style={{ color: '#666', marginBottom: '20px' }}>Enter the access PIN to continue.</p>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <input 
+              type="password" 
+              placeholder="Enter PIN (1234)" 
+              value={pin} 
+              onChange={(e) => setPin(e.target.value)} 
+              style={{...inputStyle, textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.2rem'}} 
+            />
+            <button type="submit" style={{ ...btnStyle, background: '#E32636', color: 'white' }}>
+              Authenticate
+            </button>
+          </form>
+          <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: '#666', marginTop: '15px', cursor: 'pointer', textDecoration: 'underline' }}>
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="cms-page" style={{ padding: '20px', minHeight: '100vh', background: '#f4f4f4', color: '#333', fontFamily: 'sans-serif' }}>
       <header style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
@@ -234,7 +289,25 @@ export default function SalesCMS() {
       </header>
 
       {step === 1 && (
-        <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+        <>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', marginBottom: '20px' }}>
+            <h3>Admin Dashboard</h3>
+            <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>Bulk upload car models (Excel/CSV) to populate the dropdown below.</p>
+            <label style={{ ...btnStyle, background: '#1A3B5C', color: 'white', display: 'inline-block', cursor: 'pointer' }}>
+              {isUploadingBulk ? "Uploading..." : "Upload Inventory Sheet"}
+              <input 
+                type="file" 
+                accept=".csv, .xlsx, .xls" 
+                onChange={handleBulkUpload} 
+                style={{ display: 'none' }} 
+                disabled={isUploadingBulk}
+              />
+            </label>
+            <p style={{ fontSize: '0.8rem', color: '#999', marginTop: '10px' }}>Requires columns: id, name, specs</p>
+          </div>
+
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+
           <h3>Add New Vehicle</h3>
           <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '20px' }}>Enter the vehicle specifications before starting the 360° capture.</p>
           
@@ -261,7 +334,8 @@ export default function SalesCMS() {
               Proceed to Capture
             </button>
           </div>
-        </div>
+          </div>
+        </>
       )}
 
       {step === 2 && (
@@ -306,7 +380,7 @@ export default function SalesCMS() {
           </div>
 
           {frames.filter(f => f !== null).length === 36 && (
-            <button onClick={publishCar} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', width: '100%', marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+            <button onClick={handlePublish} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', width: '100%', marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
               <Upload size={18} /> Publish to Inventory
             </button>
           )}

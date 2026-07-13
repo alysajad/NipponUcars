@@ -65,7 +65,7 @@ export default function Inventory() {
 
   return (
     <div className="inventory-page">
-      <Link to="/" className="inventory-back-link">
+      <Link href="/" className="inventory-back-link">
         <Home size={20} /> BACK TO HOME
       </Link>
       

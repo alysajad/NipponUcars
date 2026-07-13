@@ -1,23 +1,16 @@
 import React, { useRef, useEffect, useState, Suspense, useMemo } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
-import { Environment, ContactShadows } from '@react-three/drei';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { Environment, ContactShadows, useGLTF } from '@react-three/drei';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Setup Draco decoder for compressed models
+// Replaced manual useLoader with Drei's useGLTF which handles caching and decoders automatically
 function useDracoGLTF(path) {
-  const gltf = useLoader(GLTFLoader, path, (loader) => {
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
-    dracoLoader.setDecoderConfig({ type: 'js' });
-    loader.setDRACOLoader(dracoLoader);
-  });
-  return gltf;
+  // useGLTF(path, useDraco, useMeshopt)
+  return useGLTF(path, true, true);
 }
 
 class ErrorBoundary extends React.Component {
@@ -160,10 +153,10 @@ export default function LandingCanvas() {
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
         <Environment preset="city" />
         <Suspense fallback={null}>
-          <ErrorBoundary><CarModel path="/toyota_hilux_revo_prerunner_2021-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 0} initialScale={1.5} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="/toyota_fortuner_2021-optimized.glb" scrollProxy={scrollProxy} isActive={activeModel === 1} initialScale={1.5} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="/toyota-corolla-e170-2017-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 2} initialScale={1.2} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="/2021_tata_safari-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 3} initialScale={1.2} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783927072/3d_models/hilux-ultra.glb" scrollProxy={scrollProxy} isActive={activeModel === 0} initialScale={1.5} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926380/3d_models/toyota_fortuner_2021-optimized.glb" scrollProxy={scrollProxy} isActive={activeModel === 1} initialScale={1.5} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926381/3d_models/toyota-corolla-e170-2017-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 2} initialScale={1.2} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926387/3d_models/2021_tata_safari-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 3} initialScale={1.2} /></ErrorBoundary>
           <ContactShadows position={[0, -1.01, 0]} opacity={0.35} scale={20} blur={2.5} far={4} />
         </Suspense>
       </Canvas>

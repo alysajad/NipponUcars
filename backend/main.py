@@ -1,12 +1,17 @@
 import os
 import uuid
 import base64
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, UploadFile, File
+import pandas as pd
+import io
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from supabase import create_client, Client
 import cloudinary
 import cloudinary.uploader
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -19,7 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load environment variables (In production, use python-dotenv)
+# Load environment variables
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 
@@ -66,6 +71,55 @@ async def get_car_models():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/inventory")
+async def get_inventory():
+    """
+    Returns a list of cars available in the inventory.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    try:
+        response = supabase.table("inventory").select("*").execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/models/bulk")
+async def bulk_upload_models(file: UploadFile = File(...)):
+    """
+    Accepts a CSV or Excel file containing car models and bulk upserts them to the database.
+    Required columns: id, name, specs.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database not configured")
+        
+    contents = await file.read()
+    try:
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(io.BytesIO(contents))
+        elif file.filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(io.BytesIO(contents))
+        else:
+            raise HTTPException(status_code=400, detail="Only CSV or Excel files are allowed")
+            
+        # Ensure correct columns exist
+        required_cols = {'id', 'name', 'specs'}
+        if not required_cols.issubset(set(df.columns)):
+            raise HTTPException(status_code=400, detail=f"File must contain columns: {', '.join(required_cols)}")
+            
+        # Replace NaN with empty strings and convert to dict
+        df = df.fillna('')
+        records = df[['id', 'name', 'specs']].to_dict(orient='records')
+        
+        # Upsert into supabase
+        response = supabase.table("car_models").upsert(records).execute()
+        return {"status": "success", "inserted": len(records), "data": response.data}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+
 @app.post("/api/cars")
 async def publish_car(car: CarPayload):
     """
@@ -111,6 +165,8 @@ async def publish_car(car: CarPayload):
             supabase.table("inventory").insert(record).execute()
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    else:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
 
     return {"status": "success", "car": record}
 

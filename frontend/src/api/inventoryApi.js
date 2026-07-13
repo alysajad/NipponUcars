@@ -7,14 +7,10 @@ const API_BASE_URL = 'http://localhost:8000'; // FastAPI backend
  */
 export const fetchInventory = async () => {
   try {
-    // We could fetch from /api/cars later. Using mock data for display.
-    return [
-      { id: "hilux", name: "HILUX REVO", desc: "Toyota Hilux Revo 2021", specs: "2.8L Prerunner", price: "₹ 30,00,000", scale: 1.2, frames: [] },
-      { id: "fortuner", name: "FORTUNER", desc: "Toyota Fortuner 2021", specs: "2.8L Diesel | 201 BHP", price: "₹ 35,50,000", scale: 1.2, frames: [] },
-      { id: "corolla", name: "COROLLA", desc: "Toyota Corolla e170", specs: "1.8L Hybrid | 121 BHP", price: "₹ 18,20,000", scale: 1.0, frames: [] },
-      { id: "land-cruiser", name: "LAND CRUISER", desc: "Toyota Land Cruiser LC300", specs: "3.3L Twin-Turbo V6", price: "₹ 2,10,00,000", scale: 1.0, frames: [] },
-      { id: "supra", name: "GR SUPRA", desc: "Toyota GR Supra", specs: "3.0L Turbo Inline-6", price: "₹ 85,00,000", scale: 1.1, frames: [] }
-    ];
+    const res = await fetch(`${API_BASE_URL}/api/inventory`);
+    if (!res.ok) throw new Error("Failed to fetch inventory");
+    const data = await res.json();
+    return data;
   } catch (err) {
     console.error("Failed to load inventory:", err);
     return [];
@@ -57,6 +53,31 @@ export const publishCar = async (newCar) => {
     return data.car;
   } catch (err) {
     console.error("Failed to publish car to API:", err);
+    throw err;
+  }
+};
+
+/**
+ * Uploads a bulk models Excel/CSV file to the FastAPI backend.
+ */
+export const uploadBulkModels = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/models/bulk`, {
+      method: "POST",
+      body: formData
+    });
+    
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.detail || "Failed to bulk upload models");
+    }
+    
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to upload bulk models:", err);
     throw err;
   }
 };
