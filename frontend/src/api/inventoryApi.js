@@ -7,7 +7,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
  */
 export const fetchInventory = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/inventory`);
+    const res = await fetch(`${API_BASE_URL}/api/inventory`, { cache: 'no-store' });
     if (!res.ok) throw new Error("Failed to fetch inventory");
     const data = await res.json();
     return data;

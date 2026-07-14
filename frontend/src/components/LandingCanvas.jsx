@@ -13,6 +13,12 @@ function useDracoGLTF(path) {
   return useGLTF(path, true, true);
 }
 
+// Preload models so they fetch instantly in the background, fixing slow render times
+useGLTF.preload("https://res.cloudinary.com/vdofesxh/raw/upload/v1783927072/3d_models/hilux-ultra.glb");
+useGLTF.preload("https://res.cloudinary.com/vdofesxh/raw/upload/v1783926380/3d_models/toyota_fortuner_2021-optimized.glb");
+useGLTF.preload("https://res.cloudinary.com/vdofesxh/raw/upload/v1783926381/3d_models/toyota-corolla-e170-2017-compressed.glb");
+useGLTF.preload("https://res.cloudinary.com/vdofesxh/raw/upload/v1783926387/3d_models/2021_tata_safari-compressed.glb");
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -52,27 +58,16 @@ function CarModel({ path, scrollProxy, isActive, initialScale = 1.5, initialY = 
         // Subtle 10% scale shift
         gsap.fromTo(innerGroup.current.scale,
           { x: initialScale * 0.9, y: initialScale * 0.9, z: initialScale * 0.9 },
-          { x: initialScale, y: initialScale, z: initialScale, duration: 1.0, ease: "power2.out", overwrite: "auto" }
+          { x: initialScale, y: initialScale, z: initialScale, duration: 1.2, ease: "power2.out", overwrite: "auto" }
         );
         // Gentle slide in
         gsap.fromTo(innerGroup.current.position,
           { z: -3 },
-          { z: 0, duration: 1.0, ease: "power2.out", overwrite: "auto" }
+          { z: 0, duration: 1.2, ease: "power2.out", overwrite: "auto" }
         );
       } else {
-        gsap.to(innerGroup.current.scale, {
-          x: initialScale * 0.9, y: initialScale * 0.9, z: initialScale * 0.9,
-          duration: 0.6, ease: "power2.in", overwrite: "auto"
-        });
-        gsap.to(innerGroup.current.position, {
-          z: 3,
-          duration: 0.6,
-          ease: "power2.in",
-          overwrite: "auto",
-          onComplete: () => {
-            if (innerGroup.current) innerGroup.current.visible = false;
-          }
-        });
+        // Instantly hide inactive models to prevent them from overlapping with the active one during fast scrolls
+        innerGroup.current.visible = false;
       }
     }
   }, [isActive, initialScale]);
@@ -96,16 +91,32 @@ function PerformanceManager() {
 }
 
 export default function LandingCanvas() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Set up mobile detection
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const scrollProxy = useRef({
     rotationY: -Math.PI / 4,
-    positionX: 0,
+    positionX: 0, 
     positionZ: 0
   }).current;
+
+  // Update initial positionX when isMobile changes
+  useEffect(() => {
+    // Increased from 1.5 to 2.2 to prevent overlap with left-aligned hero text
+    scrollProxy.positionX = isMobile ? 0 : 2.2;
+  }, [isMobile, scrollProxy]);
 
   const [activeModel, setActiveModel] = useState(0);
 
   useEffect(() => {
-    const verticalSections = ['sec-0', 'sec-1', 'sec-2', 'sec-3'];
+    const verticalSections = ['sec-0', 'sec-1', 'sec-2', 'sec-3', 'sec-4'];
     verticalSections.forEach((id, i) => {
       const el = document.getElementById(id);
       if (el) {
@@ -119,31 +130,36 @@ export default function LandingCanvas() {
       }
     });
 
-    const sec3 = document.getElementById('sec-3');
-    const scrollEnd = sec3 ? sec3.offsetTop + sec3.offsetHeight : 3000;
+    const sec4 = document.getElementById('sec-4');
+    const scrollEnd = sec4 ? sec4.offsetTop + sec4.offsetHeight : 4000;
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: ".content-layer",
         start: "top top",
         end: () => scrollEnd,
-        scrub: 1.5, // smoother scrub
+        scrub: 3, // Much smoother/slower scrub
       }
     });
 
-    tl.to(scrollProxy, { rotationY: Math.PI / 2, positionX: -3, positionZ: 1, ease: "power1.inOut" }, 0);
-    tl.to(scrollProxy, { rotationY: Math.PI, positionX: 3, positionZ: -2, ease: "power1.inOut" }, 1);
-    tl.to(scrollProxy, { rotationY: -Math.PI / 6, positionX: 0, positionZ: 3, ease: "power1.inOut" }, 2);
+    // Dynamic swings based on mobile (less horizontal movement on narrow screens)
+    // Increased X offsets (2.2) to prevent models from overlapping with text blocks
+    const m = isMobile ? 0 : 1; 
+    
+    tl.to(scrollProxy, { rotationY: Math.PI / 3,  positionX: -2.2 * m, positionZ: 0.5,  ease: "none" }, 0); // Sec 1 (Text right)
+    tl.to(scrollProxy, { rotationY: Math.PI * 0.7, positionX: 2.2 * m,  positionZ: -0.5, ease: "none" }, 1); // Sec 2 (Text left)
+    tl.to(scrollProxy, { rotationY: -Math.PI / 6,  positionX: -2.2 * m,   positionZ: 1,    ease: "none" }, 2); // Sec 3 (Text right)
+    tl.to(scrollProxy, { rotationY: Math.PI / 4,   positionX: 0,        positionZ: 0,    ease: "none" }, 3); // Sec 4
     
     return () => {
       ScrollTrigger.getAll().forEach(t => t.kill());
     };
-  }, [scrollProxy]);
+  }, [scrollProxy, isMobile]);
 
   return (
     <div className="canvas-container">
       <Canvas
-        camera={{ position: [0, 2, 8], fov: 45 }}
+        camera={{ position: [0, 2, 8], fov: isMobile ? 65 : 45 }}
         dpr={[1, 1.5]}
         performance={{ min: 0.5 }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
@@ -153,11 +169,11 @@ export default function LandingCanvas() {
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
         <Environment preset="city" />
         <Suspense fallback={null}>
-          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783927072/3d_models/hilux-ultra.glb" scrollProxy={scrollProxy} isActive={activeModel === 0} initialScale={1.5} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926380/3d_models/toyota_fortuner_2021-optimized.glb" scrollProxy={scrollProxy} isActive={activeModel === 1} initialScale={1.5} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926381/3d_models/toyota-corolla-e170-2017-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 2} initialScale={1.2} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926387/3d_models/2021_tata_safari-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 3} initialScale={1.2} /></ErrorBoundary>
-          <ContactShadows position={[0, -1.01, 0]} opacity={0.35} scale={20} blur={2.5} far={4} />
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783927072/3d_models/hilux-ultra.glb" scrollProxy={scrollProxy} isActive={activeModel === 0} initialScale={1.5} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926380/3d_models/toyota_fortuner_2021-optimized.glb" scrollProxy={scrollProxy} isActive={activeModel === 1} initialScale={1.8} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926381/3d_models/toyota-corolla-e170-2017-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 2} initialScale={1.3} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926387/3d_models/2021_tata_safari-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 3} initialScale={1.3} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
+          <ContactShadows position={[0, isMobile ? -1.51 : -1.01, 0]} opacity={0.35} scale={20} blur={2.5} far={4} />
         </Suspense>
       </Canvas>
     </div>

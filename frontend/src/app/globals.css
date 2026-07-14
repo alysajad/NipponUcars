@@ -355,18 +355,18 @@ p {
 
 .inventory-back-link {
   position: absolute;
-  top: 2rem;
+  top: 1.5rem;
   left: 2rem;
-  z-index: 10;
+  z-index: 20;
   color: var(--dark-grey);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
   font-weight: bold;
-  font-size: 0.95rem;
-  padding: 0.6rem 1.2rem;
-  background: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255,255,255,0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 8px;
@@ -374,10 +374,11 @@ p {
 }
 
 .inventory-back-link:hover {
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.95);
   transform: translateX(-4px);
 }
 
+/* Background watermark title */
 .inventory-bg-title {
   position: absolute;
   top: 50%;
@@ -398,79 +399,266 @@ p {
   transition: opacity 0.4s ease;
 }
 
-.inventory-panel {
+/* ─── Inventory: Top Info Bar ─── */
+.inv-top-bar {
   position: absolute;
-  z-index: 10;
-  color: var(--dark-grey);
-}
-
-.inventory-panel.tl { top: 12%; left: 5%; max-width: 350px; }
-.inventory-panel.bl { bottom: 12%; left: 5%; max-width: 400px; }
-.inventory-panel.tr { top: 12%; right: 8%; max-width: 300px; text-align: right; }
-.inventory-panel.br { bottom: 12%; right: 8%; max-width: 300px; text-align: right; }
-
-.inventory-panel h2 {
-  font-family: var(--font-sailors);
-  font-size: clamp(1.8rem, 3.5vw, 3.5rem);
-  color: var(--primary-red);
-  margin-bottom: 0.5rem;
-  line-height: 1.1;
-}
-
-.panel-label {
-  color: #888;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
-  display: block;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-}
-
-.price-tag {
-  font-size: 2.2rem;
-  font-weight: bold;
-  color: var(--primary-red);
-}
-
-.features-wrap {
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 15;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 5rem 5% 0 5%;
+  pointer-events: none;
 }
 
-.feature-badge {
-  background: transparent;
-  border: 1px solid rgba(215, 25, 33, 0.3);
+.inv-top-left {
+  max-width: 380px;
+}
+
+.inv-top-left h2 {
+  font-family: var(--font-sailors);
+  font-size: clamp(1.4rem, 2.5vw, 2.5rem);
   color: var(--primary-red);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: bold;
+  line-height: 1.15;
+  margin-bottom: 0.3rem;
 }
 
-.specs-grid-2x2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+.inv-car-name {
+  font-size: 1rem;
+  color: #888;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0;
 }
 
-.specs-grid-2x2.right-align {
+.inv-top-right {
   text-align: right;
 }
 
-.spec-box {
-  font-size: 1.2rem;
+.inv-price-label {
+  color: #888;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.inv-price {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-red);
+  line-height: 1;
+}
+
+/* ─── Inventory: Bottom Info Bar ─── */
+.inv-bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 15;
+  padding: 0 5% 4.5rem 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.inv-bottom-left {
+  max-width: 420px;
+}
+
+.inv-specs-row {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.inv-spec-item {
+  font-size: 1.05rem;
   font-weight: bold;
   color: var(--dark-grey);
 }
 
-.spec-box span {
+.inv-spec-item span {
   color: #888;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   display: block;
   font-weight: normal;
   letter-spacing: 1px;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.15rem;
+}
+
+.inv-bottom-right {
+  max-width: 360px;
+}
+
+.inv-features-label {
+  color: #888;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  text-align: right;
+}
+
+.inv-features-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.inv-feature-badge {
+  background: transparent;
+  border: 1px solid rgba(215, 25, 33, 0.3);
+  color: var(--primary-red);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+/* ─── Inventory Navigation Controls ─── */
+.inventory-controls {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 1.5rem;
+  pointer-events: none;
+}
+
+.inventory-nav-btn {
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: var(--dark-grey);
+  padding: 1rem;
+  cursor: pointer;
+  border-radius: 50%;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  pointer-events: auto;
+}
+
+.inventory-nav-btn:hover {
+  background: rgba(255,255,255,0.9);
+  transform: scale(1.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+
+.inventory-nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* Inventory dot indicators */
+.inventory-dots {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.6rem;
+  z-index: 20;
+}
+
+.inventory-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.15);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.inventory-dot.active {
+  background: var(--primary-red);
+  transform: scale(1.4);
+  box-shadow: 0 0 8px rgba(215, 25, 33, 0.4);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 1.5rem;
+  }
+
+  .hero-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 2rem;
+    gap: 1rem;
+  }
+
+  .section {
+    padding: 2rem 1.5rem;
+  }
+
+  .section-content {
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+
+  .main-nav {
+    gap: 0.25rem;
+  }
+
+  .nav-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .inv-top-bar, .inv-bottom-bar {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .inv-top-bar {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .inv-top-right { text-align: left; }
+
+  .inv-bottom-bar {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .inv-features-wrap { justify-content: flex-start; }
+  .inv-features-label { text-align: left; }
+
+  .inventory-controls {
+    padding: 0 0.5rem;
+  }
+}
+
+/* ─── Animations ─── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* App-level overrides - kept minimal, global styles are in index.css */

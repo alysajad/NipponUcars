@@ -3,87 +3,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, Upload, CheckCircle, ChevronLeft } from 'lucide-react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { initCar, uploadFrames, publishCar as publishCarApi, fetchModels, uploadBulkModels } from '@/api/inventoryApi';
-
-const CaptureGuide = ({ frame }) => {
-  const angle = frame * 10;
-  
-  return (
-    <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 15px' }}>
-      {/* Car Top-Down View */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '36px',
-        height: '76px',
-        background: '#1A3B5C',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-      }}>
-        {/* Headlights (indicates front pointing UP) */}
-        <div style={{ position: 'absolute', top: '2px', left: '4px', width: '6px', height: '4px', background: '#FFF', borderRadius: '2px' }} />
-        <div style={{ position: 'absolute', top: '2px', right: '4px', width: '6px', height: '4px', background: '#FFF', borderRadius: '2px' }} />
-        {/* Windshield */}
-        <div style={{ position: 'absolute', top: '15px', left: '4px', right: '4px', height: '15px', background: '#87CEEB', borderRadius: '4px 4px 0 0', opacity: 0.8 }} />
-        {/* Rear window */}
-        <div style={{ position: 'absolute', bottom: '8px', left: '6px', right: '6px', height: '8px', background: '#87CEEB', borderRadius: '0 0 2px 2px', opacity: 0.8 }} />
-      </div>
-      
-      {/* Rotating Camera Indicator */}
-      <div style={{
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        transform: `rotate(${angle}deg)`,
-        transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: '0',
-          left: '50%',
-          transform: 'translate(-50%, -50%) rotate(-' + angle + 'deg)', // Keep icon upright
-          background: '#E32636',
-          borderRadius: '50%',
-          padding: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(227,38,54,0.5)',
-          zIndex: 10
-        }}>
-          <Camera size={16} color="white" />
-        </div>
-        {/* Line pointing to car */}
-        <div style={{
-          position: 'absolute',
-          top: '16px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '2px',
-          height: '24px',
-          background: 'rgba(227,38,54,0.5)'
-        }} />
-      </div>
-    </div>
-  );
-};
 
 export default function SalesCMS() {
   const [step, setStep] = useState(1); // 1: Details, 2: Capture, 3: Processing
   const [carDetails, setCarDetails] = useState({
-    name: '', desc: '', specs: '', price: ''
+    name: '', desc: '', price: '',
+    year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: ''
   });
+  const [features, setFeatures] = useState([]);
+  const [newFeature, setNewFeature] = useState('');
   
   const [activeCarId, setActiveCarId] = useState(null);
-  const [frames, setFrames] = useState(Array(36).fill(null)); // Stores object URLs for preview
-  const [serverStatuses, setServerStatuses] = useState(Array(36).fill('queued'));
+  const [frames, setFrames] = useState([]); // Stores object URLs for preview and processed URLs
+  const [serverStatuses, setServerStatuses] = useState([]); // 'queued', 'processing', 'done'
   
-  const [currentCaptureFrame, setCurrentCaptureFrame] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pin, setPin] = useState('');
@@ -105,22 +40,57 @@ export default function SalesCMS() {
     if (name === "model_id") {
       const selectedModel = models.find(m => m.id === value);
       if (selectedModel) {
+        let parsedSpecs = {};
+        try { parsedSpecs = JSON.parse(selectedModel.specs || "{}"); } catch(e){}
         setCarDetails(prev => ({
           ...prev,
           name: selectedModel.name,
-          specs: selectedModel.specs,
-          model_id: value
+          model_id: value,
+          year: parsedSpecs.year || '',
+          fuel: parsedSpecs.fuel || '',
+          transmission: parsedSpecs.transmission || '',
+          km: parsedSpecs.km || '',
+          engineCC: parsedSpecs.engineCC || '',
+          owner: parsedSpecs.owner || '',
+          variant: parsedSpecs.variant || ''
         }));
+        setFeatures(parsedSpecs.features || []);
       }
     } else {
       setCarDetails(prev => ({ ...prev, [name]: value }));
     }
   };
 
+  const addFeature = (e) => {
+    e.preventDefault();
+    if (newFeature.trim() && !features.includes(newFeature.trim())) {
+      setFeatures([...features, newFeature.trim()]);
+      setNewFeature('');
+    }
+  };
+
+  const removeFeature = (fToRemove) => {
+    setFeatures(features.filter(f => f !== fToRemove));
+  };
+
   const startCapture = async () => {
     if (carDetails.name && carDetails.desc && carDetails.price) {
       try {
-        const res = await initCar(carDetails);
+        const payload = {
+          ...carDetails,
+          specs: JSON.stringify({
+            brand: carDetails.name.split(' ')[0],
+            year: carDetails.year,
+            fuel: carDetails.fuel,
+            transmission: carDetails.transmission,
+            km: carDetails.km,
+            engineCC: carDetails.engineCC,
+            owner: carDetails.owner,
+            variant: carDetails.variant,
+            features: features
+          })
+        };
+        const res = await initCar(payload);
         setActiveCarId(res.id);
         
         // Start listening to SSE
@@ -185,30 +155,31 @@ export default function SalesCMS() {
     }
   };
 
-  const handleFileCapture = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleMultiFileCapture = async (e) => {
+    const files = Array.from(e.target.files);
+    const availableSlots = 7 - frames.length;
+    const filesToUpload = files.slice(0, availableSlots);
+    
+    if (filesToUpload.length === 0) return;
 
     setIsProcessing(true);
     
+    // Create local previews
+    const localPreviews = filesToUpload.map(file => URL.createObjectURL(file));
+    setFrames(prev => [...prev, ...localPreviews]);
+    
+    // Set statuses to queued
+    const newStatuses = filesToUpload.map(() => 'queued');
+    setServerStatuses(prev => [...prev, ...newStatuses]);
+
     try {
         const formData = new FormData();
-        formData.append("files", file);
-        
-        // Immediately show a local preview
-        const localPreview = URL.createObjectURL(file);
-        const newFrames = [...frames];
-        newFrames[currentCaptureFrame] = localPreview;
-        setFrames(newFrames);
+        filesToUpload.forEach(file => formData.append("files", file));
         
         // Upload asynchronously
         await uploadFrames(activeCarId, formData);
-        
-        if (currentCaptureFrame < 35) {
-          setCurrentCaptureFrame(prev => prev + 1);
-        }
     } catch (e) {
-        alert("Failed to upload frame");
+        alert("Failed to upload frames");
     }
     
     setIsProcessing(false);
@@ -216,8 +187,12 @@ export default function SalesCMS() {
   };
 
   const handlePublish = async () => {
+    if (frames.length === 0) {
+      alert("Please upload at least one image.");
+      return;
+    }
     if (serverStatuses.some(s => s !== "done")) {
-      alert("Please wait for all 36 frames to finish processing on the server.");
+      alert("Please wait for all images to finish background removal processing.");
       return;
     }
     
@@ -231,14 +206,6 @@ export default function SalesCMS() {
         alert("Publish failed: " + e.message);
         setStep(2);
     }
-  };
-
-  const getCaptureInstruction = () => {
-    if (currentCaptureFrame === 0) return "Direct Front";
-    if (currentCaptureFrame === 9) return "Right Side Profile";
-    if (currentCaptureFrame === 18) return "Direct Rear";
-    if (currentCaptureFrame === 27) return "Left Side Profile";
-    return `Move 10 degrees right (Angle ${currentCaptureFrame * 10}°)`;
   };
 
   if (!isAuthenticated) {
@@ -297,7 +264,7 @@ export default function SalesCMS() {
           <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
 
           <h3>Add New Vehicle</h3>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '20px' }}>Enter the vehicle specifications before starting the 360° capture.</p>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '20px' }}>Enter the vehicle specifications before uploading images.</p>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <select 
@@ -308,18 +275,49 @@ export default function SalesCMS() {
             >
               <option value="" disabled>Select Vehicle Model</option>
               {models.map(m => (
-                <option key={m.id} value={m.id}>{m.name} ({m.specs})</option>
+                <option key={m.id} value={m.id}>{m.name}</option>
               ))}
             </select>
             {modelsLoading && <span style={{fontSize: '0.8rem', color: '#666'}}>Loading models from database...</span>}
             
             <input name="name" placeholder="Car Name (Auto-filled)" value={carDetails.name} readOnly style={{...inputStyle, background: '#f9f9f9', color: '#888'}} />
+            <input name="variant" placeholder="Variant (e.g., 1.5 SX Opt)" value={carDetails.variant} onChange={handleInputChange} style={inputStyle} />
             <input name="desc" placeholder="Short Description (e.g., Mint Condition, 1 Owner)" value={carDetails.desc} onChange={handleInputChange} style={inputStyle} />
-            <input name="specs" placeholder="Specs (Auto-filled)" value={carDetails.specs} readOnly style={{...inputStyle, background: '#f9f9f9', color: '#888'}} />
             <input name="price" placeholder="Price (e.g., ₹ 18,20,000)" value={carDetails.price} onChange={handleInputChange} style={inputStyle} />
             
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <input name="year" placeholder="Year (e.g., 2022)" value={carDetails.year} onChange={handleInputChange} style={inputStyle} />
+              <input name="km" placeholder="Kilometers (e.g., 21000)" value={carDetails.km} onChange={handleInputChange} style={inputStyle} />
+              <input name="fuel" placeholder="Fuel Type (Petrol/Diesel)" value={carDetails.fuel} onChange={handleInputChange} style={inputStyle} />
+              <input name="transmission" placeholder="Transmission (Auto/Manual)" value={carDetails.transmission} onChange={handleInputChange} style={inputStyle} />
+              <input name="engineCC" placeholder="Engine CC (e.g., 1498)" value={carDetails.engineCC} onChange={handleInputChange} style={inputStyle} />
+              <input name="owner" placeholder="Owner (e.g., 1st Owner)" value={carDetails.owner} onChange={handleInputChange} style={inputStyle} />
+            </div>
+
+            <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '6px' }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#666' }}>Features</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
+                {features.map((f, i) => (
+                  <span key={i} style={{ background: '#E32636', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    {f}
+                    <button onClick={() => removeFeature(f)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 0, fontSize: '1rem', lineHeight: 1 }}>&times;</button>
+                  </span>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input 
+                  value={newFeature} 
+                  onChange={e => setNewFeature(e.target.value)} 
+                  onKeyDown={e => e.key === 'Enter' && addFeature(e)}
+                  placeholder="Add a feature (e.g., Sunroof)" 
+                  style={{...inputStyle, flex: 1, padding: '8px'}} 
+                />
+                <button onClick={addFeature} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', padding: '8px 15px' }}>Add</button>
+              </div>
+            </div>
+            
             <button onClick={startCapture} style={{ ...btnStyle, background: '#E32636', color: 'white', marginTop: '10px' }}>
-              Proceed to Capture
+              Proceed to Upload Images
             </button>
           </div>
           </div>
@@ -328,69 +326,44 @@ export default function SalesCMS() {
 
       {step === 2 && (
         <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', textAlign: 'center' }}>
-          <h3>360° Server Processing</h3>
-          <div style={{ background: '#f0f0f0', borderRadius: '8px', padding: '15px', margin: '15px 0' }}>
-            <CaptureGuide frame={currentCaptureFrame} />
-            <h4 style={{ margin: '0 0 5px 0', color: '#E32636' }}>Frame {currentCaptureFrame + 1} / 36</h4>
-            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '1.1rem' }}>{getCaptureInstruction()}</p>
-          </div>
-
-          <div style={{ width: '100%', height: '250px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', overflow: 'hidden', position: 'relative' }}>
-            {frames[currentCaptureFrame] ? (
-              <>
-                 <img src={frames[currentCaptureFrame]} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                 {serverStatuses[currentCaptureFrame] !== 'done' && (
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
-                      {serverStatuses[currentCaptureFrame] === 'processing' ? 'Processing on Server...' : 'Queued...'}
-                    </div>
-                 )}
-              </>
-            ) : (
-              <Camera size={48} color="#ccc" />
-            )}
-          </div>
+          <h3>Upload Vehicle Images</h3>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '20px' }}>Upload up to 7 high-quality images of the vehicle. Backgrounds will be automatically removed.</p>
 
           <input 
             type="file" 
             accept="image/*" 
-            capture="environment" 
+            multiple
             ref={fileInputRef} 
-            onChange={handleFileCapture} 
+            onChange={handleMultiFileCapture} 
             style={{ display: 'none' }} 
-            id="camera-input"
+            id="multi-camera-input"
+            disabled={frames.length >= 7 || isProcessing}
           />
           
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => setCurrentCaptureFrame(Math.max(0, currentCaptureFrame - 1))} disabled={currentCaptureFrame === 0 || isProcessing} style={{ ...btnStyle, flex: 1, background: '#e0e0e0' }}>
-              Previous
-            </button>
-            <label htmlFor="camera-input" style={{ ...btnStyle, flex: 2, background: '#E32636', color: 'white', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-              <Camera size={18} /> Upload Frame
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '20px' }}>
+            <label htmlFor="multi-camera-input" style={{ ...btnStyle, background: frames.length >= 7 ? '#ccc' : '#E32636', color: 'white', cursor: frames.length >= 7 ? 'not-allowed' : 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
+              <Camera size={20} /> Select Images ({frames.length}/7)
             </label>
-            <button onClick={() => setCurrentCaptureFrame(Math.min(35, currentCaptureFrame + 1))} disabled={currentCaptureFrame === 35 || isProcessing} style={{ ...btnStyle, flex: 1, background: '#e0e0e0' }}>
-              Skip
-            </button>
           </div>
 
-          {frames.filter(f => f !== null).length === 36 && (
-            <button onClick={handlePublish} style={{ ...btnStyle, background: serverStatuses.every(s => s === "done") ? '#1A3B5C' : '#999', color: 'white', width: '100%', marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px', marginBottom: '20px' }}>
+            {frames.map((f, i) => (
+              <div key={i} style={{ position: 'relative', aspectRatio: '1', borderRadius: '8px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                 <img src={f} alt={`Preview ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                 {serverStatuses[i] !== 'done' && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                      {serverStatuses[i] === 'processing' ? 'Processing...' : 'Queued...'}
+                    </div>
+                 )}
+              </div>
+            ))}
+          </div>
+
+          {frames.length > 0 && (
+            <button onClick={handlePublish} disabled={serverStatuses.some(s => s !== "done")} style={{ ...btnStyle, background: serverStatuses.every(s => s === "done") ? '#1A3B5C' : '#999', color: 'white', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: serverStatuses.every(s => s === "done") ? 'pointer' : 'not-allowed' }}>
               <Upload size={18} /> {serverStatuses.every(s => s === "done") ? "Publish to Inventory" : "Waiting for server..."}
             </button>
           )}
-          
-          <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: '4px' }}>
-            {frames.map((f, i) => {
-               let bg = '#ddd';
-               if (f) {
-                   if (serverStatuses[i] === 'done') bg = '#4CAF50';
-                   else if (serverStatuses[i] === 'processing') bg = '#FFC107';
-                   else bg = '#2196F3'; // Queued
-               }
-               return (
-                <div key={i} style={{ aspectRatio: '1', background: bg, borderRadius: '2px', cursor: 'pointer' }} onClick={() => setCurrentCaptureFrame(i)} />
-               );
-            })}
-          </div>
         </div>
       )}
 

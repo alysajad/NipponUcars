@@ -68,11 +68,11 @@ async def get_car_models():
         # Fallback mock data if Supabase isn't configured yet
         return {
             "models": [
-                {"id": "hilux", "name": "Toyota Hilux Revo", "specs": "2.8L Prerunner"},
-                {"id": "fortuner", "name": "Toyota Fortuner", "specs": "2.8L Diesel | 201 BHP"},
-                {"id": "corolla", "name": "Toyota Corolla e170", "specs": "1.8L Hybrid | 121 BHP"},
-                {"id": "land-cruiser", "name": "Toyota Land Cruiser", "specs": "3.3L Twin-Turbo V6"},
-                {"id": "supra", "name": "Toyota GR Supra", "specs": "3.0L Turbo Inline-6"}
+                {"id": "hilux", "name": "Toyota Hilux Revo", "specs": json.dumps({"variant": "2.8L Prerunner", "year": "2021", "fuel": "Diesel", "transmission": "Automatic", "km": "32,000", "engineCC": "2755", "features": ["4x4", "JBL Audio", "Ventilated Seats"]})},
+                {"id": "fortuner", "name": "Toyota Fortuner", "specs": json.dumps({"variant": "2.8L Diesel", "year": "2021", "fuel": "Diesel", "transmission": "Automatic", "km": "45,000", "engineCC": "2755", "features": ["Ventilated Seats", "4x4", "Power Tailgate"]})},
+                {"id": "corolla", "name": "Toyota Corolla e170", "specs": json.dumps({"variant": "1.8L Hybrid", "year": "2017", "fuel": "Hybrid", "transmission": "CVT", "km": "78,000", "engineCC": "1798", "features": ["EV Mode", "Sunroof"]})},
+                {"id": "safari", "name": "Tata Safari", "specs": json.dumps({"variant": "2.0L Kryotec", "year": "2021", "fuel": "Diesel", "transmission": "Automatic", "km": "22,000", "engineCC": "1956", "features": ["Panoramic Sunroof", "JBL Audio"]})},
+                {"id": "supra", "name": "Toyota GR Supra", "specs": json.dumps({"variant": "3.0L Turbo", "year": "2022", "fuel": "Petrol", "transmission": "Automatic", "km": "12,000", "engineCC": "2998", "features": ["Sport Mode", "Carbon Fiber Trim"]})}
             ]
         }
     
@@ -212,12 +212,15 @@ async def job_progress(car_id: str):
         pubsub.subscribe(f"inventory:{car_id}:progress")
         try:
             while True:
-                message = pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
+                message = pubsub.get_message(ignore_subscribe_messages=True)
                 if message is not None:
                     yield {"data": message["data"].decode("utf-8")}
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.5)
+        except asyncio.CancelledError:
+            pass
         finally:
             pubsub.unsubscribe(f"inventory:{car_id}:progress")
+            pubsub.close()
 
     return EventSourceResponse(event_stream())
 

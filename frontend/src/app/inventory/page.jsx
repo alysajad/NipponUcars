@@ -1,38 +1,45 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Home } from 'lucide-react';
-import ImageViewer360 from '@/components/ImageViewer360';
+import ImageGallery from '@/components/ImageGallery';
 import gsap from 'gsap';
 
 import { useQuery } from '@tanstack/react-query';
 import { fetchInventory } from '@/api/inventoryApi';
 
 export default function Inventory() {
-  const { data: cars = [], isLoading: isReady } = useQuery({
+  const { data: cars = [], isLoading } = useQuery({
     queryKey: ['inventory'],
     queryFn: fetchInventory
   });
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-  const [slideDir, setSlideDir] = useState(1);
+  const slideDirRef = useRef(1);
 
   const changeCar = useCallback((newIndex) => {
-    if (isTransitioning) return;
+    if (isTransitioning || cars.length === 0) return;
     setIsTransitioning(true);
 
     let dir = newIndex > activeIndex ? 1 : -1;
     if (activeIndex === cars.length - 1 && newIndex === 0) dir = 1;
     if (activeIndex === 0 && newIndex === cars.length - 1) dir = -1;
-    setSlideDir(dir);
+    slideDirRef.current = dir;
 
-    gsap.to(".fade-content", {
+    const els = document.querySelectorAll(".inv-animate");
+    if (els.length === 0) {
+      setActiveIndex(newIndex);
+      setIsTransitioning(false);
+      return;
+    }
+
+    gsap.to(els, {
       opacity: 0,
-      x: dir * -80,
-      duration: 0.35,
+      x: dir * -60,
+      duration: 0.3,
       ease: "power2.in",
+      stagger: 0.02,
       onComplete: () => {
         setActiveIndex(newIndex);
       }
@@ -48,14 +55,20 @@ export default function Inventory() {
   }, [activeIndex, changeCar, cars]);
 
   useEffect(() => {
-    gsap.fromTo(".fade-content", 
-      { opacity: 0, x: slideDir * 80 }, 
+    const els = document.querySelectorAll(".inv-animate");
+    if (els.length === 0) {
+      setIsTransitioning(false);
+      return;
+    }
+    gsap.fromTo(els, 
+      { opacity: 0, x: slideDirRef.current * 60 }, 
       { 
-        opacity: 1, x: 0, duration: 0.6, ease: "power2.out", delay: 0.05,
+        opacity: 1, x: 0, duration: 0.5, ease: "power2.out", delay: 0.05,
+        stagger: 0.03,
         onComplete: () => setIsTransitioning(false)
       }
     );
-  }, [activeIndex]); // Re-run animation when activeIndex updates
+  }, [activeIndex]);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -66,87 +79,90 @@ export default function Inventory() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [nextCar, prevCar]);
 
-  if (isReady || cars.length === 0) return <div>Loading...</div>;
+  if (isLoading || cars.length === 0) return <div>Loading...</div>;
 
   const currentCar = cars[activeIndex];
+
+  // Parse specs - handle both JSON string and plain string
   let specs = {};
-  try {
-    specs = JSON.parse(currentCar.specs || "{}");
-  } catch(e) {
-    // leave empty
+  if (currentCar.specs) {
+    if (typeof currentCar.specs === 'object') {
+      specs = currentCar.specs;
+    } else {
+      try { specs = JSON.parse(currentCar.specs); } catch(e) { /* plain string, leave empty */ }
+    }
   }
+
+  const descText = (currentCar.desc && currentCar.desc !== 'null') ? currentCar.desc : (specs.variant || currentCar.name);
 
   return (
     <div className="inventory-page">
       <Link href="/" className="inventory-back-link">
-        <Home size={20} /> BACK TO HOME
+        <Home size={18} /> HOME
       </Link>
       
+      {/* Background watermark */}
       <div className="inventory-bg-title">
-         <h1 className="fade-content">{currentCar.name}</h1>
+         <h1 className="inv-animate">{currentCar.name}</h1>
       </div>
 
-      <div className="fade-content" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
-        <ImageViewer360 
-          folderPath={`/cars/${currentCar.id}`} 
-          activeIndex={activeIndex} 
-          initialScale={currentCar.scale}
-          customFrames={currentCar.frames}
+      {/* Image Gallery - center of screen */}
+      <div className="inv-animate" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
+        <ImageGallery 
+          frames={currentCar.frames}
+          initialScale={currentCar.scale || 1}
         />
       </div>
       
-      {/* TOP LEFT: Title & Price */}
-      <div className="inventory-panel tl fade-content">
-        <h2>{currentCar.desc && currentCar.desc !== 'null' ? currentCar.desc : specs.variant}</h2>
-        <div style={{ marginTop: '1rem' }}>
-           <span className="panel-label">EST. PRICE</span>
-           <div className="price-tag">{currentCar.price}</div>
+      {/* TOP BAR: Title left, Price right */}
+      <div className="inv-top-bar">
+        <div className="inv-top-left inv-animate">
+          <p className="inv-car-name">{currentCar.name}</p>
+          <h2>{descText}</h2>
+        </div>
+        <div className="inv-top-right inv-animate">
+          <p className="inv-price-label">Est. Price</p>
+          <div className="inv-price">{currentCar.price}</div>
         </div>
       </div>
 
-      {/* BOTTOM LEFT: Key Features */}
-      <div className="inventory-panel bl fade-content">
-        {specs.features && specs.features.length > 0 && (
-          <div>
-            <span className="panel-label">KEY FEATURES</span>
-            <div className="features-wrap">
-              {specs.features.map((feat, i) => (
-                <span key={i} className="feature-badge">{feat}</span>
-              ))}
-            </div>
+      {/* BOTTOM BAR: Specs left, Features right */}
+      <div className="inv-bottom-bar">
+        <div className="inv-bottom-left inv-animate">
+          <div className="inv-specs-row">
+            {specs.year && <div className="inv-spec-item"><span>YEAR</span>{specs.year}</div>}
+            {specs.fuel && <div className="inv-spec-item"><span>FUEL</span>{specs.fuel}</div>}
+            {specs.transmission && <div className="inv-spec-item"><span>TRANS</span>{specs.transmission}</div>}
+            {specs.km && <div className="inv-spec-item"><span>KM</span>{specs.km}</div>}
+            {specs.engineCC && <div className="inv-spec-item"><span>ENGINE</span>{specs.engineCC} cc</div>}
+            {specs.owner && <div className="inv-spec-item"><span>OWNER</span>{specs.owner}</div>}
           </div>
-        )}
-      </div>
-
-      {/* TOP RIGHT: Basic Specs */}
-      <div className="inventory-panel tr fade-content">
-        <div className="specs-grid-2x2">
-          <div className="spec-box"><span>YEAR</span>{specs.year || 'N/A'}</div>
-          <div className="spec-box"><span>FUEL</span>{specs.fuel || 'N/A'}</div>
-          <div className="spec-box"><span>TRANS</span>{specs.transmission || 'N/A'}</div>
-          <div className="spec-box"><span>DRIVEN</span>{specs.km ? `${specs.km} km` : 'N/A'}</div>
+        </div>
+        <div className="inv-bottom-right inv-animate">
+          {specs.features && specs.features.length > 0 && (
+            <div>
+              <p className="inv-features-label">Features</p>
+              <div className="inv-features-wrap">
+                {specs.features.map((feat, i) => (
+                  <span key={i} className="inv-feature-badge">{feat}</span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* BOTTOM RIGHT: Tech Specs */}
-      <div className="inventory-panel br fade-content">
-         <div className="specs-grid-2x2 right-align">
-            <div className="spec-box"><span>ENGINE</span>{specs.engineCC ? `${specs.engineCC} cc` : 'N/A'}</div>
-            <div className="spec-box"><span>CLEARANCE</span>{specs.groundClearance ? `${specs.groundClearance} mm` : 'N/A'}</div>
-            <div className="spec-box"><span>BOOT SPACE</span>{specs.bootSpace ? `${specs.bootSpace} L` : 'N/A'}</div>
-            <div className="spec-box"><span>MILEAGE</span>{specs.mileage ? `${specs.mileage} kmpl` : 'N/A'}</div>
-         </div>
-      </div>
-
+      {/* Left / Right nav buttons at screen edges */}
       <div className="inventory-controls">
          <button onClick={prevCar} className="inventory-nav-btn" disabled={isTransitioning} aria-label="Previous car">
-           <ChevronLeft size={28} />
+           <ChevronLeft size={24} />
          </button>
          <button onClick={nextCar} className="inventory-nav-btn" disabled={isTransitioning} aria-label="Next car">
-           <ChevronRight size={28} />
+           <ChevronRight size={24} />
          </button>
       </div>
 
+      {/* Dot indicators */}
       <div className="inventory-dots">
         {cars.map((_, idx) => (
           <button
@@ -156,6 +172,11 @@ export default function Inventory() {
             aria-label={`View ${cars[idx].name}`}
           />
         ))}
+      </div>
+      {/* Preload adjacent cars to eliminate lag */}
+      <div style={{ display: 'none' }}>
+         {cars[(activeIndex + 1) % cars.length]?.frames?.[0] && <img src={cars[(activeIndex + 1) % cars.length].frames[0]} alt="preload-next" />}
+         {cars[(activeIndex - 1 + cars.length) % cars.length]?.frames?.[0] && <img src={cars[(activeIndex - 1 + cars.length) % cars.length].frames[0]} alt="preload-prev" />}
       </div>
     </div>
   );
