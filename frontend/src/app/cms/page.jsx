@@ -177,7 +177,7 @@ export default function SalesCMS() {
             } catch (err) {
                 console.error("Polling error", err);
             }
-        }, 2500);
+        }, 30000);
         
         setStep(3);
         
