@@ -28,9 +28,10 @@ session = new_session("u2netp")
 print("Model ready.")
 
 def process_image(url, inventory_id, index):
-    print(f"  Downloading {url}...")
+    safe_url = url.replace("/upload/", "/upload/w_1024,c_limit/")
+    print(f"  Downloading {safe_url}...")
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-    response = requests.get(url, headers=headers, timeout=30)
+    response = requests.get(safe_url, headers=headers, timeout=30)
     response.raise_for_status()
     raw_image = Image.open(io.BytesIO(response.content)).convert("RGBA")
     

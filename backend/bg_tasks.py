@@ -46,7 +46,9 @@ def sync_remove_background(frame_id: str, raw_url: str, inventory_id: str, frame
         supabase.table("listing_frames").update({"status": "processing"}).eq("id", frame_id).execute()
         
         # Step 2: Download raw image from Cloudinary
-        response = requests.get(raw_url, timeout=30)
+        # ponytail: downsize via Cloudinary URL to prevent Render Free Tier OOM from massive smartphone JPEGs
+        safe_url = raw_url.replace("/upload/", "/upload/w_1024,c_limit/")
+        response = requests.get(safe_url, timeout=30)
         response.raise_for_status()
         raw_image = Image.open(io.BytesIO(response.content)).convert("RGBA")
         
