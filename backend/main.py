@@ -40,18 +40,18 @@ async def startup_event():
         return
     try:
         # Resume any stuck tasks on startup
+        # ponytail: blindly resuming all historical queued tasks clogs the single-threaded lock. 
+        # Mark them as failed so the queue is clean for new uploads.
         res = supabase.table("listing_frames").select("*").in_("status", ["queued", "processing"]).execute()
         if res.data:
-            print(f"[startup] Resuming {len(res.data)} stuck background tasks...")
+            print(f"[startup] Marking {len(res.data)} stuck background tasks as failed...")
             for frame in res.data:
-                asyncio.create_task(remove_background_task(
-                    frame_id=frame["id"],
-                    raw_url=frame["raw_url"],
-                    inventory_id=frame["inventory_id"],
-                    frame_index=frame["frame_index"]
-                ))
+                supabase.table("listing_frames").update({
+                    "status": "failed", 
+                    "error_message": "Server restarted before completion"
+                }).eq("id", frame["id"]).execute()
     except Exception as e:
-        print(f"[startup] Failed to resume tasks: {e}")
+        print(f"[startup] Failed to clear stuck tasks: {e}")
 
 # Load environment variables
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
