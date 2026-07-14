@@ -92,7 +92,7 @@ async def get_inventory():
     
     try:
         response = supabase.table("inventory").select("*").execute()
-        return response.data
+        return [car for car in response.data if car.get("frames")]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -205,24 +205,17 @@ async def upload_frames(car_id: str, background_tasks: BackgroundTasks, files: l
 
     return {"car_id": car_id, "queued": len(results), "frames": results}
 
-@app.get("/api/cars/{car_id}/progress")
-async def job_progress(car_id: str):
-    async def event_stream():
-        pubsub = redis_client.pubsub()
-        pubsub.subscribe(f"inventory:{car_id}:progress")
-        try:
-            while True:
-                message = pubsub.get_message(ignore_subscribe_messages=True)
-                if message is not None:
-                    yield {"data": message["data"].decode("utf-8")}
-                await asyncio.sleep(0.5)
-        except asyncio.CancelledError:
-            pass
-        finally:
-            pubsub.unsubscribe(f"inventory:{car_id}:progress")
-            pubsub.close()
-
-    return EventSourceResponse(event_stream())
+@app.get("/api/cars/{car_id}/status")
+async def car_status(car_id: str):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    res = supabase.table("listing_frames").select("status").eq("inventory_id", car_id).execute()
+    frames = res.data
+    total = len(frames)
+    done = sum(1 for f in frames if f["status"] == "done")
+    
+    return {"status": "done" if total > 0 and done == total else "processing", "total_done": done, "total_frames": total}
 
 @app.post("/api/cars/{car_id}/publish")
 async def publish_listing(car_id: str):

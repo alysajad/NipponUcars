@@ -15,15 +15,11 @@ export default function SalesCMS() {
   const [features, setFeatures] = useState([]);
   const [newFeature, setNewFeature] = useState('');
   
-  const [activeCarId, setActiveCarId] = useState(null);
-  const [frames, setFrames] = useState([]); // Stores object URLs for preview and processed URLs
-  const [serverStatuses, setServerStatuses] = useState([]); // 'queued', 'processing', 'done'
-  
+  const [frames, setFrames] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pin, setPin] = useState('');
   const [isUploadingBulk, setIsUploadingBulk] = useState(false);
-  const eventSourceRef = useRef(null);
   
   const { data: models = [], isLoading: modelsLoading } = useQuery({
     queryKey: ['models'],
@@ -73,61 +69,13 @@ export default function SalesCMS() {
     setFeatures(features.filter(f => f !== fToRemove));
   };
 
-  const startCapture = async () => {
+  const handleProceed = () => {
     if (carDetails.name && carDetails.desc && carDetails.price) {
-      try {
-        const payload = {
-          ...carDetails,
-          specs: JSON.stringify({
-            brand: carDetails.name.split(' ')[0],
-            year: carDetails.year,
-            fuel: carDetails.fuel,
-            transmission: carDetails.transmission,
-            km: carDetails.km,
-            engineCC: carDetails.engineCC,
-            owner: carDetails.owner,
-            variant: carDetails.variant,
-            features: features
-          })
-        };
-        const res = await initCar(payload);
-        setActiveCarId(res.id);
-        
-        // Start listening to SSE
-        const es = new EventSource(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cars/${res.id}/progress`);
-        eventSourceRef.current = es;
-        
-        es.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          setServerStatuses(prev => {
-            const next = [...prev];
-            next[data.frame_index] = data.status;
-            return next;
-          });
-          
-          if (data.status === "done") {
-             setFrames(prev => {
-                const next = [...prev];
-                next[data.frame_index] = data.processed_url;
-                return next;
-             });
-          }
-        };
-        
-        setStep(2);
-      } catch (e) {
-        alert("Failed to initialize car: " + e.message);
-      }
+      setStep(2);
     } else {
       alert("Please fill out basic car details first.");
     }
   };
-
-  useEffect(() => {
-     return () => {
-         if (eventSourceRef.current) eventSourceRef.current.close();
-     };
-  }, []);
 
   const handleBulkUpload = async (e) => {
     const file = e.target.files[0];
@@ -155,34 +103,17 @@ export default function SalesCMS() {
     }
   };
 
-  const handleMultiFileCapture = async (e) => {
+  const handleMultiFileCapture = (e) => {
     const files = Array.from(e.target.files);
     const availableSlots = 7 - frames.length;
     const filesToUpload = files.slice(0, availableSlots);
-    
     if (filesToUpload.length === 0) return;
 
-    setIsProcessing(true);
-    
-    // Create local previews
-    const localPreviews = filesToUpload.map(file => URL.createObjectURL(file));
+    const localPreviews = filesToUpload.map(file => ({
+      url: URL.createObjectURL(file),
+      file: file
+    }));
     setFrames(prev => [...prev, ...localPreviews]);
-    
-    // Set statuses to queued
-    const newStatuses = filesToUpload.map(() => 'queued');
-    setServerStatuses(prev => [...prev, ...newStatuses]);
-
-    try {
-        const formData = new FormData();
-        filesToUpload.forEach(file => formData.append("files", file));
-        
-        // Upload asynchronously
-        await uploadFrames(activeCarId, formData);
-    } catch (e) {
-        alert("Failed to upload frames");
-    }
-    
-    setIsProcessing(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -191,20 +122,62 @@ export default function SalesCMS() {
       alert("Please upload at least one image.");
       return;
     }
-    if (serverStatuses.some(s => s !== "done")) {
-      alert("Please wait for all images to finish background removal processing.");
-      return;
-    }
     
-    setStep(3); // Show publishing state
-    
+    setIsProcessing(true);
     try {
-        await publishCarApi(activeCarId);
-        queryClient.invalidateQueries({ queryKey: ['inventory'] });
-        router.push('/inventory');
+        const payload = {
+          ...carDetails,
+          specs: JSON.stringify({
+            brand: carDetails.name.split(' ')[0],
+            year: carDetails.year,
+            fuel: carDetails.fuel,
+            transmission: carDetails.transmission,
+            km: carDetails.km,
+            engineCC: carDetails.engineCC,
+            owner: carDetails.owner,
+            variant: carDetails.variant,
+            features: features
+          })
+        };
+        
+        // 1. Create the inventory row first
+        const res = await initCar(payload);
+        const newCarId = res.id;
+        
+        // 2. Upload the frames for background removal
+        const formData = new FormData();
+        frames.forEach(f => formData.append("files", f.file));
+        await uploadFrames(newCarId, formData);
+        
+        // Background polling
+        const pollInterval = setInterval(async () => {
+            try {
+                const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cars/${newCarId}/status`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.status === "done" && data.total_done === data.total_frames) {
+                    clearInterval(pollInterval);
+                    alert(`Success! The AI has finished processing ${payload.name} and it is now live in the inventory!`);
+                    queryClient.invalidateQueries({ queryKey: ['inventory'] });
+                }
+            } catch (err) {
+                console.error("Polling error", err);
+            }
+        }, 2500);
+        
+        setStep(3);
+        
+        // Reset state for next car
+        setCarDetails({
+          name: '', desc: '', price: '', year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: ''
+        });
+        setFeatures([]);
+        setFrames([]);
     } catch (e) {
         alert("Publish failed: " + e.message);
-        setStep(2);
+    } finally {
+        setIsProcessing(false);
     }
   };
 
@@ -316,7 +289,7 @@ export default function SalesCMS() {
               </div>
             </div>
             
-            <button onClick={startCapture} style={{ ...btnStyle, background: '#E32636', color: 'white', marginTop: '10px' }}>
+            <button onClick={handleProceed} style={{ ...btnStyle, background: '#E32636', color: 'white', marginTop: '10px' }}>
               Proceed to Upload Images
             </button>
           </div>
@@ -349,29 +322,28 @@ export default function SalesCMS() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px', marginBottom: '20px' }}>
             {frames.map((f, i) => (
               <div key={i} style={{ position: 'relative', aspectRatio: '1', borderRadius: '8px', overflow: 'hidden', border: '1px solid #ddd' }}>
-                 <img src={f} alt={`Preview ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                 {serverStatuses[i] !== 'done' && (
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                      {serverStatuses[i] === 'processing' ? 'Processing...' : 'Queued...'}
-                    </div>
-                 )}
+                 <img src={f.url} alt={`Preview ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
           </div>
 
           {frames.length > 0 && (
-            <button onClick={handlePublish} disabled={serverStatuses.some(s => s !== "done")} style={{ ...btnStyle, background: serverStatuses.every(s => s === "done") ? '#1A3B5C' : '#999', color: 'white', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: serverStatuses.every(s => s === "done") ? 'pointer' : 'not-allowed' }}>
-              <Upload size={18} /> {serverStatuses.every(s => s === "done") ? "Publish to Inventory" : "Waiting for server..."}
+            <button onClick={handlePublish} disabled={isProcessing} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: isProcessing ? 'not-allowed' : 'pointer' }}>
+              <Upload size={18} /> {isProcessing ? "Submitting..." : "Submit to Inventory"}
             </button>
           )}
         </div>
       )}
 
       {step === 3 && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', textAlign: 'center' }}>
           <CheckCircle size={64} color="#4CAF50" />
-          <h2 style={{ marginTop: '20px' }}>Car Published!</h2>
-          <p>Redirecting to inventory...</p>
+          <h2 style={{ marginTop: '20px' }}>Car Submitted!</h2>
+          <p>It is currently being processed by AI in the background.</p>
+          <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '10px' }}>You will receive a notification here once it goes live.</p>
+          <button onClick={() => setStep(1)} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', marginTop: '20px' }}>
+            Add Another Vehicle
+          </button>
         </div>
       )}
     </div>

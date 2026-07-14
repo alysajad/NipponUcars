@@ -91,6 +91,13 @@ def sync_remove_background(frame_id: str, raw_url: str, inventory_id: str, frame
             "processing_ms": elapsed_ms
         }).eq("id", frame_id).execute()
         
+        # Step 7b: Append to inventory table immediately
+        inv_res = supabase.table("inventory").select("frames").eq("id", inventory_id).execute()
+        if inv_res.data:
+            current_frames = inv_res.data[0].get("frames") or []
+            current_frames.append(processed_url)
+            supabase.table("inventory").update({"frames": current_frames}).eq("id", inventory_id).execute()
+        
         # Step 8: Publish SSE event via Redis
         done_res = supabase.table("listing_frames").select("id", count="exact").eq("inventory_id", inventory_id).eq("status", "done").execute()
         total_done = done_res.count if done_res.count else 0
