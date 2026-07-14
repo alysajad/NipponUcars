@@ -6,6 +6,13 @@ import { Camera, Upload, CheckCircle, ChevronLeft } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { initCar, uploadFrames, publishCar as publishCarApi, fetchModels, uploadBulkModels } from '@/api/inventoryApi';
 
+const CAR_DATA = {
+  "Toyota Fortuner": { variants: ["4x2 MT", "4x2 AT", "4x4 MT", "4x4 AT", "GR-S"], features: ["4WD", "Ventilated Seats", "Touchscreen", "Leather Seats", "Cruise Control"] },
+  "Toyota Hilux Revo": { variants: ["Standard", "High", "Prerunner"], features: ["4x4", "Canopy", "Offroad Tires", "Bedliner"] },
+  "Toyota Corolla e170": { variants: ["G", "V", "Hybrid"], features: ["Sunroof", "Reverse Camera", "Keyless Entry"] },
+  "Toyota Land Cruiser": { variants: ["ZX", "VX", "GR Sport"], features: ["4WD", "360 Camera", "ADAS", "Cool Box", "Rear Entertainment"] },
+  "Toyota GR Supra": { variants: ["2.0L", "3.0L", "3.0L Pro"], features: ["RWD", "Sports Exhaust", "Carbon Fiber Trim", "Alcantara Seats"] }
+};
 export default function SalesCMS() {
   const [step, setStep] = useState(1); // 1: Details, 2: Capture, 3: Processing
   const [carDetails, setCarDetails] = useState({
@@ -34,15 +41,15 @@ export default function SalesCMS() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "model_id") {
-      const selectedModel = models.find(m => m.id === value);
+    if (name === "name") {
+      const selectedModel = models.find(m => m.name === value);
       if (selectedModel) {
         let parsedSpecs = {};
         try { parsedSpecs = JSON.parse(selectedModel.specs || "{}"); } catch(e){}
         setCarDetails(prev => ({
           ...prev,
-          name: selectedModel.name,
-          model_id: value,
+          name: value,
+          model_id: selectedModel.id,
           year: parsedSpecs.year || '',
           fuel: parsedSpecs.fuel || '',
           transmission: parsedSpecs.transmission || '',
@@ -52,6 +59,8 @@ export default function SalesCMS() {
           variant: parsedSpecs.variant || ''
         }));
         setFeatures(parsedSpecs.features || []);
+      } else {
+        setCarDetails(prev => ({ ...prev, name: value, model_id: '' }));
       }
     } else {
       setCarDetails(prev => ({ ...prev, [name]: value }));
@@ -129,7 +138,7 @@ export default function SalesCMS() {
         const payload = {
           ...carDetails,
           specs: JSON.stringify({
-            brand: carDetails.name.split(' ')[0],
+            brand: (carDetails.name || '').split(' ')[0],
             year: carDetails.year,
             fuel: carDetails.fuel,
             transmission: carDetails.transmission,
@@ -244,35 +253,62 @@ export default function SalesCMS() {
           <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '20px' }}>Enter the vehicle specifications before uploading images.</p>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <select 
-              name="model_id" 
-              value={carDetails.model_id || ""} 
+            <input 
+              name="name" 
+              list="models-list" 
+              placeholder="Select or enter vehicle model" 
+              value={carDetails.name || ""} 
               onChange={handleInputChange} 
               style={inputStyle}
-            >
-              <option value="" disabled>Select Vehicle Model</option>
+            />
+            <datalist id="models-list">
               {models.map(m => (
-                <option key={m.id} value={m.id}>{m.name}</option>
+                <option key={m.id} value={m.name} />
               ))}
-            </select>
+            </datalist>
             {modelsLoading && <span style={{fontSize: '0.8rem', color: '#666'}}>Loading models from database...</span>}
             
-            <input name="name" placeholder="Car Name (Auto-filled)" value={carDetails.name} readOnly style={{...inputStyle, background: '#f9f9f9', color: '#888'}} />
-            <input name="variant" placeholder="Variant (e.g., 1.5 SX Opt)" value={carDetails.variant} onChange={handleInputChange} style={inputStyle} />
+            <input name="variant" list="variant-list" placeholder="Variant (e.g., 1.5 SX Opt)" value={carDetails.variant} onChange={handleInputChange} style={inputStyle} />
+            <datalist id="variant-list">
+              {CAR_DATA[carDetails.name]?.variants?.map(v => <option key={v} value={v} />)}
+            </datalist>
+
             <input name="desc" placeholder="Short Description (e.g., Mint Condition, 1 Owner)" value={carDetails.desc} onChange={handleInputChange} style={inputStyle} />
             <input name="price" placeholder="Price (e.g., ₹ 18,20,000)" value={carDetails.price} onChange={handleInputChange} style={inputStyle} />
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <input name="year" placeholder="Year (e.g., 2022)" value={carDetails.year} onChange={handleInputChange} style={inputStyle} />
-              <input name="km" placeholder="Kilometers (e.g., 21000)" value={carDetails.km} onChange={handleInputChange} style={inputStyle} />
-              <input name="fuel" placeholder="Fuel Type (Petrol/Diesel)" value={carDetails.fuel} onChange={handleInputChange} style={inputStyle} />
-              <input name="transmission" placeholder="Transmission (Auto/Manual)" value={carDetails.transmission} onChange={handleInputChange} style={inputStyle} />
-              <input name="engineCC" placeholder="Engine CC (e.g., 1498)" value={carDetails.engineCC} onChange={handleInputChange} style={inputStyle} />
-              <input name="owner" placeholder="Owner (e.g., 1st Owner)" value={carDetails.owner} onChange={handleInputChange} style={inputStyle} />
+              <select name="year" value={carDetails.year} onChange={handleInputChange} style={inputStyle}>
+                <option value="" disabled>Select Year</option>
+                {Array.from({length: 30}, (_, i) => new Date().getFullYear() - i).map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+              <input name="km" type="number" placeholder="Kilometers (e.g., 21000)" value={carDetails.km} onChange={handleInputChange} style={inputStyle} />
+              
+              <input name="fuel" list="fuel-list" placeholder="Fuel Type (Petrol/Diesel/EV...)" value={carDetails.fuel} onChange={handleInputChange} style={inputStyle} />
+              <datalist id="fuel-list"><option value="Petrol" /><option value="Diesel" /><option value="EV" /><option value="Hybrid" /><option value="CNG" /></datalist>
+              
+              <input name="transmission" list="trans-list" placeholder="Transmission (Auto/Manual)" value={carDetails.transmission} onChange={handleInputChange} style={inputStyle} />
+              <datalist id="trans-list"><option value="Auto" /><option value="Manual" /></datalist>
+              
+              <input name="engineCC" type="number" placeholder="Engine CC (e.g., 1498)" value={carDetails.engineCC} onChange={handleInputChange} style={inputStyle} />
+              
+              <input name="owner" list="owner-list" placeholder="Owner (e.g., 1st Owner)" value={carDetails.owner} onChange={handleInputChange} style={inputStyle} />
+              <datalist id="owner-list"><option value="1st Owner" /><option value="2nd Owner" /><option value="3rd Owner" /><option value="4th Owner" /><option value="5th Owner" /></datalist>
             </div>
 
             <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '6px' }}>
               <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#666' }}>Features</p>
+              
+              {CAR_DATA[carDetails.name]?.features?.length > 0 && (
+                <div style={{ marginBottom: '10px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#888', marginRight: '8px' }}>Suggested:</span>
+                  {CAR_DATA[carDetails.name].features.filter(f => !features.includes(f)).map(f => (
+                    <button key={f} onClick={(e) => { e.preventDefault(); setFeatures([...features, f]); }} style={{ background: '#f0f0f0', border: '1px solid #ccc', borderRadius: '4px', padding: '2px 8px', fontSize: '0.8rem', cursor: 'pointer', marginRight: '5px' }}>+ {f}</button>
+                  ))}
+                </div>
+              )}
+
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
                 {features.map((f, i) => (
                   <span key={i} style={{ background: '#E32636', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
