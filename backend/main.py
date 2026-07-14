@@ -56,6 +56,7 @@ class CarPayload(BaseModel):
     desc: str
     specs: str
     price: str
+    attributes: dict = {}
 
 @app.get("/api/models")
 async def get_car_models():
@@ -142,7 +143,7 @@ async def init_car(car: CarPayload):
         "id": car_id,
         "name": car.name,
         "desc": car.desc,
-        "specs": car.specs,
+        "specs": json.dumps(car.attributes) if car.attributes else car.specs,
         "price": car.price,
         "frames": [] # Start empty
     }

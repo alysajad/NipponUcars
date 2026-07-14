@@ -12,3 +12,4 @@ sse-starlette==2.1.0
 pydantic==2.7.4
 pandas
 openpyxl
+pillow-avif-plugin==1.4.37

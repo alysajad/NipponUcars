@@ -8,6 +8,7 @@ import cloudinary
 import cloudinary.uploader
 import asyncio
 from PIL import Image
+import pillow_avif
 from supabase import create_client, Client
 from dotenv import load_dotenv
 

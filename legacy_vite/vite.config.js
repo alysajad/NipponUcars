@@ -6,5 +6,9 @@ export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
     exclude: ['@imgly/background-removal']
+  },
+  server: {
+    port: 3000,
+    strictPort: true
   }
 })
