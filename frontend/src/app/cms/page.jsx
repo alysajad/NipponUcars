@@ -20,6 +20,7 @@ export default function SalesCMS() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pin, setPin] = useState('');
   const [isUploadingBulk, setIsUploadingBulk] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
   
   const { data: models = [], isLoading: modelsLoading } = useQuery({
     queryKey: ['models'],
@@ -150,11 +151,14 @@ export default function SalesCMS() {
         await uploadFrames(newCarId, formData);
         
         // Background polling
+        setUploadProgress({ done: 0, total: frames.length });
         const pollInterval = setInterval(async () => {
             try {
                 const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cars/${newCarId}/status`;
                 const response = await fetch(url);
                 const data = await response.json();
+                
+                setUploadProgress({ done: data.total_done, total: data.total_frames });
                 
                 if (data.status === "done" && data.total_done === data.total_frames) {
                     clearInterval(pollInterval);
@@ -340,8 +344,21 @@ export default function SalesCMS() {
           <CheckCircle size={64} color="#4CAF50" />
           <h2 style={{ marginTop: '20px' }}>Car Submitted!</h2>
           <p>It is currently being processed by AI in the background.</p>
+          
+          {uploadProgress && uploadProgress.total > 0 && (
+            <div style={{ width: '100%', maxWidth: '300px', marginTop: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#666', marginBottom: '5px' }}>
+                <span>Processing frames...</span>
+                <span>{uploadProgress.done} / {uploadProgress.total}</span>
+              </div>
+              <div style={{ width: '100%', height: '8px', background: '#e0e0e0', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ width: `${(uploadProgress.done / uploadProgress.total) * 100}%`, height: '100%', background: '#E32636', transition: 'width 0.3s ease' }} />
+              </div>
+            </div>
+          )}
+          
           <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '10px' }}>You will receive a notification here once it goes live.</p>
-          <button onClick={() => setStep(1)} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', marginTop: '20px' }}>
+          <button onClick={() => { setStep(1); setUploadProgress(null); }} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', marginTop: '20px' }}>
             Add Another Vehicle
           </button>
         </div>
