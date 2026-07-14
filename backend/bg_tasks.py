@@ -29,15 +29,6 @@ REMBG_SESSION = None
 bg_process_lock = asyncio.Lock()
 
 def sync_remove_background(frame_id: str, raw_url: str, inventory_id: str, frame_index: int):
-    # Lazy import to prevent memory spike on Uvicorn startup
-    from rembg import new_session, remove
-    
-    global REMBG_SESSION
-    if REMBG_SESSION is None:
-        print("[bg_task] Loading u2netp model...")
-        REMBG_SESSION = new_session("u2netp")
-        print("[bg_task] Model ready.")
-
     start = time.monotonic()
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
     
@@ -52,18 +43,22 @@ def sync_remove_background(frame_id: str, raw_url: str, inventory_id: str, frame
         response.raise_for_status()
         raw_image = Image.open(io.BytesIO(response.content)).convert("RGBA")
         
-        # Step 3: Remove background
-        removed = remove(raw_image, session=REMBG_SESSION)
+        # Step 3: Remove background in a subprocess to isolate OOMKill
+        import tempfile
+        import subprocess
+        import sys
         
-        # Step 4: Composite onto white canvas
-        white_canvas = Image.new("RGBA", removed.size, (255, 255, 255, 255))
-        white_canvas.paste(removed, mask=removed.split()[3])
-        final = white_canvas.convert("RGB")
-        
-        # Step 5: Convert to bytes
-        buffer = io.BytesIO()
-        final.save(buffer, format="JPEG", quality=88, optimize=True)
-        buffer.seek(0)
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as in_f, tempfile.NamedTemporaryFile(suffix=".jpg") as out_f:
+            raw_image.convert("RGB").save(in_f.name, format="JPEG")
+            
+            import os
+            script_path = os.path.join(os.path.dirname(__file__), "run_rembg.py")
+            res = subprocess.run([sys.executable, script_path, in_f.name, out_f.name])
+            if res.returncode != 0:
+                raise Exception(f"AI crashed (Code: {res.returncode}). Possible OOM. Upgrade plan or enable Cloudinary AI.")
+            
+            # Step 5: Convert to bytes
+            buffer = io.BytesIO(open(out_f.name, "rb").read())
         
         # Step 6: Upload processed image to Cloudinary
         upload_result = cloudinary.uploader.upload(
