@@ -2,7 +2,6 @@ import os
 import io
 import time
 import json
-import redis
 import requests
 import cloudinary
 import cloudinary.uploader
@@ -16,16 +15,12 @@ load_dotenv()
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
-
 cloudinary.config(
     cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
     api_key=os.environ.get("CLOUDINARY_API_KEY", ""),
     api_secret=os.environ.get("CLOUDINARY_API_SECRET", ""),
     secure=True
 )
-
-redis_client = redis.from_url(REDIS_URL)
 
 # Load model lazily to prevent OOM
 REMBG_SESSION = None
@@ -98,37 +93,12 @@ def sync_remove_background(frame_id: str, raw_url: str, inventory_id: str, frame
             current_frames.append(processed_url)
             supabase.table("inventory").update({"frames": current_frames}).eq("id", inventory_id).execute()
         
-        # Step 8: Publish SSE event via Redis
-        done_res = supabase.table("listing_frames").select("id", count="exact").eq("inventory_id", inventory_id).eq("status", "done").execute()
-        total_done = done_res.count if done_res.count else 0
-        
-        total_res = supabase.table("listing_frames").select("id", count="exact").eq("inventory_id", inventory_id).execute()
-        total_frames = total_res.count if total_res.count else 36
-
-        payload = json.dumps({
-            "frame_id": frame_id,
-            "frame_index": frame_index,
-            "processed_url": processed_url,
-            "thumb_url": thumb_url,
-            "status": "done",
-            "processing_ms": elapsed_ms,
-            "total_done": total_done,
-            "total_frames": total_frames
-        })
-        redis_client.publish(f"inventory:{inventory_id}:progress", payload)
-        
     except Exception as exc:
         print(f"Error processing frame {frame_id}: {exc}")
         supabase.table("listing_frames").update({
             "status": "failed",
             "error_message": str(exc)
         }).eq("id", frame_id).execute()
-        
-        redis_client.publish(f"inventory:{inventory_id}:progress", json.dumps({
-            "frame_id": frame_id,
-            "status": "failed",
-            "error": str(exc)
-        }))
 
 async def remove_background_task(frame_id: str, raw_url: str, inventory_id: str, frame_index: int):
     # Ensure only 1 background removal process runs at a time globally
