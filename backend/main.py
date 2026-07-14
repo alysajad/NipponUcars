@@ -32,6 +32,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_event():
+    if not supabase:
+        return
+    try:
+        # Resume any stuck tasks on startup
+        res = supabase.table("listing_frames").select("*").in_("status", ["queued", "processing"]).execute()
+        if res.data:
+            print(f"[startup] Resuming {len(res.data)} stuck background tasks...")
+            for frame in res.data:
+                asyncio.create_task(remove_background_task(
+                    frame_id=frame["id"],
+                    raw_url=frame["raw_url"],
+                    inventory_id=frame["inventory_id"],
+                    frame_index=frame["frame_index"]
+                ))
+    except Exception as e:
+        print(f"[startup] Failed to resume tasks: {e}")
+
 # Load environment variables
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
