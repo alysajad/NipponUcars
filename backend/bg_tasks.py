@@ -36,40 +36,51 @@ def sync_remove_background(frame_id: str, raw_url: str, inventory_id: str, frame
         # Step 1: Update DB status to 'processing'
         supabase.table("listing_frames").update({"status": "processing"}).eq("id", frame_id).execute()
         
-        # Step 2: Download raw image from Cloudinary
-        # ponytail: downsize via Cloudinary URL to prevent Render Free Tier OOM from massive smartphone JPEGs
-        safe_url = raw_url.replace("/upload/", "/upload/w_1024,c_limit/")
-        response = requests.get(safe_url, timeout=30)
-        response.raise_for_status()
-        raw_image = Image.open(io.BytesIO(response.content)).convert("RGBA")
+        # Step 2: Try Cloudinary AI Native Background Removal First
+        processed_url = None
+        cloudinary_ai_url = raw_url.replace("/upload/", "/upload/e_background_removal,b_white,f_jpg,c_limit,w_1920/")
         
-        # Step 3: Remove background in a subprocess to isolate OOMKill
-        import tempfile
-        import subprocess
-        import sys
-        
-        with tempfile.NamedTemporaryFile(suffix=".jpg") as in_f, tempfile.NamedTemporaryFile(suffix=".jpg") as out_f:
-            raw_image.convert("RGB").save(in_f.name, format="JPEG")
+        try:
+            # Send a GET request to trigger the on-the-fly transformation and verify it works
+            resp = requests.get(cloudinary_ai_url, timeout=30)
+            if resp.status_code == 200:
+                processed_url = cloudinary_ai_url
+        except Exception:
+            pass
+
+        if not processed_url:
+            # FALLBACK: Local rembg subprocess
+            import tempfile
+            import subprocess
+            import sys
             
-            import os
-            script_path = os.path.join(os.path.dirname(__file__), "run_rembg.py")
-            res = subprocess.run([sys.executable, script_path, in_f.name, out_f.name])
-            if res.returncode != 0:
-                raise Exception(f"AI crashed (Code: {res.returncode}). Possible OOM. Upgrade plan or enable Cloudinary AI.")
+            # Downsize first to prevent OOM
+            safe_url = raw_url.replace("/upload/", "/upload/w_1024,c_limit/")
+            response = requests.get(safe_url, timeout=30)
+            response.raise_for_status()
+            raw_image = Image.open(io.BytesIO(response.content)).convert("RGBA")
             
-            # Step 5: Convert to bytes
-            buffer = io.BytesIO(open(out_f.name, "rb").read())
-        
-        # Step 6: Upload processed image to Cloudinary
-        upload_result = cloudinary.uploader.upload(
-            buffer,
-            folder=f"inventory/{inventory_id}",
-            public_id=f"frame_{frame_index:02d}",
-            resource_type="image",
-            overwrite=True,
-            transformation=[{"width": 1920, "crop": "limit"}]
-        )
-        processed_url = upload_result["secure_url"]
+            with tempfile.NamedTemporaryFile(suffix=".jpg") as in_f, tempfile.NamedTemporaryFile(suffix=".jpg") as out_f:
+                raw_image.convert("RGB").save(in_f.name, format="JPEG")
+                
+                import os
+                script_path = os.path.join(os.path.dirname(__file__), "run_rembg.py")
+                res = subprocess.run([sys.executable, script_path, in_f.name, out_f.name])
+                if res.returncode != 0:
+                    raise Exception(f"AI crashed (Code: {res.returncode}). Possible OOM. Upgrade plan or enable Cloudinary AI.")
+                
+                buffer = io.BytesIO(open(out_f.name, "rb").read())
+            
+            # Upload fallback processed image to Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                buffer,
+                folder=f"inventory/{inventory_id}",
+                public_id=f"frame_{frame_index:02d}",
+                resource_type="image",
+                overwrite=True,
+                transformation=[{"width": 1920, "crop": "limit"}]
+            )
+            processed_url = upload_result["secure_url"]
         
         # Thumb URL
         thumb_url = processed_url.replace("/upload/", "/upload/c_thumb,w_200,h_140,g_auto/")
