@@ -1,16 +1,18 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchInventory } from '@/api/inventoryApi';
 import Link from 'next/link';
-import ScrollStack, { ScrollStackItem } from './ScrollStack';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function InventoryScrollStack() {
   const { data: cars, isLoading, isError } = useQuery({
     queryKey: ['inventory', 'premium'],
     queryFn: fetchInventory
   });
+
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   if (isLoading) {
     return (
@@ -30,25 +32,87 @@ export default function InventoryScrollStack() {
 
   const premiumCars = cars.slice(0, 8);
 
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev === premiumCars.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev === 0 ? premiumCars.length - 1 : prev - 1));
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '2rem 0', backgroundColor: '#ffffff' }}>
-      <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
-        <ScrollStack 
-          useWindowScroll={true}
-          itemDistance={600}
-          itemScale={0.03}
-          itemStackDistance={40}
-          stackPosition="15%"
-          scaleEndPosition="5%"
-          baseScale={0.85}
-          scaleDuration={0.5}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+      <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', position: 'relative', overflow: 'hidden', padding: '2rem 0' }}>
+        
+        {/* Navigation Buttons */}
+        <button 
+          onClick={prevSlide}
+          className="slider-arrow"
+          style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', zIndex: 50, background: 'var(--pure-white)', border: '1px solid #eee', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', transition: 'transform 0.2s' }}
         >
-          {premiumCars.map((car, index) => (
-            <ScrollStackItem key={car.id || index}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <ChevronLeft size={24} color="var(--dark-grey)" />
+        </button>
+
+        <button 
+          onClick={nextSlide}
+          className="slider-arrow"
+          style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', zIndex: 50, background: 'var(--pure-white)', border: '1px solid #eee', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', transition: 'transform 0.2s' }}
+        >
+          <ChevronRight size={24} color="var(--dark-grey)" />
+        </button>
+
+        {/* Slider Container */}
+        <div style={{ display: 'grid', width: '100%', alignItems: 'center', justifyItems: 'center' }}>
+          {premiumCars.map((car, index) => {
+            
+            // Stacking Logic
+            const isCurrent = index === currentIndex;
+            const isNext = index > currentIndex;
+            const isPrev = index < currentIndex;
+            
+            // Default styles
+            let transform = 'translateX(100%)';
+            let opacity = 0;
+            let zIndex = 1;
+
+            if (isCurrent) {
+              transform = 'translateX(0) scale(1)';
+              opacity = 1;
+              zIndex = 20;
+            } else if (isPrev) {
+              // Fade out to the left
+              transform = 'translateX(-30%) scale(0.95)';
+              opacity = 0;
+              zIndex = 10;
+            } else if (isNext) {
+              // Slide in from right (like a stack)
+              transform = 'translateX(100%) scale(1)';
+              opacity = 1; // Keep visible while sliding in
+              zIndex = 30; // Slide on TOP of current
+            }
+
+            return (
+              <div 
+                key={car.id || index}
+                style={{ 
+                  gridArea: '1 / 1',
+                  width: '100%', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease',
+                  transform: transform,
+                  opacity: isNext ? 1 : opacity, // Ensure next elements in stack are opaque if they are sliding in
+                  visibility: (isCurrent || isNext || isPrev) ? 'visible' : 'hidden', // Optimize render
+                  zIndex: zIndex,
+                  pointerEvents: isCurrent ? 'auto' : 'none',
+                  backgroundColor: '#ffffff'
+                }}
+              >
                 
                 {/* Title & Price */}
-                <div style={{ textAlign: 'center', marginBottom: '3rem', zIndex: 10 }}>
+                <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
                   <h3 style={{ fontSize: '3rem', fontFamily: 'var(--font-sailors)', color: 'var(--dark-grey)', margin: 0, textTransform: 'uppercase', letterSpacing: '2px' }}>
                     {car.name}
                   </h3>
@@ -58,7 +122,7 @@ export default function InventoryScrollStack() {
                 </div>
                 
                 {/* Center Content: Left Specs - Image - Right Specs */}
-                <div className="car-stack-center" style={{ zIndex: 10 }}>
+                <div className="car-stack-center" style={{ width: '100%' }}>
                   
                   {/* Left Specs */}
                   <div className="car-stack-specs left">
@@ -92,7 +156,7 @@ export default function InventoryScrollStack() {
                 </div>
 
                 {/* CTA Button */}
-                <div style={{ marginTop: '3rem', zIndex: 10 }}>
+                <div style={{ marginTop: '3rem' }}>
                   <Link 
                     href={`/inventory/detail?id=${car.id}`} 
                     className="cta-button" 
@@ -103,9 +167,9 @@ export default function InventoryScrollStack() {
                 </div>
 
               </div>
-            </ScrollStackItem>
-          ))}
-        </ScrollStack>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
