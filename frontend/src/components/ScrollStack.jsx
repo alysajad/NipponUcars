@@ -8,10 +8,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const ScrollStackItem = ({ children, itemClassName = '' }) => (
   <div
-    className={`scroll-stack-card ${itemClassName}`.trim()}
+    className={`scroll-stack-card relative w-full min-h-[100svh] flex flex-col items-center justify-center origin-top will-change-transform bg-white ${itemClassName}`.trim()}
     style={{
       backfaceVisibility: 'hidden',
-      transformStyle: 'preserve-3d'
+      transformStyle: 'preserve-3d',
+      backgroundColor: '#ffffff'
     }}
   >
     {children}
@@ -54,11 +55,29 @@ const ScrollStack = ({
     return parseFloat(value);
   }, []);
 
+  const cachedHeightRef = useRef(0);
+  const cachedWidthRef = useRef(0);
+  
+  useLayoutEffect(() => {
+    if (typeof window !== 'undefined') {
+      cachedHeightRef.current = window.innerHeight;
+      cachedWidthRef.current = window.innerWidth;
+      const handleResize = () => {
+        if (window.innerWidth !== cachedWidthRef.current) {
+          cachedHeightRef.current = window.innerHeight;
+          cachedWidthRef.current = window.innerWidth;
+        }
+      };
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
   const getScrollData = useCallback(() => {
     if (useWindowScroll) {
       return {
         scrollTop: window.scrollY,
-        containerHeight: window.innerHeight,
+        containerHeight: cachedHeightRef.current || window.innerHeight,
         scrollContainer: document.documentElement
       };
     } else {
@@ -154,7 +173,7 @@ const ScrollStack = ({
         Math.abs(lastTransform.blur - newTransform.blur) > 0.1;
 
       if (hasChanged) {
-        const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
+        const transform = `translate3d(0, ${newTransform.translateY}px, ${i}px) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
         const filter = newTransform.blur > 0 ? `blur(${newTransform.blur}px)` : '';
 
         card.style.transform = transform;
@@ -276,6 +295,7 @@ const ScrollStack = ({
       card.style.webkitTransform = 'translateZ(0)';
       card.style.perspective = '1000px';
       card.style.webkitPerspective = '1000px';
+      card.style.zIndex = i + 10;
     });
 
     setupLenis();
