@@ -36,7 +36,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-function CarModel({ path, scrollProxy, isActive, initialScale = 1.5, initialY = -1 }) {
+function CarModel({ path, scrollProxy, isActive, initialScale = 1.5, initialY = -1, initialRotation = [0, 0, 0] }) {
   const gltf = useDracoGLTF(path);
   // Clone scene to avoid shared-scene conflicts between Landing & Inventory
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
@@ -74,7 +74,7 @@ function CarModel({ path, scrollProxy, isActive, initialScale = 1.5, initialY = 
 
   return (
     <group ref={outerGroup} position={[0, initialY, 0]}>
-      <group ref={innerGroup} visible={false}>
+      <group ref={innerGroup} visible={false} rotation={initialRotation}>
         <primitive object={clonedScene} />
       </group>
     </group>
@@ -90,7 +90,7 @@ function PerformanceManager() {
   return null;
 }
 
-export default function LandingCanvas() {
+export default function LandingCanvas({ activeModelIndex = 0 }) {
   const [isMobile, setIsMobile] = useState(false);
 
   // Set up mobile detection
@@ -109,38 +109,13 @@ export default function LandingCanvas() {
 
   // Update initial positionX when isMobile changes
   useEffect(() => {
-    // Increased from 1.5 to 2.2 to prevent overlap with left-aligned hero text
     scrollProxy.positionX = isMobile ? 0 : 2.2;
   }, [isMobile, scrollProxy]);
 
   const containerRef = useRef();
-  const [activeModel, setActiveModel] = useState(0);
 
   useEffect(() => {
-    const verticalSections = ['sec-0', 'sec-1', 'sec-2', 'sec-3'];
-    verticalSections.forEach((id, i) => {
-      const el = document.getElementById(id);
-      if (el) {
-        ScrollTrigger.create({
-          trigger: el,
-          start: "top center",
-          end: "bottom center",
-          onEnter: () => setActiveModel(i),
-          onEnterBack: () => setActiveModel(i),
-        });
-      }
-    });
-
     const sec4 = document.getElementById('sec-4');
-    if (sec4) {
-      ScrollTrigger.create({
-        trigger: sec4,
-        start: "top 85%", 
-        onEnter: () => setActiveModel(4),
-        onLeaveBack: () => setActiveModel(3),
-      });
-    }
-
     const scrollEnd = sec4 ? sec4.offsetTop + sec4.offsetHeight : 4000;
 
     const tl = gsap.timeline({
@@ -183,10 +158,10 @@ export default function LandingCanvas() {
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
         <Environment preset="city" />
         <Suspense fallback={null}>
-          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783927072/3d_models/hilux-ultra.glb" scrollProxy={scrollProxy} isActive={activeModel === 0} initialScale={1.5} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926380/3d_models/toyota_fortuner_2021-optimized.glb" scrollProxy={scrollProxy} isActive={activeModel === 1} initialScale={1.8} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926381/3d_models/toyota-corolla-e170-2017-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 2} initialScale={1.3} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
-          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926387/3d_models/2021_tata_safari-compressed.glb" scrollProxy={scrollProxy} isActive={activeModel === 3} initialScale={1.3} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783927072/3d_models/hilux-ultra.glb" scrollProxy={scrollProxy} isActive={activeModelIndex === 0} initialScale={1.5} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926380/3d_models/toyota_fortuner_2021-optimized.glb" scrollProxy={scrollProxy} isActive={activeModelIndex === 1} initialScale={1.8} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926381/3d_models/toyota-corolla-e170-2017-compressed.glb" scrollProxy={scrollProxy} isActive={activeModelIndex === 2} initialScale={1.3} initialY={isMobile ? -1.5 : -1} /></ErrorBoundary>
+          <ErrorBoundary><CarModel path="https://res.cloudinary.com/vdofesxh/raw/upload/v1783926387/3d_models/2021_tata_safari-compressed.glb" scrollProxy={scrollProxy} isActive={activeModelIndex === 3} initialScale={1.3} initialY={isMobile ? -1.5 : -1} initialRotation={[0, Math.PI, 0]} /></ErrorBoundary>
           <ContactShadows position={[0, isMobile ? -1.51 : -1.01, 0]} opacity={0.35} scale={20} blur={2.5} far={4} />
         </Suspense>
       </Canvas>

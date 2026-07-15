@@ -126,9 +126,18 @@ export default function InventoryList() {
           .inventory-layout {
             padding: 1rem !important;
           }
+          .inventory-header {
+            padding: 1rem 1.5rem !important;
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 1rem;
+          }
         }
       `}</style>
-      <header className="inventory-header" style={{ padding: '1.5rem 4rem', background: 'var(--pure-white)', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header className="inventory-header" style={{ padding: '1.5rem 4rem', background: 'var(--pure-white)', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '2rem' }}>
+        <Link href="/" className="cta-button" style={{ margin: 0, padding: '0.6rem 1.2rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <Home size={16} /> BACK TO HOME
+        </Link>
         <div>
           <h1 style={{ fontFamily: 'var(--font-sailors)', fontSize: '2rem', margin: 0 }}><span className="text-red">U-Trust</span> Used Cars</h1>
           <p style={{ color: '#888', margin: 0, fontSize: '0.9rem', marginTop: '0.2rem' }}>
@@ -139,9 +148,6 @@ export default function InventoryList() {
             <span style={{ color: 'var(--dark-grey)', fontWeight: 'bold' }}>All India</span>
           </p>
         </div>
-        <Link href="/" className="cta-button" style={{ margin: 0, padding: '0.6rem 1.2rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Home size={16} /> BACK TO HOME
-        </Link>
       </header>
 
       <div className="inventory-layout" style={{ display: 'flex', gap: '2rem', padding: '2rem 2rem', maxWidth: '100%', margin: '0', flexWrap: 'wrap' }}>

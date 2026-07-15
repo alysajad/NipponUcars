@@ -4,10 +4,29 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import LandingCanvas from '@/components/LandingCanvas';
-import InventoryScrollStack from '@/components/InventoryScrollStack';
 
 export default function Landing() {
   const router = useRouter();
+  const [currentCarIndex, setCurrentCarIndex] = React.useState(0);
+
+  const heroCars = [
+    { name: 'Toyota Hilux Ultra', price: '₹ 38,00,000', specs: '2.8L Diesel | 4x4 | Automatic' },
+    { name: 'Toyota Fortuner', price: '₹ 45,00,000', specs: '2.8L Diesel | 4x4 | Automatic' },
+    { name: 'Toyota Corolla', price: '₹ 20,00,000', specs: '1.8L Hybrid | Automatic' },
+    { name: 'Tata Safari', price: '₹ 25,00,000', specs: '2.0L Diesel | Automatic' },
+  ];
+
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight') {
+        setCurrentCarIndex((prev) => (prev + 1) % heroCars.length);
+      } else if (e.key === 'ArrowLeft') {
+        setCurrentCarIndex((prev) => (prev - 1 + heroCars.length) % heroCars.length);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const scrollToSection = (sectionId) => {
     const el = document.getElementById(sectionId);
@@ -18,7 +37,16 @@ export default function Landing() {
 
   return (
     <div className="app-wrapper">
-      <LandingCanvas />
+      <style>{`
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(30px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-slide-in {
+          animation: slideInRight 0.4s ease-out forwards;
+        }
+      `}</style>
+      <LandingCanvas activeModelIndex={currentCarIndex} />
       
       <div className="content-layer">
         {/* Hero */}
@@ -45,10 +73,20 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="certified-badge">
-               <h3 style={{ fontFamily: 'var(--font-sailors)', fontSize: '2.5rem', marginBottom: '0.5rem' }}>CERTIFIED</h3>
-               <p style={{ fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '0.25rem' }}>Premium Toyota Selection</p>
-               <p style={{ fontSize: '1rem', marginBottom: 0 }}>Quality <span className="text-red" style={{ fontWeight: 'bold' }}>Guaranteed</span></p>
+            <div key={currentCarIndex} className="animate-slide-in" style={{ background: 'var(--pure-white)', padding: '2rem', borderRadius: '20px', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', width: '350px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <span style={{ fontWeight: 'bold', color: 'var(--primary-red)' }}>FEATURED</span>
+                <span style={{ color: '#888' }}>{currentCarIndex + 1} / {heroCars.length}</span>
+              </div>
+              <h3 style={{ fontFamily: 'var(--font-sailors)', fontSize: '2rem', marginBottom: '0.5rem', lineHeight: '1.1' }}>{heroCars[currentCarIndex].name}</h3>
+              <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem', color: 'var(--dark-grey)' }}>{heroCars[currentCarIndex].price}</p>
+              <p style={{ color: '#666', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{heroCars[currentCarIndex].specs}</p>
+              
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <button onClick={() => setCurrentCarIndex((prev) => (prev - 1 + heroCars.length) % heroCars.length)} style={{ padding: '0.5rem 1rem', background: '#eee', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', color: 'var(--dark-grey)', fontSize: '1.2rem' }}>←</button>
+                <button onClick={() => setCurrentCarIndex((prev) => (prev + 1) % heroCars.length)} style={{ padding: '0.5rem 1rem', background: '#eee', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', color: 'var(--dark-grey)', fontSize: '1.2rem' }}>→</button>
+                <Link href="/inventory" style={{ flex: 1, padding: '0.5rem', background: 'var(--primary-red)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', textDecoration: 'none', textAlign: 'center', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>View Details</Link>
+              </div>
             </div>
           </div>
         </section>
@@ -112,9 +150,14 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Premium Inventory Showcase (ScrollStack) */}
-        <section id="sec-4" style={{ position: 'relative', zIndex: 5, padding: '4rem 0', minHeight: '100vh' }}>
-          <InventoryScrollStack />
+        {/* Explore Inventory CTA */}
+        <section className="section" style={{ justifyContent: 'center', alignItems: 'center', minHeight: '50vh', textAlign: 'center' }}>
+          <div className="section-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
+            <h2 className="section-title">Ready to find your perfect drive?</h2>
+            <Link href="/inventory" className="cta-button" style={{ padding: '1rem 3rem', fontSize: '1.2rem', borderRadius: '40px', background: 'var(--primary-red)', color: 'white', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 10px 20px rgba(220, 38, 38, 0.2)', transition: 'all 0.3s ease', display: 'inline-block' }}>
+              Explore Full Inventory →
+            </Link>
+          </div>
         </section>
       </div>
     </div>
