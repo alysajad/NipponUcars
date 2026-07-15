@@ -15,6 +15,7 @@ export default function InventoryList() {
   const [selectedModels, setSelectedModels] = useState([]);
   const [budgetRange, setBudgetRange] = useState({ min: 0, max: 200 }); // In Lakhs
   const [ageRange, setAgeRange] = useState({ min: 0, max: 15 }); // In Years
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   const toggleModel = (model) => {
     setSelectedModels(prev => 
@@ -78,6 +79,54 @@ export default function InventoryList() {
           box-shadow: 0 1px 4px rgba(0,0,0,0.4);
           cursor: pointer;
         }
+        .mobile-filter-btn {
+          display: none !important;
+        }
+        .mobile-filter-close {
+          display: none !important;
+        }
+        .inventory-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0,0,0,0.5);
+          z-index: 999;
+          backdrop-filter: blur(4px);
+        }
+        @media (max-width: 768px) {
+          .inventory-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 85%;
+            max-width: 350px;
+            height: 100%;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            border-radius: 0 !important;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+          }
+          .inventory-sidebar.open {
+            transform: translateX(0);
+          }
+          .mobile-filter-btn {
+            display: flex !important;
+          }
+          .mobile-filter-close {
+            display: block !important;
+          }
+          .inventory-overlay.open {
+            display: block;
+          }
+          .inventory-layout {
+            padding: 1rem !important;
+          }
+        }
       `}</style>
       <header className="inventory-header" style={{ padding: '1.5rem 4rem', background: 'var(--pure-white)', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
@@ -97,14 +146,19 @@ export default function InventoryList() {
 
       <div className="inventory-layout" style={{ display: 'flex', gap: '2rem', padding: '2rem 2rem', maxWidth: '100%', margin: '0', flexWrap: 'wrap' }}>
         
+        <div className={`inventory-overlay ${isMobileFilterOpen ? 'open' : ''}`} onClick={() => setIsMobileFilterOpen(false)} />
+
         {/* Left Sidebar Filters */}
-        <aside className="inventory-sidebar" style={{ width: '280px', flexShrink: 0, background: 'var(--pure-white)', padding: '1.5rem', borderRadius: '12px', border: '1px solid #eee', height: 'fit-content' }}>
+        <aside className={`inventory-sidebar ${isMobileFilterOpen ? 'open' : ''}`} style={{ width: '280px', flexShrink: 0, background: 'var(--pure-white)', padding: '1.5rem', borderRadius: '12px', border: '1px solid #eee', height: 'fit-content' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
             <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.2rem' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
               Filters
             </h3>
-            <button onClick={() => {setSelectedModels([]); setBudgetRange({min:0, max:200})}} style={{ background: 'none', border: 'none', color: 'var(--primary-red)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>Clear All</button>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <button onClick={() => {setSelectedModels([]); setBudgetRange({min:0, max:200})}} style={{ background: 'none', border: 'none', color: 'var(--primary-red)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>Clear All</button>
+              <button className="mobile-filter-close" onClick={() => setIsMobileFilterOpen(false)} style={{ background: 'none', border: 'none', fontSize: '2rem', lineHeight: 0.5, cursor: 'pointer', color: '#888' }}>&times;</button>
+            </div>
           </div>
           
           {/* Seller Type Mock */}
@@ -214,7 +268,17 @@ export default function InventoryList() {
 
         {/* Right Main Grid */}
         <main className="inventory-main" style={{ flex: 1, minWidth: '300px' }}>
-          <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem', color: 'var(--dark-grey)' }}>{filteredCars.length} Used Cars in India</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--dark-grey)' }}>{filteredCars.length} Used Cars in India</h2>
+            <button 
+              className="mobile-filter-btn"
+              onClick={() => setIsMobileFilterOpen(true)}
+              style={{ background: 'var(--pure-white)', border: '1px solid #ddd', padding: '0.5rem 1rem', borderRadius: '8px', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold', color: 'var(--dark-grey)', cursor: 'pointer' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              Filters
+            </button>
+          </div>
           
           {isLoading ? (
             <div className="showcase-loading">Loading inventory...</div>
@@ -227,7 +291,7 @@ export default function InventoryList() {
                 const descText = (car.desc && car.desc !== 'null') ? car.desc : (specs.variant || 'Premium Selection');
                 
                 return (
-                  <Link href={`/inventory/${car.id}`} style={{ textDecoration: 'none', color: 'inherit' }} key={car.id}>
+                  <Link href={`/inventory/detail?id=${car.id}`} style={{ textDecoration: 'none', color: 'inherit' }} key={car.id}>
                     <div className="showcase-card" style={{ width: '100%', maxWidth: '100%', minWidth: '0', display: 'block', height: '100%' }}>
                       <div className="showcase-img-wrap" style={{ height: '160px', background: '#f8f8f8', padding: '0.5rem' }}>
                         <img src={coverImage} alt={car.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />

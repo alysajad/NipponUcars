@@ -51,11 +51,19 @@ function getDynamicCarData(carName) {
 
   return { competitors, reviews };
 }
+import { useSearchParams } from 'next/navigation';
 
-export default function CarDetail({ params }) {
-  // Next.js 15+ requires params to be unwrapped if dynamic
-  const unwrappedParams = React.use(params);
-  const { id } = unwrappedParams;
+export default function CarDetailPage() {
+  return (
+    <React.Suspense fallback={<div className="detail-page-container flex items-center justify-center min-h-screen">Loading details...</div>}>
+      <CarDetail />
+    </React.Suspense>
+  );
+}
+
+function CarDetail() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
 
   const { data: cars = [], isLoading } = useQuery({
     queryKey: ['inventory'],

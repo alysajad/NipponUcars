@@ -94,7 +94,7 @@ export default function InventoryScrollStack() {
                 {/* CTA Button */}
                 <div style={{ marginTop: '3rem', zIndex: 10 }}>
                   <Link 
-                    href={`/inventory/${car.id}`} 
+                    href={`/inventory/detail?id=${car.id}`} 
                     className="cta-button" 
                     style={{ display: 'inline-block', padding: '1rem 3rem', fontSize: '1.2rem', borderRadius: '40px', background: 'var(--primary-red)', color: 'white', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 10px 20px rgba(220, 38, 38, 0.2)', transition: 'all 0.3s ease' }}
                   >
