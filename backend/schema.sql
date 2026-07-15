@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS public.inventory (
     "desc" TEXT NOT NULL,
     specs TEXT NOT NULL,
     price TEXT NOT NULL,
-    frames TEXT[] NOT NULL
+    frames TEXT[] NOT NULL,
+    extra_details JSONB DEFAULT '{}'::jsonb
 );
 
 -- Create listing_frames table for background removal tracking

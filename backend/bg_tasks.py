@@ -36,51 +36,35 @@ def sync_remove_background(frame_id: str, raw_url: str, inventory_id: str, frame
         # Step 1: Update DB status to 'processing'
         supabase.table("listing_frames").update({"status": "processing"}).eq("id", frame_id).execute()
         
-        # Step 2: Try Cloudinary AI Native Background Removal First
-        processed_url = None
-        cloudinary_ai_url = raw_url.replace("/upload/", "/upload/e_background_removal,b_white,f_jpg,c_limit,w_1920/")
+        # Step 2: Use api4ai Native Background Removal
+        api_key = 'a4a-hRWdOaPfCPZy6bLdDjXJapsJ2nzgH3jo'
+        api_url = 'https://api4ai.cloud/img-bg-removal/v1/results'
         
-        try:
-            # Send a GET request to trigger the on-the-fly transformation and verify it works
-            resp = requests.get(cloudinary_ai_url, timeout=30)
-            if resp.status_code == 200:
-                processed_url = cloudinary_ai_url
-        except Exception:
-            pass
-
-        if not processed_url:
-            # FALLBACK: Local rembg subprocess
-            import tempfile
-            import subprocess
-            import sys
-            
-            # Downsize first to prevent OOM
-            safe_url = raw_url.replace("/upload/", "/upload/w_1024,c_limit/")
-            response = requests.get(safe_url, timeout=30)
-            response.raise_for_status()
-            raw_image = Image.open(io.BytesIO(response.content)).convert("RGBA")
-            
-            with tempfile.NamedTemporaryFile(suffix=".jpg") as in_f, tempfile.NamedTemporaryFile(suffix=".jpg") as out_f:
-                raw_image.convert("RGB").save(in_f.name, format="JPEG")
-                
-                import os
-                script_path = os.path.join(os.path.dirname(__file__), "run_rembg.py")
-                res = subprocess.run([sys.executable, script_path, in_f.name, out_f.name])
-                if res.returncode != 0:
-                    raise Exception(f"AI crashed (Code: {res.returncode}). Possible OOM. Upgrade plan or enable Cloudinary AI.")
-                
-                buffer = io.BytesIO(open(out_f.name, "rb").read())
-            
-            # Upload fallback processed image to Cloudinary
-            upload_result = cloudinary.uploader.upload(
-                buffer,
-                folder=f"inventory/{inventory_id}",
-                public_id=f"frame_{frame_index:02d}",
-                resource_type="image",
-                overwrite=True,
-                transformation=[{"width": 1920, "crop": "limit"}]
-            )
-            processed_url = upload_result["secure_url"]
+        safe_url = raw_url.replace("/upload/", "/upload/w_1024,c_limit/")
+        api_resp = requests.post(
+            api_url,
+            headers={'X-API-KEY': api_key},
+            data={'url': safe_url},
+            timeout=60
+        )
+        api_resp.raise_for_status()
+        
+        data = api_resp.json()
+        b64_image = data['results'][0]['entities'][0]['image']
+        
+        import base64
+        image_bytes = base64.b64decode(b64_image)
+        
+        # Upload processed image to Cloudinary
+        upload_result = cloudinary.uploader.upload(
+            image_bytes,
+            folder=f"inventory/{inventory_id}",
+            public_id=f"frame_{frame_index:02d}",
+            resource_type="image",
+            overwrite=True,
+            transformation=[{"width": 1920, "crop": "limit", "background": "white", "format": "jpg"}]
+        )
+        processed_url = upload_result["secure_url"]
         
         # Thumb URL
         thumb_url = processed_url.replace("/upload/", "/upload/c_thumb,w_200,h_140,g_auto/")

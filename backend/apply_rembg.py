@@ -7,7 +7,6 @@ import cloudinary
 import cloudinary.uploader
 from PIL import Image
 from supabase import create_client, Client
-from rembg import new_session, remove
 
 load_dotenv()
 
@@ -23,37 +22,36 @@ cloudinary.config(
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-print("Loading rembg model...")
-session = new_session("u2netp")
-print("Model ready.")
 
 def process_image(url, inventory_id, index):
     safe_url = url.replace("/upload/", "/upload/w_1024,c_limit/")
-    print(f"  Downloading {safe_url}...")
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-    response = requests.get(safe_url, headers=headers, timeout=30)
-    response.raise_for_status()
-    raw_image = Image.open(io.BytesIO(response.content)).convert("RGBA")
+    print(f"  Sending request to api4ai for {safe_url}...")
     
-    print(f"  Removing background...")
-    removed = remove(raw_image, session=session)
+    API_KEY = 'a4a-hRWdOaPfCPZy6bLdDjXJapsJ2nzgH3jo'
+    API_URL = 'https://api4ai.cloud/img-bg-removal/v1/results'
     
-    white_canvas = Image.new("RGBA", removed.size, (255, 255, 255, 255))
-    white_canvas.paste(removed, mask=removed.split()[3])
-    final = white_canvas.convert("RGB")
+    api_resp = requests.post(
+        API_URL,
+        headers={'X-API-KEY': API_KEY},
+        data={'url': safe_url},
+        timeout=60
+    )
+    api_resp.raise_for_status()
     
-    buffer = io.BytesIO()
-    final.save(buffer, format="JPEG", quality=88, optimize=True)
-    buffer.seek(0)
+    data = api_resp.json()
+    b64_image = data['results'][0]['entities'][0]['image']
+    
+    import base64
+    image_bytes = base64.b64decode(b64_image)
     
     print(f"  Uploading to Cloudinary...")
     upload_result = cloudinary.uploader.upload(
-        buffer,
+        image_bytes,
         folder=f"inventory/{inventory_id}",
         public_id=f"frame_{index:02d}",
         resource_type="image",
         overwrite=True,
-        transformation=[{"width": 1920, "crop": "limit"}]
+        transformation=[{"width": 1920, "crop": "limit", "background": "white", "format": "jpg"}]
     )
     return upload_result["secure_url"]
 

@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import LandingCanvas from '@/components/LandingCanvas';
+import InventoryScrollStack from '@/components/InventoryScrollStack';
 
 export default function Landing() {
   const router = useRouter();
@@ -111,15 +112,9 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="section cta-section" id="sec-4" style={{ justifyContent: 'flex-end', paddingBottom: '10rem', minHeight: '60vh' }}>
-          <div className="section-content">
-            <h2 className="section-title">Ready to <span className="text-red">Explore?</span></h2>
-            <p>Browse our premium selection of Toyota-certified pre-owned vehicles. Every car inspected, every deal transparent.</p>
-            <Link href="/inventory" className="cta-button">
-              SEE INVENTORY
-            </Link>
-          </div>
+        {/* Premium Inventory Showcase (ScrollStack) */}
+        <section id="sec-4" style={{ position: 'relative', zIndex: 5, padding: '4rem 0', minHeight: '100vh' }}>
+          <InventoryScrollStack />
         </section>
       </div>
     </div>

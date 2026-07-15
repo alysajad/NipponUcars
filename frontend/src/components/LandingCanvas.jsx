@@ -113,10 +113,11 @@ export default function LandingCanvas() {
     scrollProxy.positionX = isMobile ? 0 : 2.2;
   }, [isMobile, scrollProxy]);
 
+  const containerRef = useRef();
   const [activeModel, setActiveModel] = useState(0);
 
   useEffect(() => {
-    const verticalSections = ['sec-0', 'sec-1', 'sec-2', 'sec-3', 'sec-4'];
+    const verticalSections = ['sec-0', 'sec-1', 'sec-2', 'sec-3'];
     verticalSections.forEach((id, i) => {
       const el = document.getElementById(id);
       if (el) {
@@ -131,6 +132,15 @@ export default function LandingCanvas() {
     });
 
     const sec4 = document.getElementById('sec-4');
+    if (sec4) {
+      ScrollTrigger.create({
+        trigger: sec4,
+        start: "top 85%", 
+        onEnter: () => setActiveModel(4),
+        onLeaveBack: () => setActiveModel(3),
+      });
+    }
+
     const scrollEnd = sec4 ? sec4.offsetTop + sec4.offsetHeight : 4000;
 
     const tl = gsap.timeline({
@@ -149,7 +159,11 @@ export default function LandingCanvas() {
     tl.to(scrollProxy, { rotationY: Math.PI / 3,  positionX: -2.2 * m, positionZ: 0.5,  ease: "none" }, 0); // Sec 1 (Text right)
     tl.to(scrollProxy, { rotationY: Math.PI * 0.7, positionX: 2.2 * m,  positionZ: -0.5, ease: "none" }, 1); // Sec 2 (Text left)
     tl.to(scrollProxy, { rotationY: -Math.PI / 6,  positionX: -2.2 * m,   positionZ: 1,    ease: "none" }, 2); // Sec 3 (Text right)
-    tl.to(scrollProxy, { rotationY: Math.PI / 4,   positionX: 0,        positionZ: 0,    ease: "none" }, 3); // Sec 4
+    
+    // Fade out the entire canvas when transitioning to sec-4
+    if (containerRef.current) {
+      tl.to(containerRef.current, { opacity: 0, ease: "power2.out" }, 2.5);
+    }
     
     return () => {
       ScrollTrigger.getAll().forEach(t => t.kill());
@@ -157,7 +171,7 @@ export default function LandingCanvas() {
   }, [scrollProxy, isMobile]);
 
   return (
-    <div className="canvas-container">
+    <div className="canvas-container" ref={containerRef} style={{ transition: 'opacity 0.3s' }}>
       <Canvas
         camera={{ position: [0, 2, 8], fov: isMobile ? 65 : 45 }}
         dpr={[1, 1.5]}
