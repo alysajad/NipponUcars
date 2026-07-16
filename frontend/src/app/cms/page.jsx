@@ -234,7 +234,13 @@ export default function CmsAddVehicle() {
       {/* Top Nav */}
       <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center px-10 w-full max-w-[1280px] mx-auto h-20">
-          <div className="font-headline-md text-headline-md font-bold text-primary uppercase tracking-wider">PREMIER AUTO</div>
+          <div className="flex items-center gap-2 font-label-sm text-[14px] uppercase tracking-wider font-bold">
+            <Link href="/" className="text-secondary hover:text-primary transition-colors">Home</Link>
+            <span className="text-secondary/50">&gt;</span>
+            <Link href="/cms/dashboard" className="text-primary hover:text-[#93000e] transition-colors">CMS</Link>
+            <span className="text-secondary/50">&gt;</span>
+            <span className="text-on-surface">Add Vehicle</span>
+          </div>
           <nav className="hidden md:flex items-center gap-8">
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/dashboard">Dashboard</Link>
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/inventory">Inventory</Link>

@@ -286,7 +286,7 @@ export default function InventoryList() {
           {isLoading ? (
             <div className="showcase-loading">Loading inventory...</div>
           ) : filteredCars.length > 0 ? (
-            <div className="showcase-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
               {filteredCars.map((car) => {
                 let specs = {};
                 try { specs = typeof car.specs === 'object' ? car.specs : JSON.parse(car.specs); } catch(e) { }

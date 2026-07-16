@@ -762,12 +762,6 @@ p {
   margin: 0 auto;
 }
 
-.showcase-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-}
 
 .showcase-card {
   background: var(--pure-white);
