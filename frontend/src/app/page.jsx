@@ -23,7 +23,7 @@ export default function Landing() {
             <span className="font-headline-md text-headline-md font-semibold text-primary uppercase">Nippon U-Trust</span>
             <div className="hidden md:flex items-center gap-8 ml-12">
               <Link href="#" className="nav-link font-label-bold text-label-bold uppercase text-primary relative after:content-[''] after:absolute after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary">Buy</Link>
-              <Link href="#" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Sell</Link>
+              <Link href="/sell" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Sell</Link>
               <Link href="#" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Exchange</Link>
               <Link href="/inventory" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Inventory</Link>
             </div>
@@ -90,42 +90,122 @@ export default function Landing() {
       </header>
 
       {/* The U-Trust Advantage Section */}
-      <section className="py-24 bg-surface-container-low">
+      <section className="py-24 bg-white">
         <div className="px-margin-desktop max-w-container-max mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-primary font-label-bold text-label-bold tracking-[0.2em] uppercase">The Toyota Promise</span>
-            <h2 className="font-headline-lg text-headline-lg mt-2 uppercase text-secondary">The U-Trust Advantage</h2>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-10 mb-16">
+            <h2 className="font-headline-lg text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-nowrap">The Toyota Promise</h2>
+            <p className="font-body-md text-body-md text-secondary/70 max-w-2xl leading-relaxed">
+              At Toyota U-Trust, we offer a range of advantages to help you buy and sell with confidence. These include our comprehensive evaluation, manufacturer-backed warranties, and fully transparent history.
+            </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-10 rounded-xl card-hover border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-              <div className="w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
-                <span className="material-symbols-outlined text-[32px]">assignment_turned_in</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Card 1 */}
+            <div className="bg-surface-container-low p-10 rounded-[2.5rem] border border-outline-variant flex justify-between items-center group hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-64 md:h-72">
+              <div className="flex flex-col justify-between h-full z-10">
+                <div>
+                  <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm text-secondary">203-Point</span>
+                  <br/>
+                  <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm mt-2 text-secondary">Inspection</span>
+                </div>
+                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
+                  <span className="material-symbols-outlined bg-white text-secondary group-hover:text-white group-hover:bg-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
+                  Learn More
+                </Link>
               </div>
-              <h3 className="font-headline-md text-headline-md mb-4 uppercase">203-Point Inspection</h3>
-              <p className="font-body-md text-body-md text-secondary/70">
-                Comprehensive evaluation by Toyota-trained technicians ensuring every component meets our strict performance and safety standards.
-              </p>
+              <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
+                <span className="material-symbols-outlined text-primary" style={{ fontSize: '100px' }}>assignment_turned_in</span>
+              </div>
             </div>
             
-            <div className="bg-white p-10 rounded-xl card-hover border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-              <div className="w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
-                <span className="material-symbols-outlined text-[32px]">verified_user</span>
+            {/* Card 2 */}
+            <div className="bg-secondary p-10 rounded-[2.5rem] border border-secondary flex justify-between items-center group hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-64 md:h-72">
+              <div className="flex flex-col justify-between h-full z-10">
+                <div>
+                  <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm">Comprehensive</span>
+                  <br/>
+                  <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm mt-2">Warranty</span>
+                </div>
+                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
+                  <span className="material-symbols-outlined bg-white/20 backdrop-blur-md text-white group-hover:bg-white group-hover:text-secondary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
+                  Learn More
+                </Link>
               </div>
-              <h3 className="font-headline-md text-headline-md mb-4 uppercase">Comprehensive Warranty</h3>
-              <p className="font-body-md text-body-md text-secondary/70">
-                Drive with confidence. All U-Trust vehicles come with an extensive manufacturer-backed warranty and roadside assistance.
-              </p>
+              <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
+                <span className="material-symbols-outlined text-white" style={{ fontSize: '100px' }}>verified_user</span>
+              </div>
             </div>
             
-            <div className="bg-white p-10 rounded-xl card-hover border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-              <div className="w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
-                <span className="material-symbols-outlined text-[32px]">history</span>
+            {/* Card 3 */}
+            <div className="bg-primary/5 p-10 rounded-[2.5rem] border border-primary/20 flex justify-between items-center group hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-64 md:h-72">
+              <div className="flex flex-col justify-between h-full z-10">
+                <div>
+                  <span className="font-headline-md text-headline-md uppercase bg-primary text-white px-4 py-2 rounded-md inline-block shadow-sm">Transparent</span>
+                  <br/>
+                  <span className="font-headline-md text-headline-md uppercase bg-primary text-white px-4 py-2 rounded-md inline-block shadow-sm mt-2">History</span>
+                </div>
+                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-primary group-hover:brightness-110 transition-colors">
+                  <span className="material-symbols-outlined bg-primary text-white group-hover:bg-white group-hover:text-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
+                  Learn More
+                </Link>
               </div>
-              <h3 className="font-headline-md text-headline-md mb-4 uppercase">Transparent History</h3>
-              <p className="font-body-md text-body-md text-secondary/70">
-                No hidden surprises. We provide full service history and verification of ownership for every vehicle in our inventory.
-              </p>
+              <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
+                <span className="material-symbols-outlined text-primary" style={{ fontSize: '100px' }}>history</span>
+              </div>
+            </div>
+
+            {/* Card 4 */}
+            <div className="bg-secondary p-10 rounded-[2.5rem] border border-secondary flex justify-between items-center group hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-64 md:h-72">
+              <div className="flex flex-col justify-between h-full z-10">
+                <div>
+                  <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm">Flexible</span>
+                  <br/>
+                  <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm mt-2">Financing</span>
+                </div>
+                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
+                  <span className="material-symbols-outlined bg-white/20 backdrop-blur-md text-white group-hover:bg-white group-hover:text-secondary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
+                  Learn More
+                </Link>
+              </div>
+              <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
+                <span className="material-symbols-outlined text-white" style={{ fontSize: '100px' }}>account_balance</span>
+              </div>
+            </div>
+
+            {/* Card 5 */}
+            <div className="bg-surface-container-low p-10 rounded-[2.5rem] border border-outline-variant flex justify-between items-center group hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-64 md:h-72">
+              <div className="flex flex-col justify-between h-full z-10">
+                <div>
+                  <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm text-secondary">Roadside</span>
+                  <br/>
+                  <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm mt-2 text-secondary">Assistance</span>
+                </div>
+                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
+                  <span className="material-symbols-outlined bg-white text-secondary group-hover:text-white group-hover:bg-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
+                  Learn More
+                </Link>
+              </div>
+              <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
+                <span className="material-symbols-outlined text-primary" style={{ fontSize: '100px' }}>car_crash</span>
+              </div>
+            </div>
+
+            {/* Card 6 */}
+            <div className="bg-primary/5 p-10 rounded-[2.5rem] border border-primary/20 flex justify-between items-center group hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-64 md:h-72">
+              <div className="flex flex-col justify-between h-full z-10">
+                <div>
+                  <span className="font-headline-md text-headline-md uppercase bg-primary text-white px-4 py-2 rounded-md inline-block shadow-sm">Instant</span>
+                  <br/>
+                  <span className="font-headline-md text-headline-md uppercase bg-primary text-white px-4 py-2 rounded-md inline-block shadow-sm mt-2">Valuation</span>
+                </div>
+                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-primary group-hover:brightness-110 transition-colors">
+                  <span className="material-symbols-outlined bg-primary text-white group-hover:bg-white group-hover:text-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
+                  Learn More
+                </Link>
+              </div>
+              <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
+                <span className="material-symbols-outlined text-primary" style={{ fontSize: '100px' }}>sell</span>
+              </div>
             </div>
           </div>
         </div>
@@ -277,9 +357,9 @@ export default function Landing() {
               </p>
             </div>
             <div>
-              <button className="bg-primary text-white font-headline-md text-headline-md px-16 py-8 uppercase tracking-widest rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-2xl">
+              <Link href="/sell" className="inline-block bg-primary text-white font-headline-md text-headline-md px-16 py-8 uppercase tracking-widest rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-2xl">
                 Get Valuation
-              </button>
+              </Link>
             </div>
           </div>
         </div>

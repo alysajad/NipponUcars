@@ -2,11 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Home, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchInventory } from '@/api/inventoryApi';
 
 export default function InventoryList() {
+  const router = useRouter();
+
   const { data: cars = [], isLoading } = useQuery({
     queryKey: ['inventory'],
     queryFn: fetchInventory
@@ -309,8 +312,14 @@ export default function InventoryList() {
                           <button className="flex-1 px-1 py-2 text-[0.75rem] sm:text-[0.8rem] whitespace-nowrap bg-transparent text-primary border border-primary rounded-md font-bold cursor-pointer hover:bg-primary/5 transition-colors overflow-hidden text-ellipsis">
                             Car Details
                           </button>
-                          <button className="flex-[1.2] px-1 py-2 text-[0.75rem] sm:text-[0.8rem] whitespace-nowrap bg-primary text-white border border-primary rounded-md font-bold cursor-pointer hover:brightness-110 transition-all overflow-hidden text-ellipsis">
-                            Get Seller Details
+                          <button 
+                            className="flex-[1.2] px-1 py-2 text-[0.75rem] sm:text-[0.8rem] whitespace-nowrap bg-primary text-white border border-primary rounded-md font-bold cursor-pointer hover:brightness-110 transition-all overflow-hidden text-ellipsis"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              router.push(`/enquiry?id=${car.id}`);
+                            }}
+                          >
+                            Enquire Now!
                           </button>
                         </div>
                       </div>
