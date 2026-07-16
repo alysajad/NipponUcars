@@ -40,7 +40,7 @@ export default function Landing() {
       {/* Hero Section */}
       <header className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-cover bg-center scale-105" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCpB0-ancLEaMoIOupmai5HG_HjVk68k5k0HIZvX-E5nrN7WHsbiuw-MANNzYvP1TwNKL1w53q314d32FgzQTaMFHuK17BIBqO5bOLx4HIM08f999ivP-CKaLveAEVJ4h5DNNIyHzDAlYNi8VWGd10Ou5CNVkwFqwsBTDVP0ypqwSLSUv8V2xcne0DVRHGuaBrBEmW-GyrrmizaH95v4FAQBRo9KfX-gRezClZ8V5GETizziAbKHOV7qw')" }}></div>
+          <div className="absolute inset-0 bg-cover bg-center scale-105" style={{ backgroundImage: "url('https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784193326/utrust_assets/hero/hero_main_new.jpg')" }}></div>
           <div className="absolute inset-0 hero-gradient" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%)' }}></div>
         </div>
         <div className="relative z-10 w-full px-margin-desktop max-w-container-max mx-auto">
@@ -67,9 +67,9 @@ export default function Landing() {
                 <label className="block font-label-sm text-secondary uppercase mb-1 opacity-70">Budget</label>
                 <select className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
                   <option>Any Price</option>
-                  <option>Under $15k</option>
-                  <option>$15k - $30k</option>
-                  <option>Over $30k</option>
+                  <option>Under ₹10 Lakh</option>
+                  <option>₹10 Lakh - ₹25 Lakh</option>
+                  <option>Over ₹25 Lakh</option>
                 </select>
               </div>
               <div className="flex-1 px-6 py-3">
@@ -89,8 +89,76 @@ export default function Landing() {
         </div>
       </header>
 
+      {/* Infinite Marquee Strip */}
+      <div className="w-full overflow-hidden bg-surface border-b border-outline-variant py-6 flex items-center relative">
+        <div className="flex animate-marquee whitespace-nowrap" style={{ width: 'max-content' }}>
+          {[1, 2, 3, 4].map((_, i) => (
+            <div key={i} className="flex items-center space-x-12 px-6">
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">verified</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Certified Pre-Owned</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+              
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">assignment_turned_in</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">203-Point Inspection</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">sell</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Instant Valuation</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">analytics</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Fair Market Price</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">account_balance</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Easy Financing</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">visibility_off</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">No Hidden Fees</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">local_shipping</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Doorstep Delivery</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">verified_user</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">1-Year Warranty</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">swap_horiz</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Easy Exchange</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">directions_car</span>
+                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Test Drive Anywhere</span>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
+            </div>
+          ))}
+        </div>
+      </div>
       {/* The U-Trust Advantage Section */}
-      <section className="py-24 bg-white">
+      <section className="pt-10 pb-24 bg-white">
         <div className="px-margin-desktop max-w-container-max mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-10 mb-16">
             <h2 className="font-headline-lg text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-nowrap">The Toyota Promise</h2>
@@ -228,7 +296,7 @@ export default function Landing() {
             {/* Card 1: Fortuner */}
             <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
               <div className="relative h-72 overflow-hidden">
-                <img className="w-full h-full object-cover" alt="A professional studio photography shot of a pristine white Toyota Fortuner SUV." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw4bAkTzDm4fWcUENbEqq5j5qA00ioryYTdGgDRLGxSk81hExyJTFI6Ve1SRRwpjgBk_w4m8QnRddIvXpmREkutmQnCPcMrb9buxtwnwT_48UrwCSE_sh5Lz5D_nPdiTrUDAtk2H7_HMehuclfby9FUwLdJvAlf9StSQPxRlpw4rXanVmcxCyI7gzO5jqD3TWS2eyR3VK6XyYPcTXvO7gGyQ8JKrFBmjgldcM0D_z9Hh5JxnAUSBeNuQ" />
+                <img className="w-full h-full object-cover" alt="A professional studio photography shot of a pristine white Toyota Fortuner SUV." src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191696/utrust_assets/utrust_asset_page_0.jpg" />
                 <div className="absolute top-4 left-4">
                   <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
                     <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -237,12 +305,12 @@ export default function Landing() {
                 </div>
               </div>
               <div className="p-8">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
+                <div className="flex justify-between items-start gap-4 mb-6">
+                  <div className="flex-1">
                     <h4 className="font-headline-md text-headline-md uppercase">Toyota Fortuner</h4>
                     <p className="text-secondary/50 font-label-sm uppercase tracking-wider">2.8L Diesel AT 4x4</p>
                   </div>
-                  <p className="font-headline-md text-headline-md text-primary">$38,900</p>
+                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹32.50 Lakh</p>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
                   <div className="text-center">
@@ -258,16 +326,16 @@ export default function Landing() {
                     <span className="font-label-bold text-secondary">Auto</span>
                   </div>
                 </div>
-                <button className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md">
+                <Link href="/inventory/detail?id=car_071b81ac" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
                   View Details
-                </button>
+                </Link>
               </div>
             </article>
 
             {/* Card 2: Corolla */}
             <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
               <div className="relative h-72 overflow-hidden">
-                <img className="w-full h-full object-cover" alt="A studio photograph of a vibrant red Toyota Corolla sedan." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX10ruREuMzSMLzoIHgvDUm3kmvpCciXgEu-lJhA7M2UsZX9MLWc7gBPrBb-QzzmH3razheucHfaodqYUB6IBt7dE7u5stFW8ghOKC5J_Vk6i1zEOkYnX9_6SIgyju8zx4ccLQB2Lfn6lKfVFMc7QdfqIvyjwLJBMEoxrTgoDk7PfLu1JYpFizuyWlc_CXGXVD5aIO1fN-MTirhCb2ejwQw59TkvE9yYyNX3vGqxcfj1ip220mYHs2w" />
+                <img className="w-full h-full object-cover" alt="A studio photograph of a vibrant red Toyota Corolla sedan." src="https://res.cloudinary.com/vdofesxh/image/upload/v1784192650/inventory/corolla/corolla_main.jpg" />
                 <div className="absolute top-4 left-4">
                   <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
                     <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -276,12 +344,12 @@ export default function Landing() {
                 </div>
               </div>
               <div className="p-8">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
+                <div className="flex justify-between items-start gap-4 mb-6">
+                  <div className="flex-1">
                     <h4 className="font-headline-md text-headline-md uppercase">Toyota Corolla</h4>
                     <p className="text-secondary/50 font-label-sm uppercase tracking-wider">1.8L Hybrid Premium</p>
                   </div>
-                  <p className="font-headline-md text-headline-md text-primary">$24,500</p>
+                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹18.50 Lakh</p>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
                   <div className="text-center">
@@ -297,16 +365,16 @@ export default function Landing() {
                     <span className="font-label-bold text-secondary">Hybrid</span>
                   </div>
                 </div>
-                <button className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md">
+                <Link href="/inventory/detail?id=car_bcfc123d" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
                   View Details
-                </button>
+                </Link>
               </div>
             </article>
 
             {/* Card 3: Camry */}
             <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
               <div className="relative h-72 overflow-hidden">
-                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGFxoh2mneaobBv6WPVob_UJbAC59RJ3Yla86l1M6s63t0atLMVb_Sxy4HV9ADWgq24_IJcnlAdSDzG55nBTsHTqacfOjv6rnZ-XQ6N1y3xaWwZwpQh7oLv5V42oYfK--1Q6VvY7zYRy_DK3Mrb364kgBw5m8qRVX7MZxlmjucByYyC1TgtFQk24CmxLNtL4ukg_3cd5ZQfnlP6JqXur4nwqFl_JGbC1TtmF-xDQ5X3dSZzQWkqh1-4Q')" }}></div>
+                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: "url('https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191702/utrust_assets/utrust_asset_page_1.jpg')" }}></div>
                 <div className="absolute top-4 left-4">
                   <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
                     <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -315,12 +383,12 @@ export default function Landing() {
                 </div>
               </div>
               <div className="p-8">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
+                <div className="flex justify-between items-start gap-4 mb-6">
+                  <div className="flex-1">
                     <h4 className="font-headline-md text-headline-md uppercase">Toyota Camry</h4>
                     <p className="text-secondary/50 font-label-sm uppercase tracking-wider">2.5L Luxury Sedan</p>
                   </div>
-                  <p className="font-headline-md text-headline-md text-primary">$31,200</p>
+                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹25.00 Lakh</p>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
                   <div className="text-center">
@@ -336,9 +404,9 @@ export default function Landing() {
                     <span className="font-label-bold text-secondary">Auto</span>
                   </div>
                 </div>
-                <button className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md">
+                <Link href="/inventory/detail?id=car_15946637" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
                   View Details
-                </button>
+                </Link>
               </div>
             </article>
           </div>

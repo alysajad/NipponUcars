@@ -80,7 +80,7 @@ export default function SellPage() {
             </div>
             <div className="w-full md:w-1/2 relative">
               <div className="aspect-[4/3] w-full bg-gray-100 overflow-hidden rounded-xl group shadow-2xl">
-                <img alt="Toyota Showroom" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFo8Or530-_2RsVfamKWfeBDZYb8kV-_Hqgqj6holRUW13uXvMMxfBu7NR5e1EC0upJQoPvU-nU-q-gP2wYGpVmeX09guHzT-enoaEhk4aEECFRaCXi9gkcjCsLXSe69PE_FV8NFSox7rbrpBEMsUgjmAzjTUibOn8WLA1OWDxGm2xXK9hytRWJq9DmJwgs5CFql1-2FWRsE1EqG8c6h_fbfkpRcHW-cPGPUJzLSoNnopJXQmbVyC2ZA" />
+                <img alt="Toyota Showroom" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191725/utrust_assets/utrust_asset_sell_page_0.jpg" />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white/60 backdrop-blur-xl p-6 rounded-xl shadow-xl border border-white/40">
                 <p className="text-xs font-bold text-primary tracking-widest uppercase mb-1">Valuation Updated</p>
@@ -266,7 +266,7 @@ export default function SellPage() {
         {/* Content Sections Alternating */}
         <section className="grid grid-cols-1 md:grid-cols-2">
           <div className="relative h-[500px] md:h-auto overflow-hidden">
-            <img alt="Toyota Inspection" className="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe02euXFBuzHa4zOtXSmIoNVZd4KKGJXmlvmcRQY9_6AxultoMwtpJlAxaTYgoY28strk7UXwkvVOecmJvJPKbhxeVxbju-F2AUbaSKaiHcbEHuZyA7nzxGSd4HKofQelOVCaKgEcxU_6dMeFLwyvUOGv-IQ0zn5OdEfwgRlJf0Itu7-Pb_qcDrf67f84e4j5Q_i8s6FkYLzNbqI7Ai9d7AburQzpLHZd6dEKmnKTD6AH_KZz3IcHcjA" />
+            <img alt="Toyota Inspection" className="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191727/utrust_assets/utrust_asset_sell_page_1.jpg" />
             <div className="absolute inset-0 bg-primary/10"></div>
           </div>
           <div className="bg-inverse-surface p-16 md:p-24 flex flex-col justify-center text-white">

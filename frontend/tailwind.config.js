@@ -53,6 +53,15 @@ module.exports = {
         "label-sm": ["12px", { lineHeight: "1", fontWeight: "500" }],
         "label-bold": ["14px", { lineHeight: "1", fontWeight: "600" }],
       },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+      },
+      animation: {
+        marquee: 'marquee 120s linear infinite',
+      },
     },
   },
   plugins: [],

@@ -1,0 +1,131 @@
+diff --git a/frontend/src/app/page.jsx b/frontend/src/app/page.jsx
+index cb72b4c9..9a8937b3 100644
+--- a/frontend/src/app/page.jsx
++++ b/frontend/src/app/page.jsx
+@@ -40,7 +40,7 @@ export default function Landing() {
+       {/* Hero Section */}
+       <header className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
+         <div className="absolute inset-0 z-0">
+-          <div className="absolute inset-0 bg-cover bg-center scale-105" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCpB0-ancLEaMoIOupmai5HG_HjVk68k5k0HIZvX-E5nrN7WHsbiuw-MANNzYvP1TwNKL1w53q314d32FgzQTaMFHuK17BIBqO5bOLx4HIM08f999ivP-CKaLveAEVJ4h5DNNIyHzDAlYNi8VWGd10Ou5CNVkwFqwsBTDVP0ypqwSLSUv8V2xcne0DVRHGuaBrBEmW-GyrrmizaH95v4FAQBRo9KfX-gRezClZ8V5GETizziAbKHOV7qw')" }}></div>
++          <div className="absolute inset-0 bg-cover bg-center scale-105" style={{ backgroundImage: "url('https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784187279/utrust_assets/utrust_asset_page_1.jpg')" }}></div>
+           <div className="absolute inset-0 hero-gradient" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%)' }}></div>
+         </div>
+         <div className="relative z-10 w-full px-margin-desktop max-w-container-max mx-auto">
+@@ -89,8 +89,76 @@ export default function Landing() {
+         </div>
+       </header>
+ 
++      {/* Infinite Marquee Strip */}
++      <div className="w-full overflow-hidden bg-surface border-b border-outline-variant py-6 flex items-center relative">
++        <div className="flex animate-marquee whitespace-nowrap" style={{ width: 'max-content' }}>
++          {[1, 2, 3, 4].map((_, i) => (
++            <div key={i} className="flex items-center space-x-12 px-6">
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">verified</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Certified Pre-Owned</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++              
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">assignment_turned_in</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">203-Point Inspection</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">sell</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Instant Valuation</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">analytics</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Fair Market Price</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">account_balance</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Easy Financing</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">visibility_off</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">No Hidden Fees</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">local_shipping</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Doorstep Delivery</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">verified_user</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">1-Year Warranty</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">swap_horiz</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Easy Exchange</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++
++              <div className="flex items-center gap-4">
++                <span className="material-symbols-outlined text-primary bg-primary/5 rounded-full p-2 text-[24px]">directions_car</span>
++                <span className="font-bold text-[16px] uppercase tracking-wide text-secondary">Test Drive Anywhere</span>
++              </div>
++              <div className="w-2 h-2 rounded-full bg-outline-variant"></div>
++            </div>
++          ))}
++        </div>
++      </div>
+       {/* The U-Trust Advantage Section */}
+-      <section className="py-24 bg-white">
++      <section className="pt-10 pb-24 bg-white">
+         <div className="px-margin-desktop max-w-container-max mx-auto">
+           <div className="flex flex-col md:flex-row items-start md:items-center gap-10 mb-16">
+             <h2 className="font-headline-lg text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-nowrap">The Toyota Promise</h2>
+@@ -228,7 +296,7 @@ export default function Landing() {
+             {/* Card 1: Fortuner */}
+             <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+               <div className="relative h-72 overflow-hidden">
+-                <img className="w-full h-full object-cover" alt="A professional studio photography shot of a pristine white Toyota Fortuner SUV." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw4bAkTzDm4fWcUENbEqq5j5qA00ioryYTdGgDRLGxSk81hExyJTFI6Ve1SRRwpjgBk_w4m8QnRddIvXpmREkutmQnCPcMrb9buxtwnwT_48UrwCSE_sh5Lz5D_nPdiTrUDAtk2H7_HMehuclfby9FUwLdJvAlf9StSQPxRlpw4rXanVmcxCyI7gzO5jqD3TWS2eyR3VK6XyYPcTXvO7gGyQ8JKrFBmjgldcM0D_z9Hh5JxnAUSBeNuQ" />
++                <img className="w-full h-full object-cover" alt="A professional studio photography shot of a pristine white Toyota Fortuner SUV." src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784187278/utrust_assets/utrust_asset_page_0.jpg" />
+                 <div className="absolute top-4 left-4">
+                   <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
+                     <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+@@ -306,7 +374,7 @@ export default function Landing() {
+             {/* Card 3: Camry */}
+             <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+               <div className="relative h-72 overflow-hidden">
+-                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGFxoh2mneaobBv6WPVob_UJbAC59RJ3Yla86l1M6s63t0atLMVb_Sxy4HV9ADWgq24_IJcnlAdSDzG55nBTsHTqacfOjv6rnZ-XQ6N1y3xaWwZwpQh7oLv5V42oYfK--1Q6VvY7zYRy_DK3Mrb364kgBw5m8qRVX7MZxlmjucByYyC1TgtFQk24CmxLNtL4ukg_3cd5ZQfnlP6JqXur4nwqFl_JGbC1TtmF-xDQ5X3dSZzQWkqh1-4Q')" }}></div>
++                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: "url('https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784187281/utrust_assets/utrust_asset_page_3.jpg')" }}></div>
+                 <div className="absolute top-4 left-4">
+                   <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
+                     <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+diff --git a/frontend/src/app/sell/page.jsx b/frontend/src/app/sell/page.jsx
+index 36d4242b..9cfa3e88 100644
+--- a/frontend/src/app/sell/page.jsx
++++ b/frontend/src/app/sell/page.jsx
+@@ -80,7 +80,7 @@ export default function SellPage() {
+             </div>
+             <div className="w-full md:w-1/2 relative">
+               <div className="aspect-[4/3] w-full bg-gray-100 overflow-hidden rounded-xl group shadow-2xl">
+-                <img alt="Toyota Showroom" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFo8Or530-_2RsVfamKWfeBDZYb8kV-_Hqgqj6holRUW13uXvMMxfBu7NR5e1EC0upJQoPvU-nU-q-gP2wYGpVmeX09guHzT-enoaEhk4aEECFRaCXi9gkcjCsLXSe69PE_FV8NFSox7rbrpBEMsUgjmAzjTUibOn8WLA1OWDxGm2xXK9hytRWJq9DmJwgs5CFql1-2FWRsE1EqG8c6h_fbfkpRcHW-cPGPUJzLSoNnopJXQmbVyC2ZA" />
++                <img alt="Toyota Showroom" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784187290/utrust_assets/utrust_asset_page_0.jpg" />
+               </div>
+               <div className="absolute -bottom-6 -left-6 bg-white/60 backdrop-blur-xl p-6 rounded-xl shadow-xl border border-white/40">
+                 <p className="text-xs font-bold text-primary tracking-widest uppercase mb-1">Valuation Updated</p>
+@@ -266,7 +266,7 @@ export default function SellPage() {
+         {/* Content Sections Alternating */}
+         <section className="grid grid-cols-1 md:grid-cols-2">
+           <div className="relative h-[500px] md:h-auto overflow-hidden">
+-            <img alt="Toyota Inspection" className="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe02euXFBuzHa4zOtXSmIoNVZd4KKGJXmlvmcRQY9_6AxultoMwtpJlAxaTYgoY28strk7UXwkvVOecmJvJPKbhxeVxbju-F2AUbaSKaiHcbEHuZyA7nzxGSd4HKofQelOVCaKgEcxU_6dMeFLwyvUOGv-IQ0zn5OdEfwgRlJf0Itu7-Pb_qcDrf67f84e4j5Q_i8s6FkYLzNbqI7Ai9d7AburQzpLHZd6dEKmnKTD6AH_KZz3IcHcjA" />
++            <img alt="Toyota Inspection" className="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784187291/utrust_assets/utrust_asset_page_1.jpg" />
+             <div className="absolute inset-0 bg-primary/10"></div>
+           </div>
+           <div className="bg-inverse-surface p-16 md:p-24 flex flex-col justify-center text-white">
