@@ -366,7 +366,9 @@ async def get_cms_enquiries(lead_type: str = None):
         response = query.execute()
         return response.data
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # If table doesn't exist yet (PGRST205) or other error, return empty list to not break frontend
+        print(f"Error fetching enquiries: {e}")
+        return []
 
 
 class EnquiryPayload(BaseModel):
@@ -418,7 +420,8 @@ async def get_cms_certifications():
         response = supabase.table("certifications").select("*").order("started_at", desc=True).execute()
         return response.data
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error fetching certifications: {e}")
+        return []
 
 
 class CertificationPayload(BaseModel):

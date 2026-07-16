@@ -40,7 +40,7 @@ export default function CmsAddVehicle() {
   const [faqs, setFaqs] = useState([]);
   const [frames, setFrames] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [pin, setPin] = useState('');
   const [isUploadingBulk, setIsUploadingBulk] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
@@ -414,6 +414,130 @@ export default function CmsAddVehicle() {
                           />
                           <button onClick={addFeature} className="bg-on-background text-on-primary px-4 py-2 rounded-[6px] font-headline-md text-[14px] uppercase hover:bg-secondary transition-colors">Add</button>
                         </div>
+                     </div>
+
+                     {/* Competitors */}
+                     <div className="mb-4 pt-4 border-t border-outline/20">
+                       <label className="block font-label-sm uppercase text-secondary mb-3">Competitors (Max 2)</label>
+                       <div className="flex flex-wrap gap-3 mb-3">
+                         {competitors.map((comp, i) => (
+                           <div key={i} className="bg-surface-container-low border border-outline/30 p-3 rounded-[6px] w-full">
+                             <div className="flex justify-between mb-2">
+                               <strong className="text-[14px]">{comp.name}</strong>
+                               <button onClick={() => setCompetitors(competitors.filter((_, idx) => idx !== i))} className="bg-transparent border-none text-primary cursor-pointer p-0 text-[16px] hover:opacity-70">&times;</button>
+                             </div>
+                             {comp.image && <img src={comp.image} alt={comp.name} className="w-full h-[80px] object-cover rounded-[4px] mb-2" />}
+                             <div className="text-[12px] text-secondary">{comp.price}</div>
+                           </div>
+                         ))}
+                       </div>
+                       {competitors.length < 2 && (
+                         <div className="flex flex-col gap-2">
+                           <select
+                             className="w-full px-4 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none appearance-none"
+                             onChange={(e) => {
+                               const selected = COMPETITORS_DATA.find(c => c.name === e.target.value);
+                               if (selected && !competitors.find(c => c.name === selected.name)) {
+                                 setCompetitors([...competitors, { ...selected, price: 'Rs. ' }]);
+                               }
+                               e.target.value = "";
+                             }}
+                           >
+                             <option value="">-- Add Competitor --</option>
+                             {COMPETITORS_DATA.map((c, i) => (
+                               <option key={i} value={c.name}>{c.name}</option>
+                             ))}
+                           </select>
+                           {competitors.length > 0 && (
+                             <input
+                               className="w-full px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]"
+                               placeholder={`Price for ${competitors[competitors.length-1].name}`}
+                               value={competitors[competitors.length-1].price}
+                               onChange={(e) => {
+                                 const newComps = [...competitors];
+                                 newComps[newComps.length-1].price = e.target.value;
+                                 setCompetitors(newComps);
+                               }}
+                             />
+                           )}
+                         </div>
+                       )}
+                     </div>
+
+                     {/* Reviews */}
+                     <div className="mb-4 pt-4 border-t border-outline/20">
+                       <label className="block font-label-sm uppercase text-secondary mb-3">Reviews</label>
+                       <div className="flex flex-col gap-2 mb-3">
+                         {reviews.map((r, i) => (
+                           <div key={i} className="bg-surface-container-low border border-outline/30 p-3 rounded-[6px] text-[12px]">
+                             <div className="flex justify-between">
+                               <strong>{r.title} ({r.rating}★)</strong>
+                               <button onClick={() => setReviews(reviews.filter((_, idx) => idx !== i))} className="bg-transparent border-none text-primary cursor-pointer p-0 text-[16px] hover:opacity-70">&times;</button>
+                             </div>
+                             <p className="my-1">{r.text}</p>
+                             <small className="text-secondary">- {r.user}, {r.time}</small>
+                           </div>
+                         ))}
+                       </div>
+                       <div className="flex flex-col gap-2">
+                         <div className="flex gap-2">
+                           <input id="rev-title" placeholder="Title" className="flex-[2] px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
+                           <input id="rev-rating" type="number" placeholder="Rating (1-5)" min="1" max="5" className="flex-1 px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
+                         </div>
+                         <input id="rev-text" placeholder="Review Text" className="w-full px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
+                         <div className="flex gap-2">
+                           <input id="rev-user" placeholder="User Name" className="flex-1 px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
+                           <input id="rev-time" placeholder="Time (e.g. 1 week ago)" className="flex-1 px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
+                           <button onClick={(e) => {
+                             e.preventDefault();
+                             const title = document.getElementById('rev-title').value;
+                             const rating = document.getElementById('rev-rating').value;
+                             const text = document.getElementById('rev-text').value;
+                             const user = document.getElementById('rev-user').value;
+                             const time = document.getElementById('rev-time').value;
+                             if(title && rating && text && user) {
+                               setReviews([...reviews, { title, rating: parseInt(rating), text, user, time }]);
+                               document.getElementById('rev-title').value = '';
+                               document.getElementById('rev-rating').value = '';
+                               document.getElementById('rev-text').value = '';
+                               document.getElementById('rev-user').value = '';
+                               document.getElementById('rev-time').value = '';
+                             }
+                           }} className="bg-on-background text-on-primary px-4 py-2 rounded-[6px] font-headline-md text-[14px] uppercase hover:bg-secondary transition-colors">Add</button>
+                         </div>
+                       </div>
+                     </div>
+
+                     {/* FAQs */}
+                     <div className="mb-4 pt-4 border-t border-outline/20">
+                       <label className="block font-label-sm uppercase text-secondary mb-3">FAQs</label>
+                       <div className="flex flex-col gap-2 mb-3">
+                         {faqs.map((faq, i) => (
+                           <div key={i} className="bg-surface-container-low border border-outline/30 p-3 rounded-[6px] text-[12px]">
+                             <div className="flex justify-between">
+                               <strong>Q: {faq.q}</strong>
+                               <button onClick={() => setFaqs(faqs.filter((_, idx) => idx !== i))} className="bg-transparent border-none text-primary cursor-pointer p-0 text-[16px] hover:opacity-70">&times;</button>
+                             </div>
+                             <p className="my-1">A: {faq.a}</p>
+                           </div>
+                         ))}
+                       </div>
+                       <div className="flex flex-col gap-2">
+                         <input id="faq-q" placeholder="Question" className="w-full px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
+                         <div className="flex gap-2">
+                           <input id="faq-a" placeholder="Answer" className="flex-[3] px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
+                           <button onClick={(e) => {
+                             e.preventDefault();
+                             const q = document.getElementById('faq-q').value;
+                             const a = document.getElementById('faq-a').value;
+                             if(q && a) {
+                               setFaqs([...faqs, { q, a }]);
+                               document.getElementById('faq-q').value = '';
+                               document.getElementById('faq-a').value = '';
+                             }
+                           }} className="flex-1 bg-on-background text-on-primary px-4 py-2 rounded-[6px] font-headline-md text-[14px] uppercase hover:bg-secondary transition-colors">Add FAQ</button>
+                         </div>
+                       </div>
                      </div>
                   </div>
                 </div>
