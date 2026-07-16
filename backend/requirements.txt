@@ -12,3 +12,4 @@ pydantic==2.7.4
 pandas
 openpyxl
 pillow-avif-plugin
+requests
