@@ -95,11 +95,11 @@ export default function CmsInventory() {
             <span className="text-on-surface">Inventory</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms/inventory">Inventory</Link>
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/dashboard">Dashboard</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms/inventory">Inventory</Link>
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms">Add Vehicle</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/certified">Certified</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/">Sell</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/enquiries">Enquiries</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
           </nav>
           <div className="flex items-center gap-6">
             <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">

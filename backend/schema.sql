@@ -44,3 +44,42 @@ CREATE TABLE IF NOT EXISTS public.listing_frames (
 CREATE INDEX IF NOT EXISTS idx_frames_inventory ON public.listing_frames(inventory_id);
 CREATE INDEX IF NOT EXISTS idx_frames_status ON public.listing_frames(status);
 CREATE INDEX IF NOT EXISTS idx_frames_job ON public.listing_frames(job_id);
+
+-- Add created_at to inventory if missing
+ALTER TABLE public.inventory ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Enquiries / Sales Leads
+CREATE TABLE IF NOT EXISTS public.enquiries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_name TEXT NOT NULL,
+    customer_email TEXT,
+    customer_phone TEXT,
+    vehicle_interest TEXT,
+    vehicle_specs JSONB DEFAULT '{}'::jsonb,
+    contact_date TIMESTAMPTZ DEFAULT NOW(),
+    priority TEXT DEFAULT 'routine',
+    lead_type TEXT DEFAULT 'sales',
+    status TEXT DEFAULT 'new',
+    notes TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_enquiries_type ON public.enquiries(lead_type);
+CREATE INDEX IF NOT EXISTS idx_enquiries_priority ON public.enquiries(priority);
+
+-- Certification Pipeline
+CREATE TABLE IF NOT EXISTS public.certifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    inventory_id TEXT REFERENCES public.inventory(id) ON DELETE CASCADE,
+    vehicle_name TEXT NOT NULL,
+    vin TEXT,
+    technician TEXT NOT NULL,
+    points_checked INT DEFAULT 0,
+    total_points INT DEFAULT 203,
+    stage TEXT DEFAULT 'inspection',
+    status TEXT DEFAULT 'in-progress',
+    started_at TIMESTAMPTZ DEFAULT NOW(),
+    completed_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_certifications_stage ON public.certifications(stage);
+CREATE INDEX IF NOT EXISTS idx_certifications_status ON public.certifications(status);

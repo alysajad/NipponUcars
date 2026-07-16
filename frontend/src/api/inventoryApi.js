@@ -135,3 +135,59 @@ export const fetchCmsInventory = async ({ page = 1, limit = 10 } = {}) => {
     return [];
   }
 };
+
+export const fetchCmsEnquiries = async (leadType) => {
+  try {
+    const url = leadType
+      ? `${API_BASE_URL}/api/cms/enquiries?lead_type=${leadType}`
+      : `${API_BASE_URL}/api/cms/enquiries`;
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error("Failed to fetch enquiries");
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to load enquiries:", err);
+    return [];
+  }
+};
+
+export const createEnquiry = async (data) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/enquiries`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Failed to create enquiry");
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to create enquiry:", err);
+    throw err;
+  }
+};
+
+export const fetchCmsCertifications = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/certifications`, { cache: 'no-store' });
+    if (!res.ok) throw new Error("Failed to fetch certifications");
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to load certifications:", err);
+    return [];
+  }
+};
+
+export const createCertification = async (data) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/certifications`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Failed to create certification");
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to create certification:", err);
+    throw err;
+  }
+};
+

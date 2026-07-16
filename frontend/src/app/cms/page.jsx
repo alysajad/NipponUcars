@@ -30,7 +30,8 @@ export default function CmsAddVehicle() {
   const [step, setStep] = useState(1);
   const [carDetails, setCarDetails] = useState({
     name: '', desc: '', price: '',
-    year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: ''
+    year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: '',
+    vin: '', stock_id: '', status: 'Available', acquisition_cost: '', color: ''
   });
   const [features, setFeatures] = useState([]);
   const [newFeature, setNewFeature] = useState('');
@@ -157,6 +158,11 @@ export default function CmsAddVehicle() {
           engineCC: carDetails.engineCC,
           owner: carDetails.owner,
           variant: carDetails.variant,
+          vin: carDetails.vin,
+          stock_id: carDetails.stock_id,
+          status: carDetails.status,
+          acquisition_cost: carDetails.acquisition_cost,
+          color: carDetails.color,
           features: features,
           competitors: competitors,
           reviews: reviews,
@@ -190,7 +196,7 @@ export default function CmsAddVehicle() {
         }
       }, 30000);
       setStep(3);
-      setCarDetails({ name: '', desc: '', price: '', year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: '' });
+      setCarDetails({ name: '', desc: '', price: '', year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: '', vin: '', stock_id: '', status: 'Available', acquisition_cost: '', color: '' });
       setFeatures([]);
       setCompetitors([]);
       setReviews([]);
@@ -245,8 +251,8 @@ export default function CmsAddVehicle() {
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/dashboard">Dashboard</Link>
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/inventory">Inventory</Link>
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms">Add Vehicle</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/certified">Certified</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/">Sell</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/enquiries">Enquiries</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
           </nav>
           <div className="flex items-center gap-6">
             <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
@@ -287,296 +293,206 @@ export default function CmsAddVehicle() {
               <p className="text-[12px] text-secondary mt-2">Requires columns: id, name, specs</p>
             </div>
 
-            {/* Vehicle Form */}
-            <div className="bg-white p-6 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
-              <h3 className="font-headline-md text-headline-md uppercase mb-2">Add New Vehicle</h3>
-              <p className="text-secondary font-body-md text-[14px] mb-6">Enter the vehicle specifications before uploading images.</p>
+            {/* Unified Vehicle Form */}
+            <div className="bg-white p-6 md:p-8 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+              <div className="mb-8">
+                <h3 className="font-headline-md text-headline-md uppercase mb-2">Add New Vehicle</h3>
+                <p className="text-secondary font-body-md text-[14px]">Enter the vehicle specifications and upload images for AI background removal.</p>
+              </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left Column */}
-                <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+                {/* Left Column - Basic & Technical */}
+                <div className="lg:col-span-7 space-y-8">
+                  {/* Basic Information */}
                   <div>
-                    <label className="block font-label-sm uppercase text-secondary mb-2">Vehicle Model</label>
-                    <input
-                      name="name"
-                      list="models-list"
-                      placeholder="Select or enter vehicle model"
-                      value={carDetails.name || ""}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none"
-                    />
-                    <datalist id="models-list">
-                      {models.map(m => (
-                        <option key={m.id} value={m.name} />
-                      ))}
-                    </datalist>
-                    {modelsLoading && <span className="text-[12px] text-secondary">Loading models from database...</span>}
+                    <h4 className="font-headline-md text-[18px] uppercase border-b border-outline/20 pb-3 mb-5">Basic Information</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">VIN (Vehicle Identification Number)</label>
+                        <input name="vin" placeholder="e.g. JTD..." value={carDetails.vin} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Stock ID</label>
+                        <input name="stock_id" placeholder="e.g. STK-1002" value={carDetails.stock_id} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Year</label>
+                        <select name="year" value={carDetails.year} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none appearance-none font-body-md">
+                          <option value="" disabled>Select Year</option>
+                          {Array.from({length: 30}, (_, i) => new Date().getFullYear() - i).map(y => (
+                            <option key={y} value={y}>{y}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Vehicle Model</label>
+                        <input name="name" list="models-list" placeholder="Select or enter vehicle model" value={carDetails.name || ""} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                        <datalist id="models-list">
+                          {models.map(m => (
+                            <option key={m.id} value={m.name} />
+                          ))}
+                        </datalist>
+                        {modelsLoading && <span className="text-[12px] text-secondary mt-1 block">Loading models...</span>}
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Variant / Trim</label>
+                        <input name="variant" list="variant-list" placeholder="e.g., 1.5 SX Opt" value={carDetails.variant} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                        <datalist id="variant-list">
+                          {CAR_DATA[carDetails.name]?.variants?.map(v => <option key={v} value={v} />)}
+                        </datalist>
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Description</label>
+                        <input name="desc" placeholder="e.g., Mint Condition" value={carDetails.desc} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                      </div>
+                    </div>
                   </div>
 
+                  {/* Technical Specs */}
                   <div>
-                    <label className="block font-label-sm uppercase text-secondary mb-2">Variant</label>
-                    <input name="variant" list="variant-list" placeholder="e.g., 1.5 SX Opt" value={carDetails.variant} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none" />
-                    <datalist id="variant-list">
-                      {CAR_DATA[carDetails.name]?.variants?.map(v => <option key={v} value={v} />)}
-                    </datalist>
-                  </div>
-
-                  <div>
-                    <label className="block font-label-sm uppercase text-secondary mb-2">Description</label>
-                    <input name="desc" placeholder="e.g., Mint Condition, 1 Owner" value={carDetails.desc} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none" />
-                  </div>
-
-                  <div>
-                    <label className="block font-label-sm uppercase text-secondary mb-2">Price (USD)</label>
-                    <input name="price" placeholder="e.g., $56,900" value={carDetails.price} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none" />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block font-label-sm uppercase text-secondary mb-2">Year</label>
-                      <select name="year" value={carDetails.year} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none appearance-none">
-                        <option value="" disabled>Select Year</option>
-                        {Array.from({length: 30}, (_, i) => new Date().getFullYear() - i).map(y => (
-                          <option key={y} value={y}>{y}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block font-label-sm uppercase text-secondary mb-2">Kilometers</label>
-                      <input name="km" type="number" placeholder="e.g., 21000" value={carDetails.km} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block font-label-sm uppercase text-secondary mb-2">Fuel Type</label>
-                      <input name="fuel" list="fuel-list" placeholder="Petrol/Diesel/EV" value={carDetails.fuel} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none" />
-                      <datalist id="fuel-list"><option value="Petrol" /><option value="Diesel" /><option value="EV" /><option value="Hybrid" /><option value="CNG" /></datalist>
-                    </div>
-                    <div>
-                      <label className="block font-label-sm uppercase text-secondary mb-2">Transmission</label>
-                      <input name="transmission" list="trans-list" placeholder="Auto/Manual" value={carDetails.transmission} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none" />
-                      <datalist id="trans-list"><option value="Auto" /><option value="Manual" /></datalist>
+                    <h4 className="font-headline-md text-[18px] uppercase border-b border-outline/20 pb-3 mb-5">Technical Specs</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Engine CC</label>
+                        <input name="engineCC" type="number" placeholder="e.g., 1498" value={carDetails.engineCC} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Transmission</label>
+                        <input name="transmission" list="trans-list" placeholder="Auto/Manual" value={carDetails.transmission} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                        <datalist id="trans-list"><option value="Auto" /><option value="Manual" /></datalist>
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Fuel Type</label>
+                        <input name="fuel" list="fuel-list" placeholder="Petrol/Diesel/EV" value={carDetails.fuel} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                        <datalist id="fuel-list"><option value="Petrol" /><option value="Diesel" /><option value="EV" /><option value="Hybrid" /><option value="CNG" /></datalist>
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Kilometers</label>
+                        <input name="km" type="number" placeholder="e.g., 21000" value={carDetails.km} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Exterior Color</label>
+                        <input name="color" placeholder="e.g., Pearl White" value={carDetails.color} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Owner</label>
+                        <input name="owner" list="owner-list" placeholder="e.g., 1st Owner" value={carDetails.owner} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                        <datalist id="owner-list"><option value="1st Owner" /><option value="2nd Owner" /><option value="3rd Owner" /><option value="4th Owner" /><option value="5th Owner" /></datalist>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block font-label-sm uppercase text-secondary mb-2">Engine CC</label>
-                      <input name="engineCC" type="number" placeholder="e.g., 1498" value={carDetails.engineCC} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none" />
-                    </div>
-                    <div>
-                      <label className="block font-label-sm uppercase text-secondary mb-2">Owner</label>
-                      <input name="owner" list="owner-list" placeholder="e.g., 1st Owner" value={carDetails.owner} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none" />
-                      <datalist id="owner-list"><option value="1st Owner" /><option value="2nd Owner" /><option value="3rd Owner" /><option value="4th Owner" /><option value="5th Owner" /></datalist>
-                    </div>
+                  
+                  {/* Features & Extras Expandable (Optional) */}
+                  <div className="border border-outline/30 p-5 rounded-[8px] bg-surface-container-lowest">
+                     <h4 className="font-headline-md text-[16px] uppercase mb-4">Additional Details</h4>
+                     
+                     <div className="mb-4">
+                        <label className="block font-label-sm uppercase text-secondary mb-3">Features</label>
+                        {CAR_DATA[carDetails.name]?.features?.length > 0 && (
+                          <div className="mb-3">
+                            <span className="text-[12px] text-secondary mr-2">Suggested:</span>
+                            {CAR_DATA[carDetails.name].features.filter(f => !features.includes(f)).map(f => (
+                              <button key={f} onClick={(e) => { e.preventDefault(); setFeatures([...features, f]); }} className="bg-surface-container-low border border-outline/30 rounded-[4px] px-2 py-1 text-[12px] cursor-pointer mr-1 mb-1 hover:bg-primary hover:text-white transition-colors">+ {f}</button>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {features.map((f, i) => (
+                            <span key={i} className="bg-primary text-white px-3 py-1 rounded-[4px] text-[12px] flex items-center gap-1">
+                              {f}
+                              <button onClick={() => removeFeature(f)} className="bg-transparent border-none text-white cursor-pointer p-0 text-[16px] leading-none hover:opacity-70">&times;</button>
+                            </span>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            value={newFeature}
+                            onChange={e => setNewFeature(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && addFeature(e)}
+                            placeholder="Add a feature"
+                            className="flex-1 px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]"
+                          />
+                          <button onClick={addFeature} className="bg-on-background text-on-primary px-4 py-2 rounded-[6px] font-headline-md text-[14px] uppercase hover:bg-secondary transition-colors">Add</button>
+                        </div>
+                     </div>
                   </div>
                 </div>
 
-                {/* Right Column */}
-                <div className="space-y-4">
-                  {/* Features */}
-                  <div className="border border-outline/30 p-4 rounded-[6px]">
-                    <label className="block font-label-sm uppercase text-secondary mb-3">Features</label>
-                    {CAR_DATA[carDetails.name]?.features?.length > 0 && (
-                      <div className="mb-3">
-                        <span className="text-[12px] text-secondary mr-2">Suggested:</span>
-                        {CAR_DATA[carDetails.name].features.filter(f => !features.includes(f)).map(f => (
-                          <button key={f} onClick={(e) => { e.preventDefault(); setFeatures([...features, f]); }} className="bg-surface-container-low border border-outline/30 rounded-[4px] px-2 py-1 text-[12px] cursor-pointer mr-1 mb-1 hover:bg-primary hover:text-white transition-colors">+ {f}</button>
-                        ))}
+                {/* Right Column - Pricing & Visuals */}
+                <div className="lg:col-span-5 space-y-8">
+                  {/* Pricing & Inventory */}
+                  <div>
+                    <h4 className="font-headline-md text-[18px] uppercase border-b border-outline/20 pb-3 mb-5">Pricing & Inventory</h4>
+                    <div className="space-y-5 bg-surface-container-lowest border border-outline/30 p-5 rounded-[8px]">
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Selling Price (USD)</label>
+                        <input name="price" placeholder="e.g., 56900" value={carDetails.price} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-bold text-[18px] text-primary" />
                       </div>
-                    )}
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {features.map((f, i) => (
-                        <span key={i} className="bg-primary text-white px-3 py-1 rounded-[4px] text-[12px] flex items-center gap-1">
-                          {f}
-                          <button onClick={() => removeFeature(f)} className="bg-transparent border-none text-white cursor-pointer p-0 text-[16px] leading-none hover:opacity-70">&times;</button>
-                        </span>
-                      ))}
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Acquisition Cost (USD)</label>
+                        <input name="acquisition_cost" placeholder="e.g., 45000" value={carDetails.acquisition_cost} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                      </div>
+                      <div>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Status</label>
+                        <div className="relative">
+                          <select name="status" value={carDetails.status} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none appearance-none font-bold font-body-md text-on-surface">
+                            <option value="Available">Available</option>
+                            <option value="Pending Inspection">Pending Inspection</option>
+                            <option value="In Prep">In Prep</option>
+                            <option value="Sold">Sold</option>
+                          </select>
+                          <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">expand_more</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
+                  </div>
+
+                  {/* Visual Assets */}
+                  <div>
+                    <h4 className="font-headline-md text-[18px] uppercase border-b border-outline/20 pb-3 mb-5">Visual Assets</h4>
+                    <div className="bg-surface-container-lowest border border-outline/30 p-5 rounded-[8px]">
+                      <p className="text-secondary font-body-md text-[13px] mb-4">Upload up to 7 high-resolution images. Backgrounds will be removed automatically by AI.</p>
+                      
                       <input
-                        value={newFeature}
-                        onChange={e => setNewFeature(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && addFeature(e)}
-                        placeholder="Add a feature"
-                        className="flex-1 px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        ref={fileInputRef}
+                        onChange={handleMultiFileCapture}
+                        style={{ display: 'none' }}
+                        id="multi-camera-input"
+                        disabled={frames.length >= 7 || isProcessing}
                       />
-                      <button onClick={addFeature} className="bg-on-background text-on-primary px-4 py-2 rounded-[6px] font-headline-md text-[14px] uppercase hover:bg-secondary transition-colors">Add</button>
-                    </div>
-                  </div>
 
-                  {/* Competitors */}
-                  <div className="border border-outline/30 p-4 rounded-[6px]">
-                    <label className="block font-label-sm uppercase text-secondary mb-3">Competitors (Max 2)</label>
-                    <div className="flex flex-wrap gap-3 mb-3">
-                      {competitors.map((comp, i) => (
-                        <div key={i} className="bg-surface-container-low border border-outline/30 p-3 rounded-[6px] w-full">
-                          <div className="flex justify-between mb-2">
-                            <strong className="text-[14px]">{comp.name}</strong>
-                            <button onClick={() => setCompetitors(competitors.filter((_, idx) => idx !== i))} className="bg-transparent border-none text-primary cursor-pointer p-0 text-[16px] hover:opacity-70">&times;</button>
-                          </div>
-                          {comp.image && <img src={comp.image} alt={comp.name} className="w-full h-[80px] object-cover rounded-[4px] mb-2" />}
-                          <div className="text-[12px] text-secondary">{comp.price}</div>
-                        </div>
-                      ))}
-                    </div>
-                    {competitors.length < 2 && (
-                      <div className="flex flex-col gap-2">
-                        <select
-                          className="w-full px-4 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none appearance-none"
-                          onChange={(e) => {
-                            const selected = COMPETITORS_DATA.find(c => c.name === e.target.value);
-                            if (selected && !competitors.find(c => c.name === selected.name)) {
-                              setCompetitors([...competitors, { ...selected, price: 'Rs. ' }]);
-                            }
-                            e.target.value = "";
-                          }}
-                        >
-                          <option value="">-- Add Competitor --</option>
-                          {COMPETITORS_DATA.map((c, i) => (
-                            <option key={i} value={c.name}>{c.name}</option>
+                      <label htmlFor="multi-camera-input" className={`w-full flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed rounded-[8px] cursor-pointer transition-all ${frames.length >= 7 ? 'bg-surface-container border-outline/30 text-secondary pointer-events-none' : 'bg-primary/5 border-primary text-primary hover:bg-primary/10'}`}>
+                        <Upload size={32} className={frames.length >= 7 ? 'text-secondary' : 'text-primary'} />
+                        <span className="font-headline-md uppercase tracking-wide text-[14px]">Select Images ({frames.length}/7)</span>
+                        <span className="text-[12px] opacity-70">Drag and drop or click to browse</span>
+                      </label>
+
+                      {frames.length > 0 && (
+                        <div className="grid grid-cols-3 gap-3 mt-5">
+                          {frames.map((f, i) => (
+                            <div key={i} className="relative aspect-square rounded-[8px] overflow-hidden border border-outline/30 shadow-sm">
+                              <img src={f.url} alt={`Preview ${i}`} className="w-full h-full object-cover" />
+                            </div>
                           ))}
-                        </select>
-                        {competitors.length > 0 && (
-                          <input
-                            className="w-full px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]"
-                            placeholder={`Price for ${competitors[competitors.length-1].name}`}
-                            value={competitors[competitors.length-1].price}
-                            onChange={(e) => {
-                              const newComps = [...competitors];
-                              newComps[newComps.length-1].price = e.target.value;
-                              setCompetitors(newComps);
-                            }}
-                          />
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Reviews */}
-                  <div className="border border-outline/30 p-4 rounded-[6px]">
-                    <label className="block font-label-sm uppercase text-secondary mb-3">Reviews</label>
-                    <div className="flex flex-col gap-2 mb-3">
-                      {reviews.map((r, i) => (
-                        <div key={i} className="bg-surface-container-low border border-outline/30 p-3 rounded-[6px] text-[12px]">
-                          <div className="flex justify-between">
-                            <strong>{r.title} ({r.rating}★)</strong>
-                            <button onClick={() => setReviews(reviews.filter((_, idx) => idx !== i))} className="bg-transparent border-none text-primary cursor-pointer p-0 text-[16px] hover:opacity-70">&times;</button>
-                          </div>
-                          <p className="my-1">{r.text}</p>
-                          <small className="text-secondary">- {r.user}, {r.time}</small>
                         </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <div className="flex gap-2">
-                        <input id="rev-title" placeholder="Title" className="flex-[2] px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
-                        <input id="rev-rating" type="number" placeholder="Rating (1-5)" min="1" max="5" className="flex-1 px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
-                      </div>
-                      <input id="rev-text" placeholder="Review Text" className="w-full px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
-                      <div className="flex gap-2">
-                        <input id="rev-user" placeholder="User Name" className="flex-1 px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
-                        <input id="rev-time" placeholder="Time (e.g. 1 week ago)" className="flex-1 px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
-                        <button onClick={(e) => {
-                          e.preventDefault();
-                          const title = document.getElementById('rev-title').value;
-                          const rating = document.getElementById('rev-rating').value;
-                          const text = document.getElementById('rev-text').value;
-                          const user = document.getElementById('rev-user').value;
-                          const time = document.getElementById('rev-time').value;
-                          if(title && rating && text && user) {
-                            setReviews([...reviews, { title, rating: parseInt(rating), text, user, time }]);
-                            document.getElementById('rev-title').value = '';
-                            document.getElementById('rev-rating').value = '';
-                            document.getElementById('rev-text').value = '';
-                            document.getElementById('rev-user').value = '';
-                            document.getElementById('rev-time').value = '';
-                          }
-                        }} className="bg-on-background text-on-primary px-4 py-2 rounded-[6px] font-headline-md text-[14px] uppercase hover:bg-secondary transition-colors">Add</button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* FAQs */}
-                  <div className="border border-outline/30 p-4 rounded-[6px]">
-                    <label className="block font-label-sm uppercase text-secondary mb-3">FAQs</label>
-                    <div className="flex flex-col gap-2 mb-3">
-                      {faqs.map((faq, i) => (
-                        <div key={i} className="bg-surface-container-low border border-outline/30 p-3 rounded-[6px] text-[12px]">
-                          <div className="flex justify-between">
-                            <strong>Q: {faq.q}</strong>
-                            <button onClick={() => setFaqs(faqs.filter((_, idx) => idx !== i))} className="bg-transparent border-none text-primary cursor-pointer p-0 text-[16px] hover:opacity-70">&times;</button>
-                          </div>
-                          <p className="my-1">A: {faq.a}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <input id="faq-q" placeholder="Question" className="w-full px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
-                      <div className="flex gap-2">
-                        <input id="faq-a" placeholder="Answer" className="flex-[3] px-3 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none text-[14px]" />
-                        <button onClick={(e) => {
-                          e.preventDefault();
-                          const q = document.getElementById('faq-q').value;
-                          const a = document.getElementById('faq-a').value;
-                          if(q && a) {
-                            setFaqs([...faqs, { q, a }]);
-                            document.getElementById('faq-q').value = '';
-                            document.getElementById('faq-a').value = '';
-                          }
-                        }} className="flex-1 bg-on-background text-on-primary px-4 py-2 rounded-[6px] font-headline-md text-[14px] uppercase hover:bg-secondary transition-colors">Add FAQ</button>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6">
-                <button onClick={handleProceed} className="w-full bg-primary text-on-primary px-6 py-3 rounded-[6px] font-headline-md text-[18px] uppercase tracking-wide hover:bg-[#93000e] transition-all active:opacity-80">
-                  Proceed to Upload Images
+              {/* Submit Action */}
+              <div className="mt-10 pt-6 border-t border-outline/20 flex flex-col sm:flex-row justify-end items-center gap-4">
+                <span className="text-[13px] text-secondary font-body-md">Make sure all details are correct before publishing.</span>
+                <button onClick={handlePublish} disabled={isProcessing || frames.length === 0} className="w-full sm:w-auto bg-primary text-on-primary px-10 py-3.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_10px_rgba(214,0,15,0.2)]">
+                  {isProcessing ? "Submitting..." : "Submit to Inventory"}
                 </button>
               </div>
             </div>
           </>
-        )}
-
-        {step === 2 && (
-          <div className="bg-white p-8 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] text-center">
-            <h3 className="font-headline-md text-headline-md uppercase mb-2">Upload Vehicle Images</h3>
-            <p className="text-secondary font-body-md mb-6">Upload up to 7 high-quality images. Backgrounds will be automatically removed.</p>
-
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              ref={fileInputRef}
-              onChange={handleMultiFileCapture}
-              style={{ display: 'none' }}
-              id="multi-camera-input"
-              disabled={frames.length >= 7 || isProcessing}
-            />
-
-            <div className="flex gap-4 justify-center mb-6">
-              <label htmlFor="multi-camera-input" className={`flex items-center justify-center gap-2 px-6 py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide cursor-pointer transition-all active:opacity-80 ${frames.length >= 7 ? 'bg-surface-container-high text-secondary' : 'bg-primary text-on-primary hover:bg-[#93000e]'}`}>
-                <Camera size={20} /> Select Images ({frames.length}/7)
-              </label>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6 max-w-[600px] mx-auto">
-              {frames.map((f, i) => (
-                <div key={i} className="relative aspect-square rounded-[8px] overflow-hidden border border-outline/30">
-                  <img src={f.url} alt={`Preview ${i}`} className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-
-            {frames.length > 0 && (
-              <button onClick={handlePublish} disabled={isProcessing} className="w-full bg-on-background text-on-primary px-6 py-3 rounded-[6px] font-headline-md text-[18px] uppercase tracking-wide hover:bg-secondary transition-all flex items-center justify-center gap-2 active:opacity-80 disabled:opacity-50">
-                <Upload size={18} /> {isProcessing ? "Submitting..." : "Submit to Inventory"}
-              </button>
-            )}
-          </div>
         )}
 
         {step === 3 && (

@@ -266,10 +266,9 @@ async def get_cms_dashboard():
         response = supabase.table("inventory").select("*").execute()
         all_cars = response.data
         
-        # Calculate stats
         total_inventory = len(all_cars)
         
-        # Count pending certifications (cars without full specs or status "Pending")
+        # Count pending certifications
         pending_certs = 0
         for car in all_cars:
             specs = {}
@@ -279,6 +278,25 @@ async def get_cms_dashboard():
                 pass
             if specs.get("status") in ["Pending Inspection", "In Prep", None, ""]:
                 pending_certs += 1
+        
+        # Count enquiries from DB
+        new_enquiries = 0
+        try:
+            enq_res = supabase.table("enquiries").select("id", count="exact").execute()
+            new_enquiries = enq_res.count or 0
+        except:
+            pass
+
+        # Count monthly sales (inventory with status=Sold)
+        monthly_sales = 0
+        for car in all_cars:
+            specs = {}
+            try:
+                specs = json.loads(car.get("specs", "{}")) if isinstance(car.get("specs"), str) else (car.get("specs") or {})
+            except:
+                pass
+            if specs.get("status") == "Sold":
+                monthly_sales += 1
         
         # Recent activity (last 5 cars)
         recent_activity = []
@@ -297,7 +315,7 @@ async def get_cms_dashboard():
                 "dateAdded": car.get("created_at", "N/A")
             })
         
-        # Tasks (mock data for now)
+        # Tasks (mock for now)
         tasks = [
             {"title": "Inspection: Vehicle Review", "subtitle": "Schedule inspection for new arrivals", "icon": "car_repair"},
             {"title": "Inventory Audit", "subtitle": "Weekly stock verification", "icon": "assignment_late"}
@@ -307,8 +325,8 @@ async def get_cms_dashboard():
             "stats": {
                 "totalInventory": total_inventory,
                 "pendingCerts": pending_certs,
-                "newEnquiries": 0,
-                "monthlySales": 0
+                "newEnquiries": new_enquiries,
+                "monthlySales": monthly_sales
             },
             "recentActivity": recent_activity,
             "tasks": tasks
@@ -332,6 +350,114 @@ async def get_cms_inventory():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/cms/enquiries")
+async def get_cms_enquiries(lead_type: str = None):
+    """
+    Returns enquiries/leads for CMS management.
+    Optional filter by lead_type: 'sales' or 'valuation'.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    try:
+        query = supabase.table("enquiries").select("*").order("contact_date", desc=True)
+        if lead_type:
+            query = query.eq("lead_type", lead_type)
+        response = query.execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class EnquiryPayload(BaseModel):
+    customer_name: str
+    customer_email: str = ""
+    customer_phone: str = ""
+    vehicle_interest: str = ""
+    vehicle_specs: dict = {}
+    priority: str = "routine"
+    lead_type: str = "sales"
+    notes: str = ""
+
+
+@app.post("/api/cms/enquiries")
+async def create_enquiry(payload: EnquiryPayload):
+    """
+    Creates a new enquiry / sales lead.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    try:
+        record = {
+            "customer_name": payload.customer_name,
+            "customer_email": payload.customer_email,
+            "customer_phone": payload.customer_phone,
+            "vehicle_interest": payload.vehicle_interest,
+            "vehicle_specs": payload.vehicle_specs,
+            "priority": payload.priority,
+            "lead_type": payload.lead_type,
+            "notes": payload.notes,
+            "status": "new"
+        }
+        response = supabase.table("enquiries").insert(record).execute()
+        return {"status": "success", "data": response.data[0] if response.data else {}}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/cms/certifications")
+async def get_cms_certifications():
+    """
+    Returns certification pipeline records.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    try:
+        response = supabase.table("certifications").select("*").order("started_at", desc=True).execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class CertificationPayload(BaseModel):
+    inventory_id: str = ""
+    vehicle_name: str
+    vin: str = ""
+    technician: str
+    points_checked: int = 0
+    total_points: int = 203
+    stage: str = "inspection"
+
+
+@app.post("/api/cms/certifications")
+async def create_certification(payload: CertificationPayload):
+    """
+    Creates a new certification pipeline entry.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    try:
+        record = {
+            "vehicle_name": payload.vehicle_name,
+            "vin": payload.vin,
+            "technician": payload.technician,
+            "points_checked": payload.points_checked,
+            "total_points": payload.total_points,
+            "stage": payload.stage,
+            "status": "in-progress"
+        }
+        if payload.inventory_id:
+            record["inventory_id"] = payload.inventory_id
+        response = supabase.table("certifications").insert(record).execute()
+        return {"status": "success", "data": response.data[0] if response.data else {}}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
