@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,6 +16,43 @@
   src: url('/Dekatron-SemiBoldItalic.otf') format('opentype');
   font-weight: 600;
   font-style: italic;
+}
+
+/* ─── CMS Dashboard Glass Card ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.sidebar-active {
+  border-left: 4px solid #ae0012;
+  background-color: #f3f3f4;
+}
+
+/* CMS Table Scrollbar */
+.table-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+.table-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.table-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e2e2;
+  border-radius: 10px;
+}
+
+/* CMS Table Row Hover */
+tr:hover td {
+  background-color: #f8f9fa;
+}
+
+/* Material Symbols for CMS */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 :root {

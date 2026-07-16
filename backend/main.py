@@ -253,6 +253,85 @@ async def publish_listing(car_id: str):
     supabase.table("inventory").update({"frames": urls}).eq("id", car_id).execute()
     return {"status": "published"}
 
+@app.get("/api/cms/dashboard")
+async def get_cms_dashboard():
+    """
+    Returns dashboard metrics and recent activity for the CMS.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    try:
+        # Get all inventory
+        response = supabase.table("inventory").select("*").execute()
+        all_cars = response.data
+        
+        # Calculate stats
+        total_inventory = len(all_cars)
+        
+        # Count pending certifications (cars without full specs or status "Pending")
+        pending_certs = 0
+        for car in all_cars:
+            specs = {}
+            try:
+                specs = json.loads(car.get("specs", "{}")) if isinstance(car.get("specs"), str) else (car.get("specs") or {})
+            except:
+                pass
+            if specs.get("status") in ["Pending Inspection", "In Prep", None, ""]:
+                pending_certs += 1
+        
+        # Recent activity (last 5 cars)
+        recent_activity = []
+        for car in all_cars[:5]:
+            specs = {}
+            try:
+                specs = json.loads(car.get("specs", "{}")) if isinstance(car.get("specs"), str) else (car.get("specs") or {})
+            except:
+                pass
+            recent_activity.append({
+                "id": car.get("id"),
+                "name": car.get("name"),
+                "price": car.get("price"),
+                "status": specs.get("status", "Available"),
+                "image": car.get("frames", [None])[0] if car.get("frames") else None,
+                "dateAdded": car.get("created_at", "N/A")
+            })
+        
+        # Tasks (mock data for now)
+        tasks = [
+            {"title": "Inspection: Vehicle Review", "subtitle": "Schedule inspection for new arrivals", "icon": "car_repair"},
+            {"title": "Inventory Audit", "subtitle": "Weekly stock verification", "icon": "assignment_late"}
+        ]
+        
+        return {
+            "stats": {
+                "totalInventory": total_inventory,
+                "pendingCerts": pending_certs,
+                "newEnquiries": 0,
+                "monthlySales": 0
+            },
+            "recentActivity": recent_activity,
+            "tasks": tasks
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/cms/inventory")
+async def get_cms_inventory():
+    """
+    Returns inventory for CMS management with all details.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    try:
+        response = supabase.table("inventory").select("*").execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

@@ -102,3 +102,36 @@ export const uploadBulkModels = async (file) => {
     throw err;
   }
 };
+
+/**
+ * Fetches CMS dashboard metrics and recent activity.
+ */
+export const fetchCmsDashboard = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/dashboard`, { cache: 'no-store' });
+    if (!res.ok) throw new Error("Failed to fetch dashboard data");
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to load dashboard:", err);
+    return {
+      stats: { totalInventory: 0, pendingCerts: 0, newEnquiries: 0, monthlySales: 0 },
+      recentActivity: [],
+      tasks: []
+    };
+  }
+};
+
+/**
+ * Fetches CMS inventory with all details for management.
+ */
+export const fetchCmsInventory = async ({ page = 1, limit = 10 } = {}) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/inventory`, { cache: 'no-store' });
+    if (!res.ok) throw new Error("Failed to fetch CMS inventory");
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Failed to load CMS inventory:", err);
+    return [];
+  }
+};

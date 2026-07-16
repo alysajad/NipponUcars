@@ -2,17 +2,14 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
-import { Home, ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchInventory } from '@/api/inventoryApi';
 import ImageGallery from '@/components/ImageGallery';
-
-
 import { useSearchParams } from 'next/navigation';
 
 export default function CarDetailPage() {
   return (
-    <React.Suspense fallback={<div className="detail-page-container flex items-center justify-center min-h-screen">Loading details...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-surface flex items-center justify-center text-secondary">Loading details...</div>}>
       <CarDetail />
     </React.Suspense>
   );
@@ -30,14 +27,20 @@ function CarDetail() {
   const car = useMemo(() => cars.find(c => c.id === id), [cars, id]);
 
   if (isLoading) {
-    return <div className="detail-page-container flex items-center justify-center min-h-screen">Loading details...</div>;
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="text-secondary font-body-md">Loading details...</div>
+      </div>
+    );
   }
 
   if (!car) {
     return (
-      <div className="detail-page-container flex flex-col items-center justify-center min-h-screen">
-        <h2>Car Not Found</h2>
-        <Link href="/inventory" className="cta-button mt-4">Back to Inventory</Link>
+      <div className="min-h-screen bg-surface flex flex-col items-center justify-center">
+        <h2 className="font-headline-md text-headline-md uppercase mb-4">Car Not Found</h2>
+        <Link href="/inventory" className="bg-primary text-on-primary px-6 py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all">
+          Back to Inventory
+        </Link>
       </div>
     );
   }
@@ -53,113 +56,179 @@ function CarDetail() {
   const reviews = specs.reviews || [];
   const faqs = specs.faqs || [];
   const competitors = specs.competitors || [];
+  const features = specs.features || [];
 
   return (
-    <div className="detail-page-container">
-      <header className="detail-header-nav">
-        <Link href="/inventory" className="nav-btn" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <ArrowLeft size={18} /> BACK TO INVENTORY
-        </Link>
-        <Link href="/" className="nav-btn">
-          <Home size={18} /> HOME
-        </Link>
+    <div className="min-h-screen bg-surface text-on-surface">
+      {/* Top Nav */}
+      <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <div className="flex justify-between items-center px-10 w-full max-w-[1280px] mx-auto h-20">
+          <div className="font-headline-md text-headline-md font-bold text-primary uppercase tracking-wider">PREMIER AUTO</div>
+          <nav className="hidden md:flex items-center gap-8">
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/inventory">Inventory</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/sell">Sell</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/certified">Certified</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/enquiry?id={car.id}">Finance</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/">About</Link>
+          </nav>
+          <div className="flex items-center gap-6">
+            <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
+              Enquire
+            </Link>
+          </div>
+        </div>
       </header>
 
-      <main className="detail-main-layout">
-        
-        {/* HERO SECTION */}
-        <section className="detail-hero-section">
-          <div className="detail-image-gallery">
-            {car.frames && car.frames.length > 1 ? (
-              <ImageGallery frames={car.frames} initialScale={1} />
-            ) : (
-              <img src={coverImage} alt={car.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            )}
-          </div>
-          <div className="detail-hero-info">
-            <h1 style={{ fontSize: '2.5rem', margin: 0, fontFamily: 'var(--font-sailors)' }}>{car.name}</h1>
-            <p style={{ fontSize: '1.2rem', color: '#666', marginTop: '0.5rem' }}>{variantText}</p>
-            
-            <div className="detail-price">
-              {car.price ? car.price : 'Price on Request'}
-            </div>
-            
-            <div className="detail-grid-specs">
-              <div className="detail-grid-item">
-                <span>YEAR</span>
-                <strong>{specs.year || '2023'}</strong>
-              </div>
-              <div className="detail-grid-item">
-                <span>FUEL</span>
-                <strong>{specs.fuel || 'Petrol'}</strong>
-              </div>
-              <div className="detail-grid-item">
-                <span>TRANSMISSION</span>
-                <strong>{specs.transmission || 'Automatic'}</strong>
-              </div>
-              <div className="detail-grid-item">
-                <span>KILOMETERS</span>
-                <strong>{specs.km || '8,500'}</strong>
-              </div>
-            </div>
-          </div>
-        </section>
+      <main className="pt-24 pb-12 px-4 md:px-10 max-w-[1280px] mx-auto">
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <p className="font-label-sm text-label-sm uppercase text-secondary">
+            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <span className="mx-2">/</span>
+            <Link href="/inventory" className="hover:text-primary transition-colors">Inventory</Link>
+            <span className="mx-2">/</span>
+            <span className="text-on-background">{car.name}</span>
+          </p>
+        </div>
 
-        {/* PRICE REVIEWS MODULE */}
+        {/* Hero Section */}
+        <div className="bg-white rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden mb-8">
+          <div className="flex flex-col lg:flex-row">
+            {/* Image Gallery */}
+            <div className="flex-[1.5] bg-surface-container-low min-h-[400px] flex items-center justify-center relative">
+              {car.frames && car.frames.length > 1 ? (
+                <ImageGallery frames={car.frames} initialScale={1} />
+              ) : (
+                <img src={coverImage} alt={car.name} className="w-full h-full object-contain" />
+              )}
+            </div>
+
+            {/* Vehicle Info */}
+            <div className="flex-1 p-8 flex flex-col justify-center">
+              <p className="font-label-sm text-label-sm uppercase text-secondary mb-2">{variantText}</p>
+              <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg uppercase text-on-background mb-2">{car.name}</h1>
+
+              <div className="text-headline-md font-headline-md text-primary mb-6">
+                {car.price ? car.price : 'Price on Request'}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-surface-container-low p-3 rounded-[8px]">
+                  <span className="block text-[12px] text-secondary uppercase mb-1">Year</span>
+                  <strong className="text-[16px] text-on-background">{specs.year || 'N/A'}</strong>
+                </div>
+                <div className="bg-surface-container-low p-3 rounded-[8px]">
+                  <span className="block text-[12px] text-secondary uppercase mb-1">Fuel</span>
+                  <strong className="text-[16px] text-on-background">{specs.fuel || 'N/A'}</strong>
+                </div>
+                <div className="bg-surface-container-low p-3 rounded-[8px]">
+                  <span className="block text-[12px] text-secondary uppercase mb-1">Transmission</span>
+                  <strong className="text-[16px] text-on-background">{specs.transmission || 'N/A'}</strong>
+                </div>
+                <div className="bg-surface-container-low p-3 rounded-[8px]">
+                  <span className="block text-[12px] text-secondary uppercase mb-1">Kilometers</span>
+                  <strong className="text-[16px] text-on-background">{specs.km || 'N/A'}</strong>
+                </div>
+              </div>
+
+              {features.length > 0 && (
+                <div className="mt-6">
+                  <p className="font-label-sm text-label-sm uppercase text-secondary mb-2 text-right">Features</p>
+                  <div className="flex flex-wrap gap-2 justify-end">
+                    {features.map((f, i) => (
+                      <span key={i} className="border border-primary/30 text-primary px-3 py-1 rounded-full text-[12px] font-bold">
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-8 flex gap-3">
+                <Link href={`/enquiry?id=${car.id}`} className="flex-1 bg-primary text-on-primary py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide text-center hover:bg-[#93000e] transition-all active:opacity-80">
+                  Enquire Now
+                </Link>
+                <Link href="/inventory" className="flex-1 border-2 border-primary text-primary py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide text-center hover:bg-surface-container transition-all active:opacity-80">
+                  Back to Inventory
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Module */}
         {reviews.length > 0 && (
-          <section className="detail-module">
-            <h2>Price Reviews for {car.name}</h2>
-            <div className="reviews-list">
+          <div className="bg-white rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] p-8 mb-8">
+            <h2 className="font-headline-md text-headline-md uppercase mb-6 pb-3 border-b-2 border-primary inline-block">Price Reviews</h2>
+            <div className="space-y-4">
               {reviews.map((r, i) => (
-                <div key={i} className="review-item">
-                  <div className="review-rating">
+                <div key={i} className="border-b border-outline-variant/20 pb-4 last:border-b-0 last:pb-0">
+                  <div className="text-[#FFB800] mb-1">
                     {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
                   </div>
-                  <div className="review-title">{r.title}</div>
-                  <div className="review-text">{r.text}</div>
-                  <div className="review-author">{r.user} • {r.time}</div>
+                  <div className="font-bold text-[16px] mb-1">{r.title}</div>
+                  <div className="text-secondary mb-1">{r.text}</div>
+                  <div className="text-[12px] text-secondary">{r.user} • {r.time}</div>
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {/* COMPETITORS MODULE */}
+        {/* Competitors Module */}
         {competitors.length > 0 && (
-          <section className="detail-module">
-            <h2>Prices of {car.name}'s Competitors</h2>
-            <div className="competitor-list">
+          <div className="bg-white rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] p-8 mb-8">
+            <h2 className="font-headline-md text-headline-md uppercase mb-6 pb-3 border-b-2 border-primary inline-block">Competitor Prices</h2>
+            <div className="flex flex-wrap gap-6">
               {competitors.map((comp, i) => (
-                <div key={i} className="competitor-card">
-                  <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', borderRadius: '8px 8px 0 0' }}>
-                    <img src={comp.image} alt={comp.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-                  </div>
-                  <div className="competitor-card-info">
-                    <h4>{comp.name}</h4>
-                    <p style={{ color: 'var(--primary-red)', fontWeight: 'bold' }}>{comp.price}</p>
+                <div key={i} className="flex-[0_1_280px] border border-outline-variant/20 rounded-[12px] overflow-hidden text-center">
+                  {comp.image && (
+                    <div className="w-full h-[160px] bg-surface overflow-hidden">
+                      <img src={comp.image} alt={comp.name} className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <h4 className="font-headline-md text-[16px] mb-2">{comp.name}</h4>
+                    <p className="text-primary font-bold">{comp.price}</p>
                   </div>
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {/* FAQS MODULE */}
+        {/* FAQs Module */}
         {faqs.length > 0 && (
-          <section className="detail-module">
-            <h2>FAQs</h2>
-            <div className="faqs-list">
+          <div className="bg-white rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] p-8 mb-8">
+            <h2 className="font-headline-md text-headline-md uppercase mb-6 pb-3 border-b-2 border-primary inline-block">FAQs</h2>
+            <div className="space-y-4">
               {faqs.map((faq, i) => (
-                <div key={i} className="faq-item">
-                  <div className="faq-q">Q: {faq.q}</div>
-                  <div className="faq-a">{faq.a}</div>
+                <div key={i} className="border-b border-outline-variant/20 pb-4 last:border-b-0 last:pb-0">
+                  <div className="font-bold text-[16px] text-on-background mb-1">Q: {faq.q}</div>
+                  <div className="text-secondary">A: {faq.a}</div>
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
-
       </main>
+
+      {/* Footer */}
+      <footer className="bg-on-background w-full py-12 px-10 border-t border-outline-variant/20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[1280px] mx-auto items-center">
+          <div className="flex flex-col gap-4">
+            <span className="font-headline-md text-headline-md text-on-primary uppercase tracking-wider font-bold">PREMIER AUTO</span>
+            <p className="font-label-sm text-label-sm uppercase text-surface-variant max-w-md opacity-80">
+              © 2024 PREMIER AUTO. ALL RIGHTS RESERVED. HIGH-PERFORMANCE PRE-OWNED.
+            </p>
+          </div>
+          <div className="flex flex-wrap md:justify-end gap-x-8 gap-y-4">
+            <a className="font-label-sm text-label-sm uppercase text-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+            <a className="font-label-sm text-label-sm uppercase text-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+            <a className="font-label-sm text-label-sm uppercase text-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
