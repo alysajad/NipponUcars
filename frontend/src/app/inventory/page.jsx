@@ -283,7 +283,7 @@ export default function InventoryList() {
           {isLoading ? (
             <div className="showcase-loading">Loading inventory...</div>
           ) : filteredCars.length > 0 ? (
-            <div className="showcase-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+            <div className="showcase-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full">
               {filteredCars.map((car) => {
                 let specs = {};
                 try { specs = typeof car.specs === 'object' ? car.specs : JSON.parse(car.specs); } catch(e) { }
@@ -291,25 +291,25 @@ export default function InventoryList() {
                 const descText = (car.desc && car.desc !== 'null') ? car.desc : (specs.variant || 'Premium Selection');
                 
                 return (
-                  <Link href={`/inventory/detail?id=${car.id}`} style={{ textDecoration: 'none', color: 'inherit' }} key={car.id}>
-                    <div className="showcase-card" style={{ width: '100%', maxWidth: '100%', minWidth: '0', display: 'block', height: '100%' }}>
-                      <div className="showcase-img-wrap" style={{ height: '160px', background: '#f8f8f8', padding: '0.5rem' }}>
-                        <img src={coverImage} alt={car.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  <Link href={`/inventory/detail?id=${car.id}`} className="block h-full" style={{ textDecoration: 'none', color: 'inherit' }} key={car.id}>
+                    <div className="showcase-card flex flex-col h-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100">
+                      <div className="showcase-img-wrap relative bg-gray-50 p-2" style={{ height: '180px' }}>
+                        <img src={coverImage} alt={car.name} className="w-full h-full object-contain hover:scale-105 transition-transform duration-500" />
                       </div>
-                      <div className="showcase-card-content" style={{ padding: '1rem' }}>
-                        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--dark-grey)' }}>{car.name}</h3>
-                        <p className="car-variant" style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1.5rem' }}>
+                      <div className="showcase-card-content flex flex-col flex-1 p-4">
+                        <h3 className="text-lg font-bold text-secondary mb-1 truncate">{car.name}</h3>
+                        <p className="text-sm text-gray-500 mb-4 truncate">
                           {specs.km || 'N/A'} km | {specs.fuel || 'Petrol'} | {specs.transmission || 'Auto'}
                         </p>
                         
-                        <div className="car-price-row" style={{ borderTop: '1px dashed #eee', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span className="car-price" style={{ fontSize: '1.3rem', fontWeight: 'bold', color: 'var(--dark-grey)' }}>{car.price ? `${car.price}` : 'Make Offer'}</span>
+                        <div className="mt-auto border-t border-dashed border-gray-200 pt-3 flex justify-between items-center">
+                          <span className="text-xl font-bold text-secondary">{car.price ? `${car.price}` : 'Make Offer'}</span>
                         </div>
-                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                          <button style={{ flex: '1', padding: '0.75rem 0.5rem', background: 'transparent', color: 'var(--primary-red)', border: '1px solid var(--primary-red)', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.3s' }}>
+                        <div className="flex gap-2 mt-4">
+                          <button className="flex-1 px-1 py-2 text-[0.75rem] sm:text-[0.8rem] whitespace-nowrap bg-transparent text-primary border border-primary rounded-md font-bold cursor-pointer hover:bg-primary/5 transition-colors overflow-hidden text-ellipsis">
                             Car Details
                           </button>
-                          <button style={{ flex: '1.5', padding: '0.75rem 0.5rem', background: 'var(--primary-red)', color: 'white', border: '1px solid var(--primary-red)', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.3s' }}>
+                          <button className="flex-[1.2] px-1 py-2 text-[0.75rem] sm:text-[0.8rem] whitespace-nowrap bg-primary text-white border border-primary rounded-md font-bold cursor-pointer hover:brightness-110 transition-all overflow-hidden text-ellipsis">
                             Get Seller Details
                           </button>
                         </div>
