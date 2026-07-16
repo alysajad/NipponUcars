@@ -1092,9 +1092,12 @@ p {
 .competitor-list {
   flex-direction: row;
   flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: flex-start;
 }
 .competitor-card {
-  flex: 1 1 300px;
+  flex: 0 1 300px;
+  width: 100%;
   border: 1px solid #eee;
   border-radius: 12px;
   overflow: hidden;

@@ -7,50 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchInventory } from '@/api/inventoryApi';
 import ImageGallery from '@/components/ImageGallery';
 
-function getDynamicCarData(carName) {
-  const name = (carName || '').toLowerCase();
-  
-  // Default generic data
-  let competitors = [
-    { name: "Honda City", price: "Rs. 11.50 Lakh onwards", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098490/inventory/competitors/competitor_asset_2.jpg" },
-    { name: "Hyundai Verna", price: "Rs. 10.96 Lakh onwards", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098494/inventory/competitors/competitor_asset_4.jpg" }
-  ];
-  let reviews = [
-    { rating: 5, title: "Great daily driver", text: "Very smooth and reliable.", user: "Amit Sharma", time: "2 weeks ago" },
-    { rating: 4, title: "Good value", text: "Maintenance is slightly high but good performance.", user: "Rajesh K.", time: "1 month ago" }
-  ];
 
-  if (name.includes("fortuner")) {
-    competitors = [
-      { name: "Ford Endeavour", price: "Rs. 36.25 Lakh onwards", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" },
-      { name: "MG Gloster", price: "Rs. 38.80 Lakh onwards", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098485/inventory/competitors/competitor_asset_0.jpg" }
-    ];
-    reviews = [
-      { rating: 5, title: "King of SUVs", text: "Unmatched road presence and reliability.", user: "Vikram Singh", time: "1 week ago" },
-      { rating: 5, title: "Tough as nails", text: "Driven 50k kms without a single issue.", user: "Anil D.", time: "2 months ago" }
-    ];
-  } else if (name.includes("supra")) {
-    competitors = [
-      { name: "BMW Z4", price: "Rs. 90.90 Lakh onwards", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" },
-      { name: "Porsche 718", price: "Rs. 1.48 Crore onwards", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098494/inventory/competitors/competitor_asset_4.jpg" }
-    ];
-    reviews = [
-      { rating: 5, title: "Absolute beast", text: "The engine is a masterpiece.", user: "Rahul", time: "3 days ago" },
-      { rating: 4, title: "Looks amazing", text: "Gets attention everywhere, slightly stiff ride.", user: "Karan", time: "1 month ago" }
-    ];
-  } else if (name.includes("thar")) {
-    competitors = [
-      { name: "Maruti Jimny", price: "Rs. 12.74 Lakh onwards", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098487/inventory/competitors/competitor_asset_1.jpg" },
-      { name: "Force Gurkha", price: "Rs. 16.75 Lakh onwards", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" }
-    ];
-    reviews = [
-      { rating: 5, title: "Best off-roader", text: "Takes on any terrain easily.", user: "Suresh", time: "1 month ago" },
-      { rating: 4, title: "Bumpy ride", text: "Great for weekend trips, tough for city commute.", user: "Neha", time: "2 months ago" }
-    ];
-  }
-
-  return { competitors, reviews };
-}
 import { useSearchParams } from 'next/navigation';
 
 export default function CarDetailPage() {
@@ -93,10 +50,9 @@ function CarDetail() {
   const variantText = (car.desc && car.desc !== 'null') ? car.desc : (specs.variant || 'Premium Selection');
   const coverImage = car.frames && car.frames.length > 0 ? car.frames[0] : '/placeholder-car.jpg';
 
-  const dynamicData = getDynamicCarData(car.name);
-  const reviews = dynamicData.reviews;
+  const reviews = specs.reviews || [];
   const faqs = specs.faqs || [];
-  const competitors = dynamicData.competitors;
+  const competitors = specs.competitors || [];
 
   return (
     <div className="detail-page-container">

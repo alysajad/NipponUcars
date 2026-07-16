@@ -13,6 +13,18 @@ const CAR_DATA = {
   "Toyota Land Cruiser": { variants: ["ZX", "VX", "GR Sport"], features: ["4WD", "360 Camera", "ADAS", "Cool Box", "Rear Entertainment"] },
   "Toyota GR Supra": { variants: ["2.0L", "3.0L", "3.0L Pro"], features: ["RWD", "Sports Exhaust", "Carbon Fiber Trim", "Alcantara Seats"] }
 };
+
+const COMPETITORS_DATA = [
+  { name: "Ford Endeavour", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" },
+  { name: "MG Gloster", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098485/inventory/competitors/competitor_asset_0.jpg" },
+  { name: "Honda City", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098490/inventory/competitors/competitor_asset_2.jpg" },
+  { name: "Hyundai Verna", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098494/inventory/competitors/competitor_asset_4.jpg" },
+  { name: "BMW Z4", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" },
+  { name: "Porsche 718", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098494/inventory/competitors/competitor_asset_4.jpg" },
+  { name: "Maruti Jimny", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098487/inventory/competitors/competitor_asset_1.jpg" },
+  { name: "Force Gurkha", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" }
+];
+
 export default function SalesCMS() {
   const [step, setStep] = useState(1); // 1: Details, 2: Capture, 3: Processing
   const [carDetails, setCarDetails] = useState({
@@ -21,6 +33,9 @@ export default function SalesCMS() {
   });
   const [features, setFeatures] = useState([]);
   const [newFeature, setNewFeature] = useState('');
+  const [competitors, setCompetitors] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [faqs, setFaqs] = useState([]);
   
   const [frames, setFrames] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -146,7 +161,10 @@ export default function SalesCMS() {
             engineCC: carDetails.engineCC,
             owner: carDetails.owner,
             variant: carDetails.variant,
-            features: features
+            features: features,
+            competitors: competitors,
+            reviews: reviews,
+            faqs: faqs
           })
         };
         
@@ -171,8 +189,15 @@ export default function SalesCMS() {
                 
                 if (data.status === "done" && data.total_done === data.total_frames) {
                     clearInterval(pollInterval);
-                    alert(`Success! The AI has finished processing ${payload.name} and it is now live in the inventory!`);
-                    queryClient.invalidateQueries({ queryKey: ['inventory'] });
+                    
+                    try {
+                        // Actually publish the listing so frames get added to inventory
+                        await publishCarApi(newCarId);
+                        alert(`Success! The AI has finished processing ${payload.name} and it is now live in the inventory!`);
+                        queryClient.invalidateQueries({ queryKey: ['inventory'] });
+                    } catch (publishErr) {
+                        alert("Processing finished but failed to publish: " + publishErr.message);
+                    }
                 }
             } catch (err) {
                 console.error("Polling error", err);
@@ -186,6 +211,9 @@ export default function SalesCMS() {
           name: '', desc: '', price: '', year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: ''
         });
         setFeatures([]);
+        setCompetitors([]);
+        setReviews([]);
+        setFaqs([]);
         setFrames([]);
     } catch (e) {
         alert("Publish failed: " + e.message);
@@ -326,6 +354,137 @@ export default function SalesCMS() {
                   style={{...inputStyle, flex: 1, padding: '8px'}} 
                 />
                 <button onClick={addFeature} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', padding: '8px 15px' }}>Add</button>
+              </div>
+            </div>
+
+            {/* COMPETITORS SECTION */}
+            <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '6px' }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#666', fontWeight: 'bold' }}>Competitors (Max 2)</p>
+              
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '10px' }}>
+                {competitors.map((comp, i) => (
+                  <div key={i} style={{ background: '#f9f9f9', border: '1px solid #ccc', padding: '10px', borderRadius: '6px', width: '200px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                      <strong style={{ fontSize: '0.9rem' }}>{comp.name}</strong>
+                      <button onClick={(e) => { e.preventDefault(); setCompetitors(competitors.filter((_, idx) => idx !== i)); }} style={{ background: 'none', border: 'none', color: '#E32636', cursor: 'pointer', padding: 0 }}>&times;</button>
+                    </div>
+                    {comp.image && <img src={comp.image} alt={comp.name} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '4px', marginBottom: '10px' }} />}
+                    <div style={{ fontSize: '0.8rem', color: '#666' }}>{comp.price}</div>
+                  </div>
+                ))}
+              </div>
+
+              {competitors.length < 2 && (
+                <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
+                  <select 
+                    style={inputStyle}
+                    onChange={(e) => {
+                      const selected = COMPETITORS_DATA.find(c => c.name === e.target.value);
+                      if (selected && !competitors.find(c => c.name === selected.name)) {
+                        setCompetitors([...competitors, { ...selected, price: 'Rs. ' }]);
+                      }
+                      e.target.value = "";
+                    }}
+                  >
+                    <option value="">-- Add Competitor --</option>
+                    {COMPETITORS_DATA.map((c, i) => (
+                      <option key={i} value={c.name}>{c.name}</option>
+                    ))}
+                  </select>
+                  {/* Let user edit the price for newly added competitor */}
+                  {competitors.length > 0 && (
+                    <input 
+                      style={{...inputStyle, marginTop: '5px'}} 
+                      placeholder={`Price for ${competitors[competitors.length-1].name} (e.g. Rs. 20 Lakh)`}
+                      value={competitors[competitors.length-1].price}
+                      onChange={(e) => {
+                        const newComps = [...competitors];
+                        newComps[newComps.length-1].price = e.target.value;
+                        setCompetitors(newComps);
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* REVIEWS SECTION */}
+            <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '6px' }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#666', fontWeight: 'bold' }}>Reviews</p>
+              
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                {reviews.map((r, i) => (
+                  <div key={i} style={{ background: '#f9f9f9', border: '1px solid #ccc', padding: '10px', borderRadius: '6px', fontSize: '0.8rem', width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>{r.title} ({r.rating}★)</strong>
+                      <button onClick={(e) => { e.preventDefault(); setReviews(reviews.filter((_, idx) => idx !== i)); }} style={{ background: 'none', border: 'none', color: '#E32636', cursor: 'pointer', padding: 0 }}>&times;</button>
+                    </div>
+                    <p style={{ margin: '5px 0' }}>{r.text}</p>
+                    <small style={{ color: '#888' }}>- {r.user}, {r.time}</small>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
+                 <div style={{ display: 'flex', gap: '10px' }}>
+                   <input id="rev-title" placeholder="Title" style={{...inputStyle, flex: 2, padding: '8px'}} />
+                   <input id="rev-rating" type="number" placeholder="Rating (1-5)" min="1" max="5" style={{...inputStyle, flex: 1, padding: '8px'}} />
+                 </div>
+                 <input id="rev-text" placeholder="Review Text" style={{...inputStyle, padding: '8px'}} />
+                 <div style={{ display: 'flex', gap: '10px' }}>
+                   <input id="rev-user" placeholder="User Name" style={{...inputStyle, flex: 1, padding: '8px'}} />
+                   <input id="rev-time" placeholder="Time (e.g. 1 week ago)" style={{...inputStyle, flex: 1, padding: '8px'}} />
+                   <button onClick={(e) => {
+                     e.preventDefault();
+                     const title = document.getElementById('rev-title').value;
+                     const rating = document.getElementById('rev-rating').value;
+                     const text = document.getElementById('rev-text').value;
+                     const user = document.getElementById('rev-user').value;
+                     const time = document.getElementById('rev-time').value;
+                     if(title && rating && text && user) {
+                       setReviews([...reviews, { title, rating: parseInt(rating), text, user, time }]);
+                       document.getElementById('rev-title').value = '';
+                       document.getElementById('rev-rating').value = '';
+                       document.getElementById('rev-text').value = '';
+                       document.getElementById('rev-user').value = '';
+                       document.getElementById('rev-time').value = '';
+                     }
+                   }} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', padding: '8px 15px' }}>Add Review</button>
+                 </div>
+              </div>
+            </div>
+
+            {/* FAQS SECTION */}
+            <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '6px' }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#666', fontWeight: 'bold' }}>FAQs</p>
+              
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                {faqs.map((faq, i) => (
+                  <div key={i} style={{ background: '#f9f9f9', border: '1px solid #ccc', padding: '10px', borderRadius: '6px', fontSize: '0.8rem', width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>Q: {faq.q}</strong>
+                      <button onClick={(e) => { e.preventDefault(); setFaqs(faqs.filter((_, idx) => idx !== i)); }} style={{ background: 'none', border: 'none', color: '#E32636', cursor: 'pointer', padding: 0 }}>&times;</button>
+                    </div>
+                    <p style={{ margin: '5px 0' }}>A: {faq.a}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
+                 <input id="faq-q" placeholder="Question" style={{...inputStyle, padding: '8px'}} />
+                 <div style={{ display: 'flex', gap: '10px' }}>
+                   <input id="faq-a" placeholder="Answer" style={{...inputStyle, flex: 3, padding: '8px'}} />
+                   <button onClick={(e) => {
+                     e.preventDefault();
+                     const q = document.getElementById('faq-q').value;
+                     const a = document.getElementById('faq-a').value;
+                     if(q && a) {
+                       setFaqs([...faqs, { q, a }]);
+                       document.getElementById('faq-q').value = '';
+                       document.getElementById('faq-a').value = '';
+                     }
+                   }} style={{ ...btnStyle, background: '#1A3B5C', color: 'white', padding: '8px 15px', flex: 1 }}>Add FAQ</button>
+                 </div>
               </div>
             </div>
             
