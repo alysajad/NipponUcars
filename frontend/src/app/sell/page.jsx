@@ -19,6 +19,7 @@ export default function SellPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     regNumber: '',
+    year: '',
     mileage: '',
     condition: 'Excellent (Showroom quality)',
     fullName: '',
@@ -48,7 +49,12 @@ export default function SellPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'regNumber') {
+      const sanitized = value.replace(/[\s-]/g, '').toUpperCase();
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   useEffect(() => {
@@ -91,6 +97,7 @@ export default function SellPage() {
         vehicle_interest: formData.regNumber,
         lead_type: 'valuation',
         vehicle_specs: {
+          year: formData.year,
           mileage: formData.mileage,
           condition: formData.condition,
           preferred_date: formData.preferredDate,
@@ -99,7 +106,7 @@ export default function SellPage() {
       });
       setIsSubmitted(true);
       setFormData({
-        regNumber: '', mileage: '', condition: 'Excellent (Showroom quality)',
+        regNumber: '', year: '', mileage: '', condition: 'Excellent (Showroom quality)',
         fullName: '', email: '', phone: '', preferredDate: '', center: 'Nippon U-CARS Main Hub'
       });
     } catch (err) {
@@ -206,13 +213,17 @@ export default function SellPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500 focus-within:text-primary transition-colors">Registration Number</label>
-                      <input name="regNumber" value={formData.regNumber} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-xl font-bold uppercase placeholder:normal-case placeholder:font-normal" placeholder="e.g. MH 12 AB 1234" type="text" required />
+                      <input name="regNumber" value={formData.regNumber} onChange={handleInputChange} pattern="^[A-Z0-9]{10}$" title="Vehicle registration number must be exactly 10 alphanumeric characters (e.g. MH12AB1234)" maxLength="10" className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-xl font-bold uppercase placeholder:normal-case placeholder:font-normal" placeholder="e.g. MH12AB1234" type="text" required />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Year of Manufacture</label>
+                      <input name="year" value={formData.year} onChange={handleInputChange} min="1990" max={new Date().getFullYear()} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="YYYY" type="number" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Mileage (km)</label>
                       <input name="mileage" value={formData.mileage} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Enter kilometers" type="number" required />
                     </div>
-                    <div>
+                    <div className="col-span-1 md:col-span-2">
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Overall Condition</label>
                       <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
                         <option>Excellent (Showroom quality)</option>
