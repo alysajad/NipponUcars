@@ -248,6 +248,7 @@ export default function CmsEnquiries() {
             <a className="font-label-sm text-label-sm uppercase text-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
           </div>
         </div>
+      </footer>
       {/* Modal */}
       {selectedEnquiry && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
