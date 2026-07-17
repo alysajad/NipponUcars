@@ -149,6 +149,82 @@ async def get_inventory():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/inventory/featured")
+async def get_featured_inventory():
+    """
+    Returns up to 5 featured cars.
+    """
+    cached = cache_get("inventory:featured")
+    if cached:
+        return cached
+
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    
+    try:
+        response = supabase.table("inventory").select("*").contains("extra_details", {"is_featured": True}).execute()
+        result = [car for car in response.data if car.get("frames")]
+        
+        # Sort by featured_at descending and take top 5
+        result.sort(key=lambda c: c.get("extra_details", {}).get("featured_at", ""), reverse=True)
+        result = result[:5]
+        
+        cache_set("inventory:featured", result, 60)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/cms/inventory/{id}")
+async def delete_inventory_item(id: str):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    try:
+        supabase.table("inventory").delete().eq("id", id).execute()
+        cache_delete("inventory:all")
+        cache_delete("inventory:featured")
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+from datetime import datetime
+
+@app.post("/api/cms/inventory/{id}/featured")
+async def toggle_featured_car(id: str):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    try:
+        res = supabase.table("inventory").select("extra_details").eq("id", id).execute()
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Car not found")
+        
+        car = res.data[0]
+        extra = car.get("extra_details") or {}
+        
+        if extra.get("is_featured"):
+            extra["is_featured"] = False
+            supabase.table("inventory").update({"extra_details": extra}).eq("id", id).execute()
+        else:
+            featured_res = supabase.table("inventory").select("id, extra_details").contains("extra_details", {"is_featured": True}).execute()
+            featured_cars = featured_res.data
+            
+            if len(featured_cars) >= 5:
+                def get_time(c):
+                    return c.get("extra_details", {}).get("featured_at", "")
+                oldest_car = min(featured_cars, key=get_time)
+                oldest_extra = oldest_car.get("extra_details", {})
+                oldest_extra["is_featured"] = False
+                supabase.table("inventory").update({"extra_details": oldest_extra}).eq("id", oldest_car["id"]).execute()
+            
+            extra["is_featured"] = True
+            extra["featured_at"] = datetime.utcnow().isoformat()
+            supabase.table("inventory").update({"extra_details": extra}).eq("id", id).execute()
+            
+        cache_delete("inventory:all")
+        cache_delete("inventory:featured")
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/models/bulk")
 async def bulk_upload_models(file: UploadFile = File(...)):
     """

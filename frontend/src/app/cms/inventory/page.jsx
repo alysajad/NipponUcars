@@ -3,8 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { fetchCmsInventory } from '@/api/inventoryApi';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchCmsInventory, deleteCar, toggleFeaturedCar } from '@/api/inventoryApi';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -14,6 +14,25 @@ export default function CmsInventory() {
   const [selectedMake, setSelectedMake] = useState('All Makes');
   const [selectedPriceRange, setSelectedPriceRange] = useState('Any Price');
   const [currentPage, setCurrentPage] = useState(1);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteCar,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['cms-inventory']);
+      setOpenDropdownId(null);
+    }
+  });
+
+  const toggleFeaturedMutation = useMutation({
+    mutationFn: toggleFeaturedCar,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['cms-inventory']);
+      setOpenDropdownId(null);
+      alert("Featured status updated successfully.");
+    }
+  });
 
   const { data: allCars = [], isLoading } = useQuery({
     queryKey: ['cms-inventory'],
@@ -247,13 +266,34 @@ export default function CmsInventory() {
                           <td className="px-6 py-4">
                             <StatusBadge status={status} />
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-6 py-4 text-right relative">
                             <button className="p-2 text-secondary hover:text-primary transition-colors" onClick={(e) => { e.stopPropagation(); router.push(`/cms?edit=${car.id}`); }}>
                               <span className="material-symbols-outlined">edit</span>
                             </button>
-                            <button className="p-2 text-secondary hover:text-on-background transition-colors" onClick={(e) => e.stopPropagation()}>
+                            <button className="p-2 text-secondary hover:text-on-background transition-colors" onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenDropdownId(openDropdownId === car.id ? null : car.id);
+                              }}>
                               <span className="material-symbols-outlined">more_vert</span>
                             </button>
+                            {openDropdownId === car.id && (
+                              <div className="absolute right-6 top-12 bg-white shadow-xl border border-outline-variant/30 rounded-lg py-2 z-50 w-48 text-left">
+                                <button className="w-full px-4 py-2 text-sm text-secondary hover:bg-surface-container-low hover:text-primary text-left" onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleFeaturedMutation.mutate(car.id);
+                                }}>
+                                  {car.extra_details?.is_featured ? 'Remove from Featured' : 'Promote to Featured'}
+                                </button>
+                                <button className="w-full px-4 py-2 text-sm text-[#D71921] hover:bg-surface-container-low text-left" onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (window.confirm("Are you sure you want to delete this car?")) {
+                                    deleteMutation.mutate(car.id);
+                                  }
+                                }}>
+                                  Delete from Inventory
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       );

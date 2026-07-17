@@ -4,6 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import MobileMenu from '@/components/MobileMenu';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { fetchFeaturedCars } from '@/api/inventoryApi';
+
+function parseSpecs(specs) {
+  if (!specs) return {};
+  if (typeof specs === 'object') return specs;
+  try { return JSON.parse(specs); } catch(e) { return {}; }
+}
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +23,11 @@ export default function Home() {
   const [searchBudget, setSearchBudget] = useState('');
   const [searchBodyType, setSearchBodyType] = useState('');
   const router = useRouter();
+
+  const { data: featuredCars = [], isLoading: isLoadingFeatured } = useQuery({
+    queryKey: ['featured-cars'],
+    queryFn: fetchFeaturedCars
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -314,201 +327,63 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
-            {/* Card 1: Fortuner */}
-            <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-              <div className="relative h-72 overflow-hidden">
-                <img className="w-full h-full object-cover" alt="A professional studio photography shot of a pristine white Toyota Fortuner SUV." src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191696/utrust_assets/utrust_asset_page_0.jpg" />
-                <div className="absolute top-4 left-4">
-                  <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
-                    <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                    Certified
-                  </span>
-                </div>
+            {isLoadingFeatured ? (
+              // Skeletons
+              Array.from({ length: 5 }).map((_, i) => (
+                <article key={i} className="bg-white rounded-xl overflow-hidden border border-outline-variant animate-pulse h-[450px]">
+                  <div className="w-full h-72 bg-surface-container-high" />
+                  <div className="p-8"><div className="h-4 bg-surface-container-high mb-4 w-1/2" /></div>
+                </article>
+              ))
+            ) : featuredCars.length > 0 ? (
+              featuredCars.map(car => {
+                const specs = parseSpecs(car.specs);
+                const coverImage = car.frames?.[0] || 'https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191696/utrust_assets/utrust_asset_page_0.jpg';
+                return (
+                  <article key={car.id} className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+                    <div className="relative h-72 overflow-hidden">
+                      <img className="w-full h-full object-cover" alt={car.name} src={coverImage} />
+                      <div className="absolute top-4 left-4">
+                        <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
+                          <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                          Certified
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-8 flex flex-col h-[calc(100%-18rem)]">
+                      <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
+                        <div className="flex-1">
+                          <h4 className="font-headline-md text-headline-md uppercase">{car.name}</h4>
+                          <p className="text-secondary/50 font-label-sm uppercase tracking-wider">{specs.engine || specs.brand || ''}</p>
+                        </div>
+                        <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">{car.price || 'N/A'}</p>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant mt-auto">
+                        <div className="text-center">
+                          <span className="material-symbols-outlined text-secondary/40 block mb-1">calendar_today</span>
+                          <span className="font-label-bold text-secondary">{specs.year || 'N/A'}</span>
+                        </div>
+                        <div className="text-center border-x border-outline-variant">
+                          <span className="material-symbols-outlined text-secondary/40 block mb-1">speed</span>
+                          <span className="font-label-bold text-secondary">{specs.km ? `${specs.km} km` : 'N/A'}</span>
+                        </div>
+                        <div className="text-center">
+                          <span className="material-symbols-outlined text-secondary/40 block mb-1">settings</span>
+                          <span className="font-label-bold text-secondary">{specs.transmission || 'Auto'}</span>
+                        </div>
+                      </div>
+                      <Link href={`/inventory/detail?id=${car.id}`} className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
+                        View Details
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="col-span-full py-12 text-center text-secondary/50 font-label-bold uppercase tracking-widest">
+                No featured cars available.
               </div>
-              <div className="p-8">
-                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
-                  <div className="flex-1">
-                    <h4 className="font-headline-md text-headline-md uppercase">Toyota Fortuner</h4>
-                    <p className="text-secondary/50 font-label-sm uppercase tracking-wider">2.8L Diesel AT 4x4</p>
-                  </div>
-                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹32.50 Lakh</p>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">calendar_today</span>
-                    <span className="font-label-bold text-secondary">2021</span>
-                  </div>
-                  <div className="text-center border-x border-outline-variant">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">speed</span>
-                    <span className="font-label-bold text-secondary">32k km</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">settings</span>
-                    <span className="font-label-bold text-secondary">Auto</span>
-                  </div>
-                </div>
-                <Link href="/inventory/detail?id=car_071b81ac" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
-                  View Details
-                </Link>
-              </div>
-            </article>
-
-            {/* Card 2: Corolla */}
-            <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-              <div className="relative h-72 overflow-hidden">
-                <img className="w-full h-full object-cover" alt="A studio photograph of a vibrant red Toyota Corolla sedan." src="https://res.cloudinary.com/vdofesxh/image/upload/v1784192650/inventory/corolla/corolla_main.jpg" />
-                <div className="absolute top-4 left-4">
-                  <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
-                    <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                    Certified
-                  </span>
-                </div>
-              </div>
-              <div className="p-8">
-                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
-                  <div className="flex-1">
-                    <h4 className="font-headline-md text-headline-md uppercase">Toyota Corolla</h4>
-                    <p className="text-secondary/50 font-label-sm uppercase tracking-wider">1.8L Hybrid Premium</p>
-                  </div>
-                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹18.50 Lakh</p>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">calendar_today</span>
-                    <span className="font-label-bold text-secondary">2022</span>
-                  </div>
-                  <div className="text-center border-x border-outline-variant">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">speed</span>
-                    <span className="font-label-bold text-secondary">15k km</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">local_gas_station</span>
-                    <span className="font-label-bold text-secondary">Hybrid</span>
-                  </div>
-                </div>
-                <Link href="/inventory/detail?id=car_bcfc123d" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
-                  View Details
-                </Link>
-              </div>
-            </article>
-
-            {/* Card 3: Camry */}
-            <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-              <div className="relative h-72 overflow-hidden">
-                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: "url('https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191702/utrust_assets/utrust_asset_page_1.jpg')" }}></div>
-                <div className="absolute top-4 left-4">
-                  <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
-                    <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                    Certified
-                  </span>
-                </div>
-              </div>
-              <div className="p-8">
-                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
-                  <div className="flex-1">
-                    <h4 className="font-headline-md text-headline-md uppercase">Toyota Camry</h4>
-                    <p className="text-secondary/50 font-label-sm uppercase tracking-wider">2.5L Luxury Sedan</p>
-                  </div>
-                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹25.00 Lakh</p>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">calendar_today</span>
-                    <span className="font-label-bold text-secondary">2020</span>
-                  </div>
-                  <div className="text-center border-x border-outline-variant">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">speed</span>
-                    <span className="font-label-bold text-secondary">28k km</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">settings</span>
-                    <span className="font-label-bold text-secondary">Auto</span>
-                  </div>
-                </div>
-                <Link href="/inventory/detail?id=car_15946637" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
-                  View Details
-                </Link>
-              </div>
-            </article>
-
-            {/* Card 4: Innova Crysta */}
-            <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-              <div className="relative h-72 overflow-hidden">
-                <img className="w-full h-full object-cover" alt="A Toyota Innova Crysta" src="https://res.cloudinary.com/vdofesxh/image/upload/v1784192650/inventory/corolla/corolla_main.jpg" />
-                <div className="absolute top-4 left-4">
-                  <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
-                    <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                    Certified
-                  </span>
-                </div>
-              </div>
-              <div className="p-8">
-                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
-                  <div className="flex-1">
-                    <h4 className="font-headline-md text-headline-md uppercase">Toyota Innova</h4>
-                    <p className="text-secondary/50 font-label-sm uppercase tracking-wider">2.4L Diesel AT</p>
-                  </div>
-                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹22.00 Lakh</p>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">calendar_today</span>
-                    <span className="font-label-bold text-secondary">2021</span>
-                  </div>
-                  <div className="text-center border-x border-outline-variant">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">speed</span>
-                    <span className="font-label-bold text-secondary">45k km</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">settings</span>
-                    <span className="font-label-bold text-secondary">Auto</span>
-                  </div>
-                </div>
-                <Link href="/inventory" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
-                  View Details
-                </Link>
-              </div>
-            </article>
-
-            {/* Card 5: Glanza */}
-            <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-              <div className="relative h-72 overflow-hidden">
-                <img className="w-full h-full object-cover" alt="A Toyota Glanza" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191696/utrust_assets/utrust_asset_page_0.jpg" />
-                <div className="absolute top-4 left-4">
-                  <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
-                    <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                    Certified
-                  </span>
-                </div>
-              </div>
-              <div className="p-8">
-                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
-                  <div className="flex-1">
-                    <h4 className="font-headline-md text-headline-md uppercase">Toyota Glanza</h4>
-                    <p className="text-secondary/50 font-label-sm uppercase tracking-wider">1.2L Petrol AT</p>
-                  </div>
-                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹7.50 Lakh</p>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">calendar_today</span>
-                    <span className="font-label-bold text-secondary">2022</span>
-                  </div>
-                  <div className="text-center border-x border-outline-variant">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">speed</span>
-                    <span className="font-label-bold text-secondary">12k km</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="material-symbols-outlined text-secondary/40 block mb-1">settings</span>
-                    <span className="font-label-bold text-secondary">Auto</span>
-                  </div>
-                </div>
-                <Link href="/inventory" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
-                  View Details
-                </Link>
-              </div>
-            </article>
-
+            )}
           </div>
         </div>
       </section>

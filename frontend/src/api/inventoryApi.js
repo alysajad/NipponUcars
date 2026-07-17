@@ -20,11 +20,26 @@ export const fetchInventory = async () => {
       ...car,
       frames: (car.frames || []).map(optimizeCloudinaryUrl)
     }));
-  } catch (err) {
-    console.error("Failed to load inventory:", err);
-    return [];
-  }
-};
+    } catch (err) {
+      console.error("Failed to load inventory:", err);
+      return [];
+    }
+  };
+  
+  export const fetchFeaturedCars = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/inventory/featured`, { next: { revalidate: 30 } });
+      if (!res.ok) throw new Error("Failed to fetch featured inventory");
+      const data = await res.json();
+      return data.map(car => ({
+        ...car,
+        frames: (car.frames || []).map(optimizeCloudinaryUrl)
+      }));
+    } catch (err) {
+      console.error("Failed to load featured inventory:", err);
+      return [];
+    }
+  };
 
 /**
  * Fetches car models for the dropdown.
@@ -68,6 +83,32 @@ export const updateCar = async (carId, updatedCar) => {
       body: JSON.stringify(updatedCar),
     });
     if (!res.ok) throw new Error("Failed to update car");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const deleteCar = async (carId) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/inventory/${carId}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete car");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const toggleFeaturedCar = async (carId) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/inventory/${carId}/featured`, {
+      method: "POST",
+    });
+    if (!res.ok) throw new Error("Failed to toggle featured status");
     return await res.json();
   } catch (error) {
     console.error(error);
