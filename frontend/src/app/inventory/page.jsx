@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Home, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchInventory } from '@/api/inventoryApi';
 
 export default function InventoryList() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { data: cars = [], isLoading } = useQuery({
     queryKey: ['inventory'],
@@ -18,7 +19,28 @@ export default function InventoryList() {
   const [selectedModels, setSelectedModels] = useState([]);
   const [budgetRange, setBudgetRange] = useState({ min: 0, max: 200 }); // In Lakhs
   const [ageRange, setAgeRange] = useState({ min: 0, max: 15 }); // In Years
+  const [bodyTypeFilter, setBodyTypeFilter] = useState('');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
+  // Read query params from homepage search on mount
+  useEffect(() => {
+    const modelParam = searchParams.get('model');
+    const budgetParam = searchParams.get('budget');
+    const bodyTypeParam = searchParams.get('bodyType');
+
+    if (modelParam) {
+      setSelectedModels([modelParam]);
+    }
+    if (budgetParam) {
+      const [min, max] = budgetParam.split('-').map(Number);
+      if (!isNaN(min) && !isNaN(max)) {
+        setBudgetRange({ min, max });
+      }
+    }
+    if (bodyTypeParam) {
+      setBodyTypeFilter(bodyTypeParam);
+    }
+  }, [searchParams]);
 
   const toggleModel = (model) => {
     setSelectedModels(prev => 
@@ -52,7 +74,10 @@ export default function InventoryList() {
     }
     const ageMatch = carAge >= ageRange.min && carAge <= ageRange.max;
 
-    return modelMatch && budgetMatch && ageMatch;
+    // Body type match
+    const bodyTypeMatch = !bodyTypeFilter || (specs.bodyType && specs.bodyType.toLowerCase() === bodyTypeFilter.toLowerCase()) || (car.name && car.name.toLowerCase().includes(bodyTypeFilter.toLowerCase()));
+
+    return modelMatch && budgetMatch && ageMatch && bodyTypeMatch;
   });
 
   // Models list for checkboxes based on dummy data

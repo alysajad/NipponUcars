@@ -2,9 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Landing() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+  const [searchModel, setSearchModel] = useState('');
+  const [searchBudget, setSearchBudget] = useState('');
+  const [searchBodyType, setSearchBodyType] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -13,6 +18,15 @@ export default function Landing() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchModel) params.set('model', searchModel);
+    if (searchBudget) params.set('budget', searchBudget);
+    if (searchBodyType) params.set('bodyType', searchBodyType);
+    const qs = params.toString();
+    router.push(`/inventory${qs ? `?${qs}` : ''}`);
+  };
 
   return (
     <div className="bg-surface text-on-surface">
@@ -26,6 +40,7 @@ export default function Landing() {
               <Link href="/sell" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Sell</Link>
               <Link href="#" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Exchange</Link>
               <Link href="/inventory" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Inventory</Link>
+              <Link href="/about" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">About Us</Link>
             </div>
           </div>
           <div className="flex items-center gap-stack-md">
@@ -56,32 +71,35 @@ export default function Landing() {
             <div className="glass-effect p-2 rounded-xl flex flex-col md:flex-row gap-2 items-stretch md:items-center" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
               <div className="flex-1 px-6 py-3 border-b md:border-b-0 md:border-r border-black/10">
                 <label className="block font-label-sm text-secondary uppercase mb-1 opacity-70">Model</label>
-                <select className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
-                  <option>All Models</option>
-                  <option>Fortuner</option>
-                  <option>Corolla</option>
-                  <option>Camry</option>
+                <select value={searchModel} onChange={(e) => setSearchModel(e.target.value)} className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
+                  <option value="">All Models</option>
+                  <option value="Fortuner">Fortuner</option>
+                  <option value="Corolla">Corolla</option>
+                  <option value="Camry">Camry</option>
+                  <option value="Hilux">Hilux</option>
+                  <option value="Innova">Innova</option>
+                  <option value="Supra">Supra</option>
                 </select>
               </div>
               <div className="flex-1 px-6 py-3 border-b md:border-b-0 md:border-r border-black/10">
                 <label className="block font-label-sm text-secondary uppercase mb-1 opacity-70">Budget</label>
-                <select className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
-                  <option>Any Price</option>
-                  <option>Under ₹10 Lakh</option>
-                  <option>₹10 Lakh - ₹25 Lakh</option>
-                  <option>Over ₹25 Lakh</option>
+                <select value={searchBudget} onChange={(e) => setSearchBudget(e.target.value)} className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
+                  <option value="">Any Price</option>
+                  <option value="0-10">Under ₹10 Lakh</option>
+                  <option value="10-25">₹10 Lakh - ₹25 Lakh</option>
+                  <option value="25-200">Over ₹25 Lakh</option>
                 </select>
               </div>
               <div className="flex-1 px-6 py-3">
                 <label className="block font-label-sm text-secondary uppercase mb-1 opacity-70">Body Type</label>
-                <select className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
-                  <option>All Types</option>
-                  <option>SUV</option>
-                  <option>Sedan</option>
-                  <option>Hatchback</option>
+                <select value={searchBodyType} onChange={(e) => setSearchBodyType(e.target.value)} className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
+                  <option value="">All Types</option>
+                  <option value="SUV">SUV</option>
+                  <option value="Sedan">Sedan</option>
+                  <option value="Hatchback">Hatchback</option>
                 </select>
               </div>
-              <button className="bg-primary text-white font-label-bold text-label-bold px-12 py-5 uppercase rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all shadow-lg">
+              <button onClick={handleSearch} className="bg-primary text-white font-label-bold text-label-bold px-12 py-5 uppercase rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all shadow-lg">
                 <span className="material-symbols-outlined font-bold">search</span> Search
               </button>
             </div>
@@ -176,7 +194,7 @@ export default function Landing() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm mt-2 text-secondary">Inspection</span>
                 </div>
-                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
+                <Link href="/about#certification-protocol" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
                   <span className="material-symbols-outlined bg-white text-secondary group-hover:text-white group-hover:bg-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>
@@ -194,7 +212,7 @@ export default function Landing() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm mt-2">Warranty</span>
                 </div>
-                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
+                <Link href="/about#utrust-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
                   <span className="material-symbols-outlined bg-white/20 backdrop-blur-md text-white group-hover:bg-white group-hover:text-secondary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>
@@ -212,7 +230,7 @@ export default function Landing() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-primary text-white px-4 py-2 rounded-md inline-block shadow-sm mt-2">History</span>
                 </div>
-                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-primary group-hover:brightness-110 transition-colors">
+                <Link href="/about#brand-story" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-primary group-hover:brightness-110 transition-colors">
                   <span className="material-symbols-outlined bg-primary text-white group-hover:bg-white group-hover:text-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>
@@ -230,7 +248,7 @@ export default function Landing() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm mt-2">Financing</span>
                 </div>
-                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
+                <Link href="/about#utrust-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
                   <span className="material-symbols-outlined bg-white/20 backdrop-blur-md text-white group-hover:bg-white group-hover:text-secondary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>
@@ -248,7 +266,7 @@ export default function Landing() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm mt-2 text-secondary">Assistance</span>
                 </div>
-                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
+                <Link href="/about#utrust-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
                   <span className="material-symbols-outlined bg-white text-secondary group-hover:text-white group-hover:bg-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>
@@ -266,7 +284,7 @@ export default function Landing() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-primary text-white px-4 py-2 rounded-md inline-block shadow-sm mt-2">Valuation</span>
                 </div>
-                <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-primary group-hover:brightness-110 transition-colors">
+                <Link href="/sell" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-primary group-hover:brightness-110 transition-colors">
                   <span className="material-symbols-outlined bg-primary text-white group-hover:bg-white group-hover:text-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>

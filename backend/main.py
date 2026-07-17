@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 import json
 import asyncio
 from bg_tasks import remove_background_task
+from cache import cache_get, cache_set, cache_delete, redis_client
 
 load_dotenv()
 
@@ -49,6 +50,30 @@ async def startup_event():
     except Exception as e:
         print(f"[startup] Failed to clear stuck tasks: {e}")
 
+@app.get("/health")
+async def health_check():
+    """Uptime monitor endpoint to keep Redis and DB connections warm."""
+    status = {"status": "ok", "redis": "disconnected", "database": "disconnected"}
+    
+    # Check Redis
+    if redis_client:
+        try:
+            if redis_client.ping():
+                status["redis"] = "connected"
+        except Exception:
+            pass
+            
+    # Check DB
+    if supabase:
+        try:
+            # Simple fast query to verify connection
+            supabase.table("car_models").select("id").limit(1).execute()
+            status["database"] = "connected"
+        except Exception:
+            pass
+            
+    return status
+
 # Load environment variables
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
@@ -78,9 +103,13 @@ async def get_car_models():
     Returns a list of car models available in the database.
     Used to populate the dropdown in the Sales CMS.
     """
+    cached = cache_get("models:all")
+    if cached:
+        return cached
+
     if not supabase:
         # Fallback mock data if Supabase isn't configured yet
-        return {
+        mock_data = {
             "models": [
                 {"id": "hilux", "name": "Toyota Hilux Revo", "specs": json.dumps({"variant": "2.8L Prerunner", "year": "2021", "fuel": "Diesel", "transmission": "Automatic", "km": "32,000", "engineCC": "2755", "features": ["4x4", "JBL Audio", "Ventilated Seats"]})},
                 {"id": "fortuner", "name": "Toyota Fortuner", "specs": json.dumps({"variant": "2.8L Diesel", "year": "2021", "fuel": "Diesel", "transmission": "Automatic", "km": "45,000", "engineCC": "2755", "features": ["Ventilated Seats", "4x4", "Power Tailgate"]})},
@@ -89,10 +118,13 @@ async def get_car_models():
                 {"id": "supra", "name": "Toyota GR Supra", "specs": json.dumps({"variant": "3.0L Turbo", "year": "2022", "fuel": "Petrol", "transmission": "Automatic", "km": "12,000", "engineCC": "2998", "features": ["Sport Mode", "Carbon Fiber Trim"]})}
             ]
         }
+        return mock_data
     
     try:
         response = supabase.table("car_models").select("*").execute()
-        return {"models": response.data}
+        result = {"models": response.data}
+        cache_set("models:all", result, 300)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -101,12 +133,18 @@ async def get_inventory():
     """
     Returns a list of cars available in the inventory.
     """
+    cached = cache_get("inventory:all")
+    if cached:
+        return cached
+
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     
     try:
         response = supabase.table("inventory").select("*").execute()
-        return [car for car in response.data if car.get("frames")]
+        result = [car for car in response.data if car.get("frames")]
+        cache_set("inventory:all", result, 60)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -145,6 +183,7 @@ async def bulk_upload_models(file: UploadFile = File(...)):
         
         # Upsert into supabase
         response = supabase.table("car_models").upsert(records).execute()
+        cache_delete("models:all")
         return {"status": "success", "inserted": len(records), "data": response.data}
     except HTTPException:
         raise
@@ -168,6 +207,7 @@ async def add_model(payload: ModelPayload):
             "specs": payload.specs
         }
         response = supabase.table("car_models").upsert(record).execute()
+        cache_delete("models:all")
         return {"status": "success", "data": response.data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -293,6 +333,9 @@ async def publish_listing(car_id: str):
         raise HTTPException(status_code=400, detail="No processed frames available")
         
     supabase.table("inventory").update({"frames": urls}).eq("id", car_id).execute()
+    cache_delete("inventory:all")
+    cache_delete("cms:inventory")
+    cache_delete("cms:dashboard")
     return {"status": "published"}
 
 @app.get("/api/cms/dashboard")
@@ -300,6 +343,10 @@ async def get_cms_dashboard():
     """
     Returns dashboard metrics and recent activity for the CMS.
     """
+    cached = cache_get("cms:dashboard")
+    if cached:
+        return cached
+
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     
@@ -363,7 +410,7 @@ async def get_cms_dashboard():
             {"title": "Inventory Audit", "subtitle": "Weekly stock verification", "icon": "assignment_late"}
         ]
         
-        return {
+        result = {
             "stats": {
                 "totalInventory": total_inventory,
                 "pendingCerts": pending_certs,
@@ -373,6 +420,8 @@ async def get_cms_dashboard():
             "recentActivity": recent_activity,
             "tasks": tasks
         }
+        cache_set("cms:dashboard", result, 30)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -382,11 +431,16 @@ async def get_cms_inventory():
     """
     Returns inventory for CMS management with all details.
     """
+    cached = cache_get("cms:inventory")
+    if cached:
+        return cached
+
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     
     try:
         response = supabase.table("inventory").select("*").execute()
+        cache_set("cms:inventory", response.data, 60)
         return response.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -445,6 +499,7 @@ async def create_enquiry(payload: EnquiryPayload):
             "status": "new"
         }
         response = supabase.table("enquiries").insert(record).execute()
+        cache_delete("cms:dashboard")
         return {"status": "success", "data": response.data[0] if response.data else {}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -455,11 +510,16 @@ async def get_cms_certifications():
     """
     Returns certification pipeline records.
     """
+    cached = cache_get("cms:certifications")
+    if cached:
+        return cached
+
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     
     try:
         response = supabase.table("certifications").select("*").order("started_at", desc=True).execute()
+        cache_set("cms:certifications", response.data, 60)
         return response.data
     except Exception as e:
         print(f"Error fetching certifications: {e}")
@@ -497,6 +557,8 @@ async def create_certification(payload: CertificationPayload):
         if payload.inventory_id:
             record["inventory_id"] = payload.inventory_id
         response = supabase.table("certifications").insert(record).execute()
+        cache_delete("cms:certifications")
+        cache_delete("cms:dashboard")
         return {"status": "success", "data": response.data[0] if response.data else {}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

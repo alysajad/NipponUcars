@@ -7,7 +7,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
  */
 export const fetchInventory = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/inventory`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE_URL}/api/inventory`, { next: { revalidate: 30 } });
     if (!res.ok) throw new Error("Failed to fetch inventory");
     const data = await res.json();
     return data;
@@ -108,7 +108,7 @@ export const uploadBulkModels = async (file) => {
  */
 export const fetchCmsDashboard = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/cms/dashboard`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE_URL}/api/cms/dashboard`, { next: { revalidate: 30 } });
     if (!res.ok) throw new Error("Failed to fetch dashboard data");
     return await res.json();
   } catch (err) {
@@ -126,7 +126,7 @@ export const fetchCmsDashboard = async () => {
  */
 export const fetchCmsInventory = async ({ page = 1, limit = 10 } = {}) => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/cms/inventory`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE_URL}/api/cms/inventory`, { next: { revalidate: 30 } });
     if (!res.ok) throw new Error("Failed to fetch CMS inventory");
     const data = await res.json();
     return data;
@@ -167,7 +167,7 @@ export const createEnquiry = async (data) => {
 
 export const fetchCmsCertifications = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/cms/certifications`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE_URL}/api/cms/certifications`, { next: { revalidate: 30 } });
     if (!res.ok) throw new Error("Failed to fetch certifications");
     return await res.json();
   } catch (err) {

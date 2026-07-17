@@ -3,7 +3,15 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { fetchInventory } from '@/api/inventoryApi';
+import { fetchInventory, createEnquiry } from '@/api/inventoryApi';
+
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  if (!d) return dateStr;
+  return `${d}/${m}/${y}`;
+};
 
 export default function EnquiryPage() {
   return (
@@ -24,7 +32,20 @@ function EnquiryContent() {
 
   const car = useMemo(() => cars.find(c => c.id === id), [cars, id]);
 
-  const [formStatus, setFormStatus] = useState('idle'); // idle, submitting, success
+  const [formStatus, setFormStatus] = useState('idle');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phone: '',
+    email: '',
+    city: 'Select City',
+    preferredDate: '',
+    message: ''
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -141,16 +162,30 @@ function EnquiryContent() {
                     <p className="text-gray-500 font-medium">Experience automotive excellence with a personalized consultation.</p>
                 </div>
                 
+                                {formStatus === 'success' ? (
+                  <div className="text-center py-16 px-4 animate-fade-in">
+                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <span className="material-symbols-outlined text-primary text-5xl">check_circle</span>
+                    </div>
+                    <h3 className="text-3xl md:text-4xl font-bold uppercase font-headline-md mb-4 text-secondary" style={{ fontFamily: 'var(--font-sailors)' }}>Thank You!</h3>
+                    <p className="text-lg text-secondary mb-8 max-w-md mx-auto leading-relaxed">
+                      Your enquiry for the {car.name} has been successfully sent. Our expert team will review your details and contact you within 24 hours.
+                    </p>
+                    <button onClick={() => { setFormStatus('idle'); setFormData({ fullName: '', phone: '', email: '', city: 'Select City', preferredDate: '', message: '' }); }} className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
+                      Submit Another Enquiry
+                    </button>
+                  </div>
+                ) : (
                 <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                     {/* Name & Contact */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
                             <label className="font-bold text-sm text-secondary uppercase tracking-wider">Full Name</label>
-                            <input required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="Enter your full name" type="text" />
+                            <input name="fullName" value={formData.fullName} onChange={handleInputChange} required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="Enter your full name" type="text" />
                         </div>
                         <div className="flex flex-col gap-2">
                             <label className="font-bold text-sm text-secondary uppercase tracking-wider">Mobile Number</label>
-                            <input required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="+91 00000 00000" type="tel" />
+                            <input name="phone" value={formData.phone} onChange={handleInputChange} pattern="^\+?[0-9\s\-]{10,15}$" title="Enter a valid phone number (e.g. +91 9876543210)" required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="+91 00000 00000" type="tel" />
                         </div>
                     </div>
                     
@@ -158,11 +193,11 @@ function EnquiryContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
                             <label className="font-bold text-sm text-secondary uppercase tracking-wider">Email Address</label>
-                            <input required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="example@email.com" type="email" />
+                            <input name="email" value={formData.email} onChange={handleInputChange} required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="example@email.com" type="email" />
                         </div>
                         <div className="flex flex-col gap-2">
                             <label className="font-bold text-sm text-secondary uppercase tracking-wider">City</label>
-                            <select className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none font-medium">
+                            <select name="city" value={formData.city} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none font-medium">
                                 <option>Select City</option>
                                 <option>Mumbai</option>
                                 <option>Delhi</option>
@@ -175,13 +210,19 @@ function EnquiryContent() {
                     {/* Date Picker */}
                     <div className="flex flex-col gap-2">
                         <label className="font-bold text-sm text-secondary uppercase tracking-wider">Preferred Date for Test Drive</label>
-                        <input className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium text-gray-700" type="date" />
+                        <div className="relative">
+                          <input name="preferredDate" value={formData.preferredDate} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" type="date" required />
+                          <div className={`w-full p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between transition-all ${formData.preferredDate ? 'focus-within:border-primary focus-within:ring-1 focus-within:ring-primary' : ''}`}>
+                            <span className={formData.preferredDate ? "text-gray-900 font-medium" : "text-gray-400 font-medium"}>{formatDate(formData.preferredDate) || "DD/MM/YYYY"}</span>
+                            <span className="material-symbols-outlined text-gray-400">calendar_month</span>
+                          </div>
+                        </div>
                     </div>
                     
                     {/* Message Box */}
                     <div className="flex flex-col gap-2">
                         <label className="font-bold text-sm text-secondary uppercase tracking-wider">Message (Optional)</label>
-                        <textarea className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="Mention any specific requirements or questions..." rows={4}></textarea>
+                        <textarea name="message" value={formData.message} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="Mention any specific requirements or questions..." rows={4}></textarea>
                     </div>
                     
                     {/* Trust Signals Overlay */}
@@ -213,6 +254,7 @@ function EnquiryContent() {
                         {formStatus === 'success' && "Enquiry Sent Successfully"}
                     </button>
                 </form>
+                )}
             </div>
         </section>
       </main>

@@ -1,10 +1,54 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { createEnquiry } from '@/api/inventoryApi';
 import Link from 'next/link';
+
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  if (!d) return dateStr;
+  return `${d}/${m}/${y}`;
+};
 
 export default function SellPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    regNumber: '',
+    mileage: '',
+    condition: 'Excellent (Showroom quality)',
+    fullName: '',
+    email: '',
+    phone: '',
+    preferredDate: '',
+    center: 'Toyota U-Trust Main Hub'
+  });
+
+  const handleNextStep = (e, nextIdx) => {
+    e.preventDefault();
+    const currentStepDiv = document.getElementById(`step-${currentStep}`);
+    if (currentStepDiv) {
+      const inputs = currentStepDiv.querySelectorAll('input, select');
+      let isValid = true;
+      for (let input of inputs) {
+        if (!input.checkValidity()) {
+          input.reportValidity();
+          isValid = false;
+          break; // Show tooltip for the first invalid input
+        }
+      }
+      if (!isValid) return;
+    }
+    nextStep(nextIdx);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,10 +65,47 @@ export default function SellPage() {
     }
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFinalSubmit = async (e) => {
     e.preventDefault();
-    alert('VALUATION REQUEST SUBMITTED! OUR TEAM WILL CONTACT YOU WITHIN 24 HOURS.');
-    setCurrentStep(1);
+    const currentStepDiv = document.getElementById(`step-3`);
+    if (currentStepDiv) {
+      const inputs = currentStepDiv.querySelectorAll('input, select');
+      let isValid = true;
+      for (let input of inputs) {
+        if (!input.checkValidity()) {
+          input.reportValidity();
+          isValid = false;
+          break;
+        }
+      }
+      if (!isValid) return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      await createEnquiry({
+        customer_name: formData.fullName,
+        customer_email: formData.email,
+        customer_phone: formData.phone,
+        vehicle_interest: formData.regNumber,
+        lead_type: 'valuation',
+        vehicle_specs: {
+          mileage: formData.mileage,
+          condition: formData.condition,
+          preferred_date: formData.preferredDate,
+          center: formData.center
+        }
+      });
+      setIsSubmitted(true);
+      setFormData({
+        regNumber: '', mileage: '', condition: 'Excellent (Showroom quality)',
+        fullName: '', email: '', phone: '', preferredDate: '', center: 'Toyota U-Trust Main Hub'
+      });
+    } catch (err) {
+      alert("Failed to submit request. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const progress = (currentStep / 3) * 100;
@@ -99,8 +180,22 @@ export default function SellPage() {
                 <div className="h-full bg-primary transition-all duration-500 ease-in-out" id="form-progress" style={{ width: `${progress}%` }}></div>
               </div>
               
-              <form className="space-y-8" id="valuation-form" onSubmit={handleFormSubmit}>
-                {/* Step 1: Vehicle Details */}
+              {isSubmitted ? (
+                <div className="text-center py-16 px-4 animate-fade-in">
+                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="material-symbols-outlined text-primary text-5xl">check_circle</span>
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold uppercase font-headline-md mb-4 text-on-surface" style={{ fontFamily: 'var(--font-sailors)' }}>Thank You!</h3>
+                  <p className="text-lg text-secondary mb-8 max-w-md mx-auto leading-relaxed">
+                    Your valuation request has been submitted successfully. Our expert team will review the details and contact you within 24 hours to proceed.
+                  </p>
+                  <button onClick={() => { setIsSubmitted(false); setCurrentStep(1); }} className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
+                    Submit Another Vehicle
+                  </button>
+                </div>
+              ) : (
+                <form className="space-y-8" id="valuation-form" noValidate>
+                  {/* Step 1: Vehicle Details */}
                 <div className={`form-step ${currentStep === 1 ? 'block' : 'hidden'}`} id="step-1">
                   <div className="flex items-center gap-4 mb-8">
                     <span className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white font-bold">01</span>
@@ -109,15 +204,15 @@ export default function SellPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500 focus-within:text-primary transition-colors">Registration Number</label>
-                      <input className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-xl font-bold uppercase placeholder:normal-case placeholder:font-normal" placeholder="e.g. MH 12 AB 1234" type="text" required />
+                      <input name="regNumber" value={formData.regNumber} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-xl font-bold uppercase placeholder:normal-case placeholder:font-normal" placeholder="e.g. MH 12 AB 1234" type="text" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Mileage (km)</label>
-                      <input className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Enter kilometers" type="number" required />
+                      <input name="mileage" value={formData.mileage} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Enter kilometers" type="number" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Overall Condition</label>
-                      <select className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
+                      <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
                         <option>Excellent (Showroom quality)</option>
                         <option>Very Good (Minor wear)</option>
                         <option>Good (Regular usage)</option>
@@ -125,7 +220,7 @@ export default function SellPage() {
                       </select>
                     </div>
                   </div>
-                  <button className="mt-8 w-full md:w-auto bg-primary text-white px-10 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2" onClick={() => nextStep(2)} type="button">
+                  <button className="mt-8 w-full md:w-auto bg-primary text-white px-10 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2" type="button" onClick={(e) => handleNextStep(e, 2)}>
                     Next Step <span className="material-symbols-outlined text-sm">arrow_forward</span>
                   </button>
                 </div>
@@ -139,22 +234,22 @@ export default function SellPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Full Name</label>
-                      <input className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="John Doe" type="text" required />
+                      <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="John Doe" type="text" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Email Address</label>
-                      <input className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="john@example.com" type="email" required />
+                      <input name="email" value={formData.email} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="john@example.com" type="email" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Phone Number</label>
-                      <input className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="+91 00000 00000" type="tel" required />
+                      <input name="phone" value={formData.phone} onChange={handleInputChange} pattern="^\+?[0-9\s\-]{10,15}$" title="Enter a valid phone number (e.g. +91 9876543210)" className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="+91 00000 00000" type="tel" required />
                     </div>
                   </div>
                   <div className="flex flex-col md:flex-row gap-4 mt-8">
                     <button className="w-full md:w-auto bg-gray-100 text-on-surface px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:bg-gray-200 transition-all" onClick={() => nextStep(1)} type="button">
                       Back
                     </button>
-                    <button className="w-full md:w-auto flex-grow bg-primary text-white px-10 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2" onClick={() => nextStep(3)} type="button">
+                    <button className="w-full md:w-auto flex-grow bg-primary text-white px-10 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2" type="button" onClick={(e) => handleNextStep(e, 3)}>
                       Continue to Inspection <span className="material-symbols-outlined text-sm">event_available</span>
                     </button>
                   </div>
@@ -170,11 +265,17 @@ export default function SellPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Preferred Date</label>
-                      <input className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="date" required />
+                      <div className="relative">
+                        <input name="preferredDate" value={formData.preferredDate} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" type="date" required />
+                        <div className={`w-full p-4 border border-gray-200 rounded-lg bg-white flex items-center justify-between transition-all ${formData.preferredDate ? 'focus-within:border-primary focus-within:ring-1 focus-within:ring-primary' : ''}`}>
+                          <span className={formData.preferredDate ? "text-gray-900" : "text-gray-400"}>{formatDate(formData.preferredDate) || "DD/MM/YYYY"}</span>
+                          <span className="material-symbols-outlined text-gray-400">calendar_month</span>
+                        </div>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Nearest Center</label>
-                      <select className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
+                      <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
                         <option>Toyota U-Trust Main Hub</option>
                         <option>North City Service Center</option>
                         <option>South Plaza Workshop</option>
@@ -185,12 +286,13 @@ export default function SellPage() {
                     <button className="w-full md:w-auto bg-gray-100 text-on-surface px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:bg-gray-200 transition-all" onClick={() => nextStep(2)} type="button">
                       Back
                     </button>
-                    <button className="w-full md:w-auto flex-grow bg-primary text-white px-10 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2" type="submit">
-                      Confirm Valuation Request <span className="material-symbols-outlined text-sm">check_circle</span>
+                    <button disabled={isSubmitting} className="w-full md:w-auto flex-grow bg-primary text-white px-10 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50" type="button" onClick={handleFinalSubmit}>
+                      {isSubmitting ? 'Submitting...' : 'Confirm Valuation Request'} <span className="material-symbols-outlined text-sm">check_circle</span>
                     </button>
                   </div>
                 </div>
               </form>
+              )}
             </div>
           </div>
         </section>
