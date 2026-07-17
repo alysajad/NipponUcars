@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { createEnquiry } from '@/api/inventoryApi';
+import { createEnquiry, fetchInventory } from '@/api/inventoryApi';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import MobileMenu from '@/components/MobileMenu';
 
@@ -10,6 +11,11 @@ export default function ExchangePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   
+  const { data: cars = [] } = useQuery({
+    queryKey: ['inventory'],
+    queryFn: fetchInventory
+  });
+
   const [formData, setFormData] = useState({
     // Step 1: Current Vehicle
     currentMake: '',
@@ -19,14 +25,46 @@ export default function ExchangePage() {
     condition: 'Excellent',
     
     // Step 2: Upgrade
-    upgradeMake: 'Nippon',
+    upgradeMake: '',
     upgradeModel: '',
     
     // Step 3: Contact
     fullName: '',
     email: '',
+    countryCode: '+91',
     phone: '',
+    whatsappOptIn: false,
   });
+
+  const dynamicMakes = React.useMemo(() => {
+    const makes = new Set();
+    cars.forEach(c => {
+      let specs = {};
+      try { specs = typeof c.specs === 'object' ? c.specs : JSON.parse(c.specs); } catch(e) {}
+      if (specs.brand) makes.add(specs.brand);
+      else if (c.name) makes.add(c.name.split(' ')[0]);
+    });
+    if (makes.size === 0) return ['Nippon', 'Toyota', 'Honda'];
+    return Array.from(makes).sort();
+  }, [cars]);
+
+  const dynamicModels = React.useMemo(() => {
+    const models = new Set();
+    cars.forEach(c => {
+      let specs = {};
+      try { specs = typeof c.specs === 'object' ? c.specs : JSON.parse(c.specs); } catch(e) {}
+      const carBrand = specs.brand || (c.name ? c.name.split(' ')[0] : '');
+      
+      if (!formData.upgradeMake || carBrand === formData.upgradeMake) {
+        if (c.name) {
+          const parts = c.name.split(' ');
+          const modelName = parts.length > 1 ? parts.slice(1).join(' ') : c.name;
+          models.add(modelName);
+        }
+      }
+    });
+    return Array.from(models).sort();
+  }, [cars, formData.upgradeMake]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -36,7 +74,15 @@ export default function ExchangePage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'phone') {
+      const sanitized = value.replace(/\D/g, '');
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+    } else if (name === 'countryCode') {
+      const sanitized = value.replace(/[^\d+]/g, '');
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const nextStep = (step) => {
@@ -74,7 +120,7 @@ export default function ExchangePage() {
       await createEnquiry({
         customer_name: formData.fullName,
         customer_email: formData.email,
-        customer_phone: formData.phone,
+        customer_phone: `${formData.countryCode} ${formData.phone}`.trim(),
         vehicle_interest: `${formData.upgradeMake} ${formData.upgradeModel}`.trim() || 'Any Upgrade',
         lead_type: 'exchange',
         notes: `Trade-in: ${formData.currentYear} ${formData.currentMake} ${formData.currentModel} (${formData.currentMileage}km, ${formData.condition})`,
@@ -109,7 +155,7 @@ export default function ExchangePage() {
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/inventory">Buy</Link>
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/sell">Sell</Link>
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-primary border-b-2 border-primary" href="/exchange">Exchange</Link>
-            <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="#">Locations</Link>
+            <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/certified">Certified</Link>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative hidden sm:block">
@@ -170,9 +216,9 @@ export default function ExchangePage() {
                   </div>
                   <div>
                     <label className="font-label-sm text-secondary mb-1 block uppercase">Registration Year</label>
-                    <select name="currentYear" value={formData.currentYear} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                    <select name="currentYear" value={formData.currentYear} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors appearance-none">
                       <option value="">Select Year</option>
-                      {Array.from({length: 15}, (_, i) => new Date().getFullYear() - i).map(year => (
+                      {Array.from({length: new Date().getFullYear() - 1989}, (_, i) => new Date().getFullYear() - i).map(year => (
                         <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
@@ -280,7 +326,12 @@ export default function ExchangePage() {
                         </div>
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Year</label>
-                          <input name="currentYear" value={formData.currentYear} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="YYYY" type="number" required />
+                          <select name="currentYear" value={formData.currentYear} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors appearance-none" required>
+                            <option value="">Select Year</option>
+                            {Array.from({length: new Date().getFullYear() - 1989}, (_, i) => new Date().getFullYear() - i).map(year => (
+                              <option key={year} value={year}>{year}</option>
+                            ))}
+                          </select>
                         </div>
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Mileage (km)</label>
@@ -313,13 +364,16 @@ export default function ExchangePage() {
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Preferred Make</label>
                           <select name="upgradeMake" value={formData.upgradeMake} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" required>
-                            <option>Nippon</option>
-                            <option>Lexus</option>
+                            <option value="">Select Make</option>
+                            {dynamicMakes.map(m => <option key={m} value={m}>{m}</option>)}
                           </select>
                         </div>
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Preferred Model</label>
-                          <input name="upgradeModel" value={formData.upgradeModel} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="e.g. Fortuner (Optional)" type="text" />
+                          <select name="upgradeModel" value={formData.upgradeModel} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <option value="">Any Model</option>
+                            {dynamicModels.map(m => <option key={m} value={m}>{m}</option>)}
+                          </select>
                         </div>
                       </div>
                       <div className="mt-8 flex justify-between">
@@ -340,11 +394,14 @@ export default function ExchangePage() {
                         </div>
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Email</label>
-                          <input name="email" value={formData.email} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="john@example.com" type="email" required />
+                          <input name="email" value={formData.email} onChange={handleInputChange} pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Enter a valid email address (e.g. john@example.com)" className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="john@example.com" type="email" required />
                         </div>
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Phone Number</label>
-                          <input name="phone" value={formData.phone} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="+91 00000 00000" type="tel" required />
+                          <div className="flex gap-2">
+                            <input name="countryCode" value={formData.countryCode} onChange={handleInputChange} className="w-20 bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-center" placeholder="+91" type="text" required />
+                            <input name="phone" value={formData.phone} onChange={handleInputChange} pattern="^[0-9]{10}$" minLength="10" maxLength="10" title="Phone number must be exactly 10 digits" className="flex-1 bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="00000 00000" type="tel" required />
+                          </div>
                         </div>
                       </div>
                       <div className="mt-8 flex justify-between">

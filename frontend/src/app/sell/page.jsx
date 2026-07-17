@@ -24,6 +24,7 @@ export default function SellPage() {
     condition: 'Excellent (Showroom quality)',
     fullName: '',
     email: '',
+    countryCode: '+91',
     phone: '',
     preferredDate: '',
     center: 'Nippon U-CARS Main Hub'
@@ -51,6 +52,12 @@ export default function SellPage() {
     const { name, value } = e.target;
     if (name === 'regNumber') {
       const sanitized = value.replace(/[\s-]/g, '').toUpperCase();
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+    } else if (name === 'phone') {
+      const sanitized = value.replace(/\D/g, '');
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+    } else if (name === 'countryCode') {
+      const sanitized = value.replace(/[^\d+]/g, '');
       setFormData(prev => ({ ...prev, [name]: sanitized }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -93,7 +100,7 @@ export default function SellPage() {
       await createEnquiry({
         customer_name: formData.fullName,
         customer_email: formData.email,
-        customer_phone: formData.phone,
+        customer_phone: `${formData.countryCode} ${formData.phone}`.trim(),
         vehicle_interest: formData.regNumber,
         lead_type: 'valuation',
         vehicle_specs: {
@@ -107,7 +114,7 @@ export default function SellPage() {
       setIsSubmitted(true);
       setFormData({
         regNumber: '', year: '', mileage: '', condition: 'Excellent (Showroom quality)',
-        fullName: '', email: '', phone: '', preferredDate: '', center: 'Nippon U-CARS Main Hub'
+        fullName: '', email: '', countryCode: '+91', phone: '', preferredDate: '', center: 'Nippon U-CARS Main Hub'
       });
     } catch (err) {
       alert("Failed to submit request. Please try again.");
@@ -133,7 +140,7 @@ export default function SellPage() {
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/inventory">Buy</Link>
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-primary border-b-2 border-primary" href="/sell">Sell</Link>
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/exchange">Exchange</Link>
-            <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="#">Locations</Link>
+            <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/certified">Certified</Link>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative hidden sm:block">
@@ -217,7 +224,12 @@ export default function SellPage() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Year of Manufacture</label>
-                      <input name="year" value={formData.year} onChange={handleInputChange} min="1990" max={new Date().getFullYear()} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="YYYY" type="number" required />
+                      <select name="year" value={formData.year} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white" required>
+                        <option value="">Select Year</option>
+                        {Array.from({length: new Date().getFullYear() - 1989}, (_, i) => new Date().getFullYear() - i).map(year => (
+                          <option key={year} value={year}>{year}</option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Mileage (km)</label>
@@ -251,11 +263,14 @@ export default function SellPage() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Email Address</label>
-                      <input name="email" value={formData.email} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="john@example.com" type="email" required />
+                      <input name="email" value={formData.email} onChange={handleInputChange} pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Enter a valid email address (e.g. john@example.com)" className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="john@example.com" type="email" required />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Phone Number</label>
-                      <input name="phone" value={formData.phone} onChange={handleInputChange} pattern="^\+?[0-9\s\-]{10,15}$" title="Enter a valid phone number (e.g. +91 9876543210)" className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="+91 00000 00000" type="tel" required />
+                      <div className="flex gap-2">
+                        <input name="countryCode" value={formData.countryCode} onChange={handleInputChange} className="w-20 p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-center" placeholder="+91" type="text" required />
+                        <input name="phone" value={formData.phone} onChange={handleInputChange} pattern="^[0-9]{10}$" minLength="10" maxLength="10" title="Phone number must be exactly 10 digits" className="flex-1 p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="00000 00000" type="tel" required />
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-col md:flex-row gap-4 mt-8">
@@ -279,7 +294,7 @@ export default function SellPage() {
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Preferred Date</label>
                       <div className="relative">
-                        <input name="preferredDate" value={formData.preferredDate} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" type="date" required />
+                        <input name="preferredDate" value={formData.preferredDate} onChange={handleInputChange} onClick={(e) => { try { e.target.showPicker(); } catch(err) {} }} min={new Date().toISOString().split('T')[0]} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" type="date" required />
                         <div className={`w-full p-4 border border-gray-200 rounded-lg bg-white flex items-center justify-between transition-all ${formData.preferredDate ? 'focus-within:border-primary focus-within:ring-1 focus-within:ring-primary' : ''}`}>
                           <span className={formData.preferredDate ? "text-gray-900" : "text-gray-400"}>{formatDate(formData.preferredDate) || "DD/MM/YYYY"}</span>
                           <span className="material-symbols-outlined text-gray-400">calendar_month</span>

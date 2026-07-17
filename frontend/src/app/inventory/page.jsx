@@ -90,8 +90,19 @@ function InventoryListContent() {
     return modelMatch && budgetMatch && ageMatch && bodyTypeMatch;
   });
 
-  // Models list for checkboxes based on dummy data
-  const availableModels = ["Fortuner", "Hilux", "Corolla", "Safari", "Supra", "Thar", "Nexon", "Creta", "City", "Seltos", "Slavia", "Innova"];
+  // Models list for checkboxes based on actual inventory
+  const availableModels = React.useMemo(() => {
+    const models = new Set();
+    cars.forEach(c => {
+      if (c.name) {
+        // Extract model name (e.g. 'Toyota Fortuner' -> 'Fortuner')
+        const parts = c.name.split(' ');
+        const modelName = parts.length > 1 ? parts.slice(1).join(' ') : c.name;
+        models.add(modelName);
+      }
+    });
+    return Array.from(models).sort();
+  }, [cars]);
 
   return (
     <div className="inventory-list-page" style={{ minHeight: '100vh', background: 'var(--light-grey)' }}>

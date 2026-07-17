@@ -5,7 +5,7 @@ import Link from 'next/link';
 import MobileMenu from '@/components/MobileMenu';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { fetchFeaturedCars } from '@/api/inventoryApi';
+import { fetchFeaturedCars, fetchInventory } from '@/api/inventoryApi';
 
 function parseSpecs(specs) {
   if (!specs) return {};
@@ -75,6 +75,37 @@ export default function Home() {
     queryFn: fetchFeaturedCars
   });
 
+  const { data: inventoryCars = [] } = useQuery({
+    queryKey: ['inventory'],
+    queryFn: fetchInventory
+  });
+
+  const dynamicModels = React.useMemo(() => {
+    const models = new Set();
+    inventoryCars.forEach(c => {
+      if (c.name) {
+        // Extract model name (e.g. 'Toyota Fortuner' -> 'Fortuner')
+        const parts = c.name.split(' ');
+        const modelName = parts.length > 1 ? parts.slice(1).join(' ') : c.name;
+        models.add(modelName);
+      }
+    });
+    return Array.from(models).sort();
+  }, [inventoryCars]);
+
+  const dynamicBodyTypes = React.useMemo(() => {
+    const types = new Set();
+    inventoryCars.forEach(c => {
+      const specs = parseSpecs(c.specs);
+      if (specs.bodyType) types.add(specs.bodyType);
+    });
+    // Add defaults if empty to avoid empty dropdown
+    if (types.size === 0) {
+      ['SUV', 'Sedan', 'Hatchback', 'Pickup', 'MUV', 'Sports'].forEach(t => types.add(t));
+    }
+    return Array.from(types).sort();
+  }, [inventoryCars]);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -133,12 +164,7 @@ export default function Home() {
                 <label className="block font-label-sm text-secondary uppercase mb-1 opacity-70">Model</label>
                 <select value={searchModel} onChange={(e) => setSearchModel(e.target.value)} className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
                   <option value="">All Models</option>
-                  <option value="Fortuner">Fortuner</option>
-                  <option value="Corolla">Corolla</option>
-                  <option value="Camry">Camry</option>
-                  <option value="Hilux">Hilux</option>
-                  <option value="Innova">Innova</option>
-                  <option value="Supra">Supra</option>
+                  {dynamicModels.map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
               </div>
               <div className="flex-1 px-6 py-3 border-b md:border-b-0 md:border-r border-black/10">
@@ -154,12 +180,7 @@ export default function Home() {
                 <label className="block font-label-sm text-secondary uppercase mb-1 opacity-70">Body Type</label>
                 <select value={searchBodyType} onChange={(e) => setSearchBodyType(e.target.value)} className="w-full bg-transparent border-none focus:ring-0 font-label-bold text-secondary p-0 uppercase outline-none">
                   <option value="">All Types</option>
-                  <option value="SUV">SUV</option>
-                  <option value="Sedan">Sedan</option>
-                  <option value="Hatchback">Hatchback</option>
-                  <option value="Pickup">Pickup</option>
-                  <option value="MUV">MUV</option>
-                  <option value="Sports">Sports</option>
+                  {dynamicBodyTypes.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <button onClick={handleSearch} className="bg-primary text-white font-label-bold text-label-bold px-6 py-4 md:px-12 md:py-5 uppercase rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all shadow-lg">

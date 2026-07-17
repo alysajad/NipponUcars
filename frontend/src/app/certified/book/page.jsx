@@ -25,13 +25,22 @@ export default function BookInspection() {
     serviceCenter: 'Tokyo Central Flagship Center',
     date: '',
     fullName: '',
+    countryCode: '+91',
     phone: '',
     email: '',
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'phone') {
+      const sanitized = value.replace(/\D/g, '');
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+    } else if (name === 'countryCode') {
+      const sanitized = value.replace(/[^\d+]/g, '');
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -42,7 +51,7 @@ export default function BookInspection() {
       const payload = {
         customer_name: formData.fullName,
         customer_email: formData.email,
-        customer_phone: formData.phone,
+        customer_phone: `${formData.countryCode} ${formData.phone}`.trim(),
         vehicle_interest: `${formData.year} ${formData.make} ${formData.model}`,
         priority: "high",
         lead_type: "inspection",
@@ -151,7 +160,7 @@ export default function BookInspection() {
                   </div>
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">VIN (Chassis Number)</label>
-                    <input name="vin" value={formData.vin} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary uppercase px-4 py-3 font-body-md" placeholder="17-CHARACTER IDENTIFIER" type="text"/>
+                    <input name="vin" value={formData.vin} onChange={handleInputChange} pattern="^[A-Za-z0-9]{17}$" minLength="17" maxLength="17" title="VIN must be exactly 17 alphanumeric characters" className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary uppercase px-4 py-3 font-body-md" placeholder="17-CHARACTER IDENTIFIER" type="text"/>
                   </div>
                 </div>
 
@@ -170,7 +179,7 @@ export default function BookInspection() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Date Selection</label>
-                    <input name="date" value={formData.date} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="date" required/>
+                    <input name="date" value={formData.date} onChange={handleInputChange} onClick={(e) => { try { e.target.showPicker(); } catch(err) {} }} min={new Date().toISOString().split('T')[0]} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="date" required/>
                   </div>
                   <div className="space-y-2">
                     <label className="font-label-sm uppercase text-secondary">Time Slot</label>
@@ -197,11 +206,14 @@ export default function BookInspection() {
                   </div>
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Phone Number</label>
-                    <input name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="tel" required/>
+                    <div className="flex gap-2">
+                      <input name="countryCode" value={formData.countryCode} onChange={handleInputChange} className="w-20 border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md text-center" placeholder="+91" type="text" required/>
+                      <input name="phone" value={formData.phone} onChange={handleInputChange} pattern="^[0-9]{10}$" minLength="10" maxLength="10" title="Phone number must be exactly 10 digits" className="flex-1 border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" placeholder="00000 00000" type="tel" required/>
+                    </div>
                   </div>
                   <div className="md:col-span-2 space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Email Address</label>
-                    <input name="email" value={formData.email} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="email" required/>
+                    <input name="email" value={formData.email} onChange={handleInputChange} pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Enter a valid email address (e.g. john@example.com)" className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" placeholder="john@example.com" type="email" required/>
                   </div>
                 </div>
 

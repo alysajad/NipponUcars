@@ -37,6 +37,7 @@ function EnquiryContent() {
   const [formStatus, setFormStatus] = useState('idle');
   const [formData, setFormData] = useState({
     fullName: '',
+    countryCode: '+91',
     phone: '',
     email: '',
     city: 'Select City',
@@ -47,11 +48,14 @@ function EnquiryContent() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'phone') {
-      const sanitized = value.replace(/[^\+0-9\s\-]/g, '');
+      const sanitized = value.replace(/\D/g, '');
       setFormData(prev => ({ ...prev, [name]: sanitized }));
-      return;
+    } else if (name === 'countryCode') {
+      const sanitized = value.replace(/[^\d+]/g, '');
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
-    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -61,7 +65,7 @@ function EnquiryContent() {
       await createEnquiry({
         customer_name: formData.fullName,
         customer_email: formData.email,
-        customer_phone: formData.phone,
+        customer_phone: `${formData.countryCode} ${formData.phone}`.trim(),
         vehicle_interest: car ? car.name : 'Unknown',
         vehicle_specs: {
           city: formData.city !== 'Select City' ? formData.city : '',
@@ -113,7 +117,7 @@ function EnquiryContent() {
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/inventory">Buy</Link>
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/sell">Sell</Link>
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/exchange">Exchange</Link>
-            <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="#">Locations</Link>
+            <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/certified">Certified</Link>
         </nav>
         <div className="flex items-center gap-6">
             <button className="bg-primary text-white px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 duration-100 hover:brightness-110 shadow-md">
@@ -201,6 +205,17 @@ function EnquiryContent() {
                   </div>
                 ) : (
                 <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+                    {/* Vehicle Details (Auto-filled) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-gray-200">
+                        <div className="flex flex-col gap-2">
+                            <label className="font-bold text-sm text-secondary uppercase tracking-wider">Vehicle of Interest</label>
+                            <input value={car.name || ''} readOnly disabled className="w-full p-4 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 font-bold outline-none cursor-not-allowed" type="text" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="font-bold text-sm text-secondary uppercase tracking-wider">Model Year</label>
+                            <input value={specs.year || ''} readOnly disabled className="w-full p-4 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 font-bold outline-none cursor-not-allowed" type="text" />
+                        </div>
+                    </div>
                     {/* Name & Contact */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
@@ -209,7 +224,10 @@ function EnquiryContent() {
                         </div>
                         <div className="flex flex-col gap-2">
                             <label className="font-bold text-sm text-secondary uppercase tracking-wider">Mobile Number</label>
-                            <input name="phone" value={formData.phone} onChange={handleInputChange} pattern="^\+?[0-9\s\-]{10,15}$" title="Enter a valid phone number (e.g. +91 9876543210)" required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="+91 00000 00000" type="tel" />
+                            <div className="flex gap-2">
+                              <input name="countryCode" value={formData.countryCode} onChange={handleInputChange} className="w-20 p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium text-center" placeholder="+91" type="text" required />
+                              <input name="phone" value={formData.phone} onChange={handleInputChange} pattern="^[0-9]{10}$" minLength="10" maxLength="10" title="Phone number must be exactly 10 digits" required className="flex-1 p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="00000 00000" type="tel" />
+                            </div>
                         </div>
                     </div>
                     
@@ -217,7 +235,7 @@ function EnquiryContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
                             <label className="font-bold text-sm text-secondary uppercase tracking-wider">Email Address</label>
-                            <input name="email" value={formData.email} onChange={handleInputChange} required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="example@email.com" type="email" />
+                            <input name="email" value={formData.email} onChange={handleInputChange} pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Enter a valid email address (e.g. john@example.com)" required className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="example@email.com" type="email" />
                         </div>
                         <div className="flex flex-col gap-2">
                             <label className="font-bold text-sm text-secondary uppercase tracking-wider">City</label>

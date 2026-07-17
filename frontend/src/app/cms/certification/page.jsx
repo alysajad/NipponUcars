@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCmsCertifications } from '@/api/inventoryApi';
+import { fetchCmsCertifications, fetchCmsEnquiries } from '@/api/inventoryApi';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -11,36 +11,62 @@ export default function CmsCertification() {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: certifications = [], isLoading } = useQuery({
+  const { data: certifications = [], isLoading: isLoadingCerts } = useQuery({
     queryKey: ['cms-certifications'],
     queryFn: fetchCmsCertifications
   });
 
+  const { data: enquiries = [], isLoading: isLoadingEnquiries } = useQuery({
+    queryKey: ['cms-enquiries', 'inspection'],
+    queryFn: () => fetchCmsEnquiries('inspection')
+  });
+
+  const isLoading = isLoadingCerts || isLoadingEnquiries;
+
+  const combinedCertifications = useMemo(() => {
+    const mappedEnquiries = enquiries.map(enq => {
+      const vinMatch = enq.notes?.match(/VIN:\s*([^\n]+)/);
+      const vin = vinMatch ? vinMatch[1].trim() : 'N/A';
+      return {
+        id: enq.id,
+        vehicle_name: enq.vehicle_interest || 'Unknown Vehicle',
+        vin: vin !== 'N/A' ? vin : undefined,
+        technician: 'Pending Assignment',
+        points_checked: 0,
+        total_points: 203,
+        stage: 'inspection',
+        status: 'pending',
+        isEnquiry: true
+      };
+    });
+    return [...mappedEnquiries, ...certifications];
+  }, [certifications, enquiries]);
+
   const filtered = useMemo(() => {
-    if (!search) return certifications;
+    if (!search) return combinedCertifications;
     const q = search.toLowerCase();
-    return certifications.filter(c =>
+    return combinedCertifications.filter(c =>
       c.vehicle_name?.toLowerCase().includes(q) ||
       c.vin?.toLowerCase().includes(q) ||
       c.technician?.toLowerCase().includes(q)
     );
-  }, [certifications, search]);
+  }, [combinedCertifications, search]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   // Stats
-  const totalInProcess = certifications.filter(c => c.status === 'in-progress').length;
-  const stageInspection = certifications.filter(c => c.stage === 'inspection').length;
-  const stageRefurbishment = certifications.filter(c => c.stage === 'refurbishment').length;
-  const stageFinalAudit = certifications.filter(c => c.stage === 'final-audit').length;
+  const totalInProcess = combinedCertifications.filter(c => c.status === 'in-progress' || c.status === 'pending').length;
+  const stageInspection = combinedCertifications.filter(c => c.stage === 'inspection').length;
+  const stageRefurbishment = combinedCertifications.filter(c => c.stage === 'refurbishment').length;
+  const stageFinalAudit = combinedCertifications.filter(c => c.stage === 'final-audit').length;
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-body-md">
       {/* Top Nav */}
       <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex flex-col md:flex-row justify-between md:items-center px-4 md:px-10 py-3 md:py-0 w-full max-w-[1280px] mx-auto min-h-[5rem] gap-3 md:gap-0">
-          <div className="flex items-center gap-4 xl:gap-8">
+          <div className="flex items-center gap-10 xl:gap-16">
             <div className="flex items-center gap-2 shrink-0 whitespace-nowrap font-label-sm text-[14px] uppercase tracking-wider font-bold">
               <Link href="/" className="text-secondary hover:text-primary transition-colors">Home</Link>
               <span className="text-secondary/50">&gt;</span>
@@ -115,9 +141,6 @@ export default function CmsCertification() {
             <div className="flex gap-4 w-full md:w-auto">
               <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-outline rounded-[6px] bg-white font-label-sm text-label-sm uppercase hover:bg-surface-container-low transition-colors">
                 <span className="material-symbols-outlined text-sm">filter_list</span> Filter
-              </button>
-              <button className="flex-1 md:flex-none bg-primary text-on-primary px-6 py-2 rounded-[6px] font-label-sm text-label-sm uppercase font-semibold hover:opacity-90 transition-colors">
-                New Inspection
               </button>
             </div>
           </div>
