@@ -8,6 +8,14 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchInventory } from '@/api/inventoryApi';
 
 export default function InventoryList() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-primary font-bold">Loading Inventory...</div>}>
+      <InventoryListContent />
+    </React.Suspense>
+  );
+}
+
+function InventoryListContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
