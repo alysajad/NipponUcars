@@ -36,11 +36,39 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
-  // Search State
   const [searchModel, setSearchModel] = useState('');
   const [searchBudget, setSearchBudget] = useState('');
   const [searchBodyType, setSearchBodyType] = useState('');
   const router = useRouter();
+
+  // Synchronize model and body type
+  useEffect(() => {
+    const modelBodyMap = {
+      'Fortuner': 'SUV',
+      'Corolla': 'Sedan',
+      'Camry': 'Sedan',
+      'Hilux': 'Pickup',
+      'Innova': 'MUV',
+      'Supra': 'Sports'
+    };
+    if (searchModel && modelBodyMap[searchModel]) {
+      setSearchBodyType(modelBodyMap[searchModel]);
+    }
+  }, [searchModel]);
+
+  useEffect(() => {
+    const modelBodyMap = {
+      'Fortuner': 'SUV',
+      'Corolla': 'Sedan',
+      'Camry': 'Sedan',
+      'Hilux': 'Pickup',
+      'Innova': 'MUV',
+      'Supra': 'Sports'
+    };
+    if (searchBodyType && searchModel && modelBodyMap[searchModel] !== searchBodyType) {
+      setSearchModel('');
+    }
+  }, [searchBodyType]);
 
   const { data: featuredCars = [], isLoading: isLoadingFeatured } = useQuery({
     queryKey: ['featured-cars'],
@@ -129,6 +157,9 @@ export default function Home() {
                   <option value="SUV">SUV</option>
                   <option value="Sedan">Sedan</option>
                   <option value="Hatchback">Hatchback</option>
+                  <option value="Pickup">Pickup</option>
+                  <option value="MUV">MUV</option>
+                  <option value="Sports">Sports</option>
                 </select>
               </div>
               <button onClick={handleSearch} className="bg-primary text-white font-label-bold text-label-bold px-6 py-4 md:px-12 md:py-5 uppercase rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all shadow-lg">
