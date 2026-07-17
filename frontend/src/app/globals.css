@@ -51,6 +51,21 @@ tr:hover td {
   
   --font-sailors: 'Montserrat', sans-serif;
   --font-proxima: 'Montserrat', sans-serif;
+
+  /* Responsive spacing defaults (Mobile first) */
+  --margin-desktop: 16px;
+  --margin-mobile: 16px;
+  --stack-lg: 16px;
+  --stack-md: 12px;
+  --stack-sm: 8px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --margin-desktop: 40px;
+    --stack-lg: 32px;
+    --stack-md: 16px;
+  }
 }
 
 * {

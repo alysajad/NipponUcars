@@ -158,7 +158,7 @@ export default function InventoryList() {
           }
         }
       `}</style>
-      <header className="inventory-header" style={{ padding: '1.5rem 4rem', background: 'var(--pure-white)', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header className="flex flex-col md:flex-row items-start md:items-center justify-between px-4 md:px-16 py-6 bg-white border-b border-black/5 gap-4 w-full">
         <div>
           <h1 style={{ fontFamily: 'var(--font-sailors)', fontSize: '2rem', margin: 0 }}>
             <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:opacity-80 transition-opacity"><span className="text-red">U-Trust</span> Used Cars</Link>
@@ -171,12 +171,12 @@ export default function InventoryList() {
             <span style={{ color: 'var(--dark-grey)', fontWeight: 'bold' }}>All India</span>
           </p>
         </div>
-        <Link href="/" className="cta-button" style={{ margin: 0, padding: '0.6rem 1.2rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Link href="/" className="bg-primary text-white hover:brightness-110 px-4 py-3 md:py-2 rounded-md font-bold uppercase tracking-wider transition-all text-sm w-full md:w-auto text-center flex justify-center items-center gap-2">
           <Home size={16} /> BACK TO HOME
         </Link>
       </header>
 
-      <div className="inventory-layout" style={{ display: 'flex', gap: '2rem', padding: '2rem 2rem', maxWidth: '100%', margin: '0', flexWrap: 'wrap' }}>
+      <div className="flex flex-col lg:flex-row gap-4 md:gap-8 px-4 md:px-8 py-8 w-full max-w-[1440px] mx-auto">
         
         <div className={`inventory-overlay ${isMobileFilterOpen ? 'open' : ''}`} onClick={() => setIsMobileFilterOpen(false)} />
 

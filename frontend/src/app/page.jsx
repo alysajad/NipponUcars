@@ -99,7 +99,7 @@ export default function Landing() {
                   <option value="Hatchback">Hatchback</option>
                 </select>
               </div>
-              <button onClick={handleSearch} className="bg-primary text-white font-label-bold text-label-bold px-12 py-5 uppercase rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all shadow-lg">
+              <button onClick={handleSearch} className="bg-primary text-white font-label-bold text-label-bold px-6 py-4 md:px-12 md:py-5 uppercase rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all shadow-lg">
                 <span className="material-symbols-outlined font-bold">search</span> Search
               </button>
             </div>
@@ -323,7 +323,7 @@ export default function Landing() {
                 </div>
               </div>
               <div className="p-8">
-                <div className="flex justify-between items-start gap-4 mb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
                   <div className="flex-1">
                     <h4 className="font-headline-md text-headline-md uppercase">Toyota Fortuner</h4>
                     <p className="text-secondary/50 font-label-sm uppercase tracking-wider">2.8L Diesel AT 4x4</p>
@@ -362,7 +362,7 @@ export default function Landing() {
                 </div>
               </div>
               <div className="p-8">
-                <div className="flex justify-between items-start gap-4 mb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
                   <div className="flex-1">
                     <h4 className="font-headline-md text-headline-md uppercase">Toyota Corolla</h4>
                     <p className="text-secondary/50 font-label-sm uppercase tracking-wider">1.8L Hybrid Premium</p>
@@ -401,7 +401,7 @@ export default function Landing() {
                 </div>
               </div>
               <div className="p-8">
-                <div className="flex justify-between items-start gap-4 mb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
                   <div className="flex-1">
                     <h4 className="font-headline-md text-headline-md uppercase">Toyota Camry</h4>
                     <p className="text-secondary/50 font-label-sm uppercase tracking-wider">2.5L Luxury Sedan</p>
