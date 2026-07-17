@@ -214,7 +214,7 @@ export default function FormEditor() {
               <div className="space-y-5 max-w-[800px] mb-8">
                 <div>
                   <label className="block font-label-sm uppercase text-secondary mb-2">Model Name</label>
-                  <input value={newModel.name} onChange={e => setNewModel({...newModel, name: e.target.value})} placeholder="e.g., Toyota Camry Hybrid" className="w-full px-4 py-3 border border-outline/30 rounded-[6px] outline-none" />
+                  <input value={newModel.name} onChange={e => setNewModel({...newModel, name: e.target.value})} placeholder="e.g., Nippon Camry Hybrid" className="w-full px-4 py-3 border border-outline/30 rounded-[6px] outline-none" />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

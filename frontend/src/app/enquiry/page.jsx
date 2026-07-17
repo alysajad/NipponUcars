@@ -106,7 +106,7 @@ function EnquiryContent() {
         <div className="flex items-center gap-4">
             <MobileMenu />
             <div className="text-2xl font-bold text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>
-                Toyota U-Trust
+                Nippon Used Cars
             </div>
         </div>
         <nav className="hidden md:flex items-center gap-8">
@@ -302,9 +302,9 @@ function EnquiryContent() {
       {/* Footer Component */}
       <footer className="w-full py-12 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-secondary text-white border-t border-gray-800 mt-auto">
         <div className="flex flex-col gap-4 text-center md:text-left">
-            <div className="text-2xl font-black text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>Toyota U-Trust</div>
+            <div className="text-2xl font-black text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon Used Cars</div>
             <p className="text-sm text-gray-400 max-w-sm">
-                © 2024 Toyota U-Trust. Certified Pre-Owned Excellence. All rights reserved.
+                © 2024 Nippon Used Cars. Certified Pre-Owned Excellence. All rights reserved.
             </p>
         </div>
         <div className="flex flex-wrap justify-center gap-6">

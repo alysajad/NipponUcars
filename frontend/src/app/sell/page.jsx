@@ -25,7 +25,7 @@ export default function SellPage() {
     email: '',
     phone: '',
     preferredDate: '',
-    center: 'Toyota U-Trust Main Hub'
+    center: 'Nippon Used Cars Main Hub'
   });
 
   const handleNextStep = (e, nextIdx) => {
@@ -100,7 +100,7 @@ export default function SellPage() {
       setIsSubmitted(true);
       setFormData({
         regNumber: '', mileage: '', condition: 'Excellent (Showroom quality)',
-        fullName: '', email: '', phone: '', preferredDate: '', center: 'Toyota U-Trust Main Hub'
+        fullName: '', email: '', phone: '', preferredDate: '', center: 'Nippon Used Cars Main Hub'
       });
     } catch (err) {
       alert("Failed to submit request. Please try again.");
@@ -119,7 +119,7 @@ export default function SellPage() {
           <div className="flex items-center gap-2">
             <MobileMenu />
             <Link href="/" className="text-2xl font-bold text-primary tracking-tighter uppercase font-headline-md hover:opacity-80 transition-opacity cursor-pointer" style={{ fontFamily: 'var(--font-sailors)' }}>
-              Toyota U-Trust
+              Nippon Used Cars
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-8">
@@ -145,10 +145,10 @@ export default function SellPage() {
             <div className="w-full md:w-1/2 z-10">
               <span className="inline-block bg-primary px-3 py-1 text-white font-bold text-[10px] uppercase tracking-[0.2em] mb-6">Certified Valuation</span>
               <h1 className="text-5xl md:text-6xl font-bold text-on-surface mb-6 font-headline-xl uppercase" style={{ fontFamily: 'var(--font-sailors)', lineHeight: '1.1' }}>
-                Get a Fair Price for Your Toyota Today
+                Get a Fair Price for Your Car Today
               </h1>
               <p className="text-lg text-gray-600 mb-8 max-w-lg leading-relaxed">
-                Three simple steps to a transparent valuation. Backed by Toyota's global standard of trust and excellence.
+                Three simple steps to a transparent valuation. Backed by Nippon's global standard of trust and excellence.
               </p>
               <div className="flex gap-6">
                 <div className="flex items-center gap-2">
@@ -163,7 +163,7 @@ export default function SellPage() {
             </div>
             <div className="w-full md:w-1/2 relative">
               <div className="aspect-[4/3] w-full bg-gray-100 overflow-hidden rounded-xl group shadow-2xl">
-                <img alt="Toyota Showroom" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191725/utrust_assets/utrust_asset_sell_page_0.jpg" />
+                <img alt="Nippon Showroom" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191725/utrust_assets/utrust_asset_sell_page_0.jpg" />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white/60 backdrop-blur-xl p-6 rounded-xl shadow-xl border border-white/40">
                 <p className="text-xs font-bold text-primary tracking-widest uppercase mb-1">Valuation Updated</p>
@@ -278,7 +278,7 @@ export default function SellPage() {
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Nearest Center</label>
                       <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
-                        <option>Toyota U-Trust Main Hub</option>
+                        <option>Nippon Used Cars Main Hub</option>
                         <option>North City Service Center</option>
                         <option>South Plaza Workshop</option>
                       </select>
@@ -319,7 +319,7 @@ export default function SellPage() {
                     <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm mt-2 text-secondary">Pricing</span>
                   </div>
                   <p className="font-body-md text-sm text-secondary/80 mt-6 leading-relaxed max-w-[80%]">
-                    Our algorithmic valuation ensures you get the most accurate, data-driven market price for your Toyota without any low-ball offers.
+                    Our algorithmic valuation ensures you get the most accurate, data-driven market price for your car without any low-ball offers.
                   </p>
                 </div>
                 <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
@@ -367,7 +367,7 @@ export default function SellPage() {
         {/* Content Sections Alternating */}
         <section className="grid grid-cols-1 md:grid-cols-2">
           <div className="relative h-[500px] md:h-auto overflow-hidden">
-            <img alt="Toyota Inspection" className="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191727/utrust_assets/utrust_asset_sell_page_1.jpg" />
+            <img alt="Nippon Inspection" className="absolute inset-0 w-full h-full object-cover" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191727/utrust_assets/utrust_asset_sell_page_1.jpg" />
             <div className="absolute inset-0 bg-primary/10"></div>
           </div>
           <div className="bg-inverse-surface p-16 md:p-24 flex flex-col justify-center text-white">
@@ -382,7 +382,7 @@ export default function SellPage() {
                 </div>
                 <div>
                   <p className="font-bold text-sm uppercase tracking-wider">Certified Engineers</p>
-                  <p className="text-xs opacity-60 uppercase tracking-widest">Trained by Toyota technicians</p>
+                  <p className="text-xs opacity-60 uppercase tracking-widest">Trained by Nippon technicians</p>
                 </div>
               </div>
               <div className="flex items-center gap-6">
@@ -419,7 +419,7 @@ export default function SellPage() {
       <footer className="bg-inverse-surface text-white pt-20 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-margin-desktop py-12 max-w-container-max mx-auto border-b border-white/10">
           <div className="col-span-1 md:col-span-1">
-            <div className="text-2xl font-bold text-primary mb-6 uppercase tracking-tighter" style={{ fontFamily: 'var(--font-sailors)' }}>Toyota U-Trust</div>
+            <div className="text-2xl font-bold text-primary mb-6 uppercase tracking-tighter" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon Used Cars</div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">Reliability and precision in every transaction. Your partner for certified pre-owned excellence.</p>
           </div>
           <div>
@@ -450,7 +450,7 @@ export default function SellPage() {
           </div>
         </div>
         <div className="px-margin-desktop pt-8 max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-gray-500 text-xs uppercase tracking-[0.2em]">© 2024 Toyota U-Trust. Certified Excellence.</p>
+          <p className="text-gray-500 text-xs uppercase tracking-[0.2em]">© 2024 Nippon Used Cars. Certified Excellence.</p>
           <div className="flex gap-8 text-gray-500">
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">facebook</span>
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">public</span>

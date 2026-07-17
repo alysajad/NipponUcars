@@ -98,7 +98,7 @@ export default function Home() {
               The Gold Standard in <br/><span className="text-primary">Pre-Owned Cars</span>
             </h1>
             <p className="font-body-lg text-body-lg mb-10 text-white opacity-90 max-w-xl">
-              Experience peace of mind with Toyota's manufacturer-certified pre-owned vehicles. Each car undergoes a rigorous 203-point inspection for absolute quality.
+              Experience peace of mind with Nippon's certified pre-owned vehicles. Each car undergoes a rigorous 203-point inspection for absolute quality.
             </p>
             
             {/* Search Tool (Glassmorphism) */}
@@ -213,9 +213,9 @@ export default function Home() {
       <section className="pt-10 pb-24 bg-white">
         <div className="px-4 md:px-8 w-full max-w-full mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10 mb-16">
-            <h2 className="font-headline-lg text-headline-md md:text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-normal md:whitespace-nowrap text-center md:text-left w-full md:w-auto">The Toyota Promise</h2>
+            <h2 className="font-headline-lg text-headline-md md:text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-normal md:whitespace-nowrap text-center md:text-left w-full md:w-auto">The Nippon Promise</h2>
             <p className="font-body-md text-body-md text-secondary/70 max-w-2xl leading-relaxed">
-              At Toyota U-Trust, we offer a range of advantages to help you buy and sell with confidence. These include our comprehensive evaluation, manufacturer-backed warranties, and fully transparent history.
+              At Nippon Used Cars, we offer a range of advantages to help you buy and sell with confidence. These include our comprehensive evaluation, manufacturer-backed warranties, and fully transparent history.
             </p>
           </div>
           
@@ -337,7 +337,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-baseline mb-12 border-b border-outline-variant pb-6">
             <div>
               <span className="text-primary font-label-bold text-label-bold tracking-[0.2em] uppercase">Handpicked Selection</span>
-              <h2 className="font-headline-lg text-headline-lg mt-2 uppercase text-secondary">Featured Toyota Certified</h2>
+              <h2 className="font-headline-lg text-headline-lg mt-2 uppercase text-secondary">Featured Nippon Certified</h2>
             </div>
             <Link href="/inventory" className="flex items-center gap-2 font-label-bold text-label-bold text-primary group uppercase mt-4 md:mt-0">
               VIEW ALL INVENTORY <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
@@ -414,7 +414,7 @@ export default function Home() {
             <div className="max-w-2xl text-center md:text-left">
               <h2 className="font-headline-xl text-headline-xl text-white mb-6 uppercase">Looking to Sell or Exchange?</h2>
               <p className="font-body-lg text-body-lg text-white opacity-70">
-                Upgrade your drive effortlessly. Get a transparent valuation for your current car in minutes and trade it in for a certified Toyota of your choice.
+                Upgrade your drive effortlessly. Get a transparent valuation for your current car in minutes and trade it in for a certified car of your choice.
               </p>
             </div>
             <div>
@@ -430,9 +430,9 @@ export default function Home() {
       <footer className="bg-secondary text-white border-t border-white/5">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-margin-desktop py-24 max-w-container-max mx-auto">
           <div className="space-y-8">
-            <span className="font-headline-md text-headline-md text-white font-semibold uppercase">Toyota U-Trust</span>
+            <span className="font-headline-md text-headline-md text-white font-semibold uppercase">Nippon Used Cars</span>
             <p className="font-body-md text-body-md opacity-60 max-w-xs">
-              The trusted name for manufacturer-certified pre-owned Toyotas. Reliability you can count on, value you can trust.
+              The trusted name for certified pre-owned cars. Reliability you can count on, value you can trust.
             </p>
             <div className="flex gap-4">
               <Link href="#" className="w-10 h-10 flex items-center justify-center border border-white/10 rounded-full hover:bg-primary transition-colors">
@@ -476,7 +476,7 @@ export default function Home() {
           </div>
         </div>
         <div className="border-t border-white/5 py-10 px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <span className="font-body-md text-body-md text-white/40">© 2024 Toyota U-Trust. All Rights Reserved. Certified Excellence.</span>
+          <span className="font-body-md text-body-md text-white/40">© 2024 Nippon Used Cars. All Rights Reserved. Certified Excellence.</span>
           <div className="flex gap-10 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em]">
             <Link href="#" className="hover:text-primary transition-colors">Legal</Link>
             <Link href="#" className="hover:text-primary transition-colors">Sitemap</Link>

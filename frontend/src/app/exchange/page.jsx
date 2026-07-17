@@ -19,7 +19,7 @@ export default function ExchangePage() {
     condition: 'Excellent',
     
     // Step 2: Upgrade
-    upgradeMake: 'Toyota',
+    upgradeMake: 'Nippon',
     upgradeModel: '',
     
     // Step 3: Contact
@@ -102,7 +102,7 @@ export default function ExchangePage() {
           <div className="flex items-center gap-2">
             <MobileMenu />
             <Link href="/" className="text-2xl font-bold text-primary tracking-tighter uppercase font-headline-md hover:opacity-80 transition-opacity cursor-pointer" style={{ fontFamily: 'var(--font-sailors)' }}>
-              Toyota U-Trust
+              Nippon Used Cars
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-8">
@@ -155,7 +155,7 @@ export default function ExchangePage() {
                     <label className="font-label-sm text-secondary mb-1 block uppercase">Vehicle Make</label>
                     <select name="currentMake" value={formData.currentMake} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                       <option value="">Select Make</option>
-                      <option value="Toyota">Toyota</option>
+                      <option value="Nippon">Nippon</option>
                       <option value="Honda">Honda</option>
                       <option value="Nissan">Nissan</option>
                       <option value="Maruti Suzuki">Maruti Suzuki</option>
@@ -272,7 +272,7 @@ export default function ExchangePage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Make</label>
-                          <input name="currentMake" value={formData.currentMake} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="e.g. Toyota" type="text" required />
+                          <input name="currentMake" value={formData.currentMake} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="e.g. Nippon" type="text" required />
                         </div>
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Model</label>
@@ -313,7 +313,7 @@ export default function ExchangePage() {
                         <div>
                           <label className="font-label-sm text-secondary mb-1 block uppercase">Preferred Make</label>
                           <select name="upgradeMake" value={formData.upgradeMake} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" required>
-                            <option>Toyota</option>
+                            <option>Nippon</option>
                             <option>Lexus</option>
                           </select>
                         </div>

@@ -223,9 +223,9 @@ export default function Certified() {
       <footer className="bg-secondary text-white py-20 mt-auto">
         <div className="px-margin-desktop max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1">
-            <span className="font-headline-md text-headline-md text-white font-semibold uppercase">Toyota U-Trust</span>
+            <span className="font-headline-md text-headline-md text-white font-semibold uppercase">Nippon Used Cars</span>
             <p className="font-body-md text-body-md opacity-60 max-w-xs mt-4">
-              The trusted name for manufacturer-certified pre-owned Toyotas. Reliability you can count on, value you can trust.
+              The trusted name for certified pre-owned cars. Reliability you can count on, value you can trust.
             </p>
             <div className="flex gap-4 mt-6">
               <Link href="#" className="w-10 h-10 flex items-center justify-center border border-white/10 rounded-full hover:bg-primary transition-colors">
@@ -269,7 +269,7 @@ export default function Certified() {
           </div>
         </div>
         <div className="border-t border-white/5 py-10 px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <span className="font-body-md text-body-md text-white/40">© 2024 Toyota U-Trust. All Rights Reserved. Certified Excellence.</span>
+          <span className="font-body-md text-body-md text-white/40">© 2024 Nippon Used Cars. All Rights Reserved. Certified Excellence.</span>
           <div className="flex gap-10 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em]">
             <Link href="#" className="hover:text-primary transition-colors">Legal</Link>
             <Link href="#" className="hover:text-primary transition-colors">Sitemap</Link>
