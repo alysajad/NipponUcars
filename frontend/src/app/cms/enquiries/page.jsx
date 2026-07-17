@@ -11,6 +11,7 @@ export default function CmsEnquiries() {
   const [activeTab, setActiveTab] = useState('sales');
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedEnquiry, setSelectedEnquiry] = useState(null);
 
   const { data: enquiries = [], isLoading } = useQuery({
     queryKey: ['cms-enquiries'],
@@ -189,7 +190,7 @@ export default function CmsEnquiries() {
                             <PriorityBadge priority={enq.priority} />
                           </td>
                           <td className="px-6 py-5 text-right">
-                            <button className="border-2 border-primary text-primary px-4 py-1.5 rounded-[6px] font-label-sm uppercase hover:bg-primary hover:text-white transition-all">
+                            <button onClick={() => setSelectedEnquiry(enq)} className="border-2 border-primary text-primary px-4 py-1.5 rounded-[6px] font-label-sm uppercase hover:bg-primary hover:text-white transition-all">
                               View Details
                             </button>
                           </td>
@@ -247,7 +248,56 @@ export default function CmsEnquiries() {
             <a className="font-label-sm text-label-sm uppercase text-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
           </div>
         </div>
-      </footer>
+      {/* Modal */}
+      {selectedEnquiry && (
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[12px] shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-outline/10 flex justify-between items-center bg-surface-container-low">
+              <h3 className="font-headline-md text-xl uppercase text-on-surface">Enquiry Details</h3>
+              <button onClick={() => setSelectedEnquiry(null)} className="text-secondary hover:text-primary text-[24px] leading-none">&times;</button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[12px] text-secondary uppercase font-bold mb-1">Customer Name</label>
+                  <p className="font-body-md text-on-surface">{selectedEnquiry.customer_name || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="block text-[12px] text-secondary uppercase font-bold mb-1">Priority</label>
+                  <PriorityBadge priority={selectedEnquiry.priority} />
+                </div>
+                <div>
+                  <label className="block text-[12px] text-secondary uppercase font-bold mb-1">Email</label>
+                  <p className="font-body-md text-on-surface break-all">{selectedEnquiry.customer_email || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="block text-[12px] text-secondary uppercase font-bold mb-1">Phone</label>
+                  <p className="font-body-md text-on-surface">{selectedEnquiry.customer_phone || 'N/A'}</p>
+                </div>
+                <div className="col-span-2 mt-2">
+                  <label className="block text-[12px] text-secondary uppercase font-bold mb-1">Vehicle of Interest</label>
+                  <p className="font-body-md text-on-surface">{selectedEnquiry.vehicle_interest || 'N/A'}</p>
+                </div>
+                <div className="col-span-2 mt-2">
+                  <label className="block text-[12px] text-secondary uppercase font-bold mb-1">Contact Date</label>
+                  <p className="font-body-md text-on-surface">{formatDate(selectedEnquiry.contact_date)}</p>
+                </div>
+                <div className="col-span-2 mt-2">
+                  <label className="block text-[12px] text-secondary uppercase font-bold mb-1">Message</label>
+                  <p className="font-body-md text-on-surface bg-surface-container-low p-3 rounded-[6px] text-[14px]">
+                    {selectedEnquiry.message || 'No additional message provided.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t border-outline/10 bg-surface-container-lowest flex justify-end">
+              <button onClick={() => setSelectedEnquiry(null)} className="bg-primary text-white px-6 py-2 rounded-[6px] font-bold text-[14px] uppercase hover:bg-[#93000e] transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
