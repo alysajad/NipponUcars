@@ -2,10 +2,11 @@ import os
 import io
 import time
 from dotenv import load_dotenv
-import requests
+import urllib.request
+import urllib.parse
+import json
 import cloudinary
 import cloudinary.uploader
-from PIL import Image
 from supabase import create_client, Client
 
 load_dotenv()
@@ -30,15 +31,10 @@ def process_image(url, inventory_id, index):
     API_KEY = 'a4a-hRWdOaPfCPZy6bLdDjXJapsJ2nzgH3jo'
     API_URL = 'https://api4ai.cloud/img-bg-removal/v1/results'
     
-    api_resp = requests.post(
-        API_URL,
-        headers={'X-API-KEY': API_KEY},
-        data={'url': safe_url},
-        timeout=60
-    )
-    api_resp.raise_for_status()
-    
-    data = api_resp.json()
+    req_data = urllib.parse.urlencode({'url': safe_url}).encode('utf-8')
+    req = urllib.request.Request(API_URL, data=req_data, headers={'X-API-KEY': API_KEY})
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        data = json.loads(resp.read().decode('utf-8'))
     b64_image = data['results'][0]['entities'][0]['image']
     
     import base64

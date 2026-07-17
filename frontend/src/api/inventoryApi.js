@@ -191,3 +191,44 @@ export const createCertification = async (data) => {
   }
 };
 
+export const fetchFormSchema = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/form-schema`);
+    if (!res.ok) throw new Error("Failed to fetch form schema");
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return { customFields: [], competitors: [], features: [] };
+  }
+};
+
+export const updateFormSchema = async (schema) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/form-schema`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(schema)
+    });
+    if (!res.ok) throw new Error("Failed to update form schema");
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const addSingleModel = async (modelData) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/models`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(modelData)
+    });
+    if (!res.ok) throw new Error("Failed to add model");
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+

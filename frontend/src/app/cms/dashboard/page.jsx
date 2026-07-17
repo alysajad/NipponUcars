@@ -35,24 +35,24 @@ export default function CmsDashboard() {
       {/* Top Nav */}
       <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center px-10 w-full max-w-[1280px] mx-auto h-20">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 font-label-sm text-[14px] uppercase tracking-wider font-bold">
+          <div className="flex items-center gap-4 xl:gap-8">
+            <div className="flex items-center gap-2 shrink-0 whitespace-nowrap font-label-sm text-[14px] uppercase tracking-wider font-bold">
               <Link href="/" className="text-secondary hover:text-primary transition-colors">Home</Link>
               <span className="text-secondary/50">&gt;</span>
               <Link href="/cms/dashboard" className="text-primary hover:text-[#93000e] transition-colors">CMS</Link>
               <span className="text-secondary/50">&gt;</span>
               <span className="text-on-surface">Dashboard</span>
             </div>
-            <nav className="hidden md:flex gap-6 items-center h-full">
-              <Link className="font-headline-md text-headline-md uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms/dashboard">Dashboard</Link>
-              <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/inventory">Inventory</Link>
-              <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms">Add Vehicle</Link>
-              <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/enquiries">Enquiries</Link>
-              <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
+            <nav className="hidden lg:flex shrink-0 whitespace-nowrap overflow-x-auto gap-3 xl:gap-6 items-center h-full">
+              <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms/dashboard">Dashboard</Link>
+              <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/inventory">Inventory</Link>
+              <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms">Add Vehicle</Link>
+              <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/enquiries">Enquiries</Link>
+              <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/" className="bg-primary text-white px-6 py-2 rounded-[6px] font-headline-md text-headline-md uppercase tracking-wider hover:opacity-90 transition-opacity">
+            <Link href="/" className="bg-primary text-white px-6 py-2 rounded-[6px] font-bold text-[12px] xl:text-[14px] uppercase tracking-wider hover:opacity-90 transition-opacity">
               Enquire
             </Link>
           </div>

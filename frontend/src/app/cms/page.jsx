@@ -1,30 +1,11 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Camera, Upload, CheckCircle } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { initCar, uploadFrames, publishCar as publishCarApi, fetchModels, uploadBulkModels } from '@/api/inventoryApi';
-
-const CAR_DATA = {
-  "Toyota Fortuner": { variants: ["4x2 MT", "4x2 AT", "4x4 MT", "4x4 AT", "GR-S"], features: ["4WD", "Ventilated Seats", "Touchscreen", "Leather Seats", "Cruise Control"] },
-  "Toyota Hilux Revo": { variants: ["Standard", "High", "Prerunner"], features: ["4x4", "Canopy", "Offroad Tires", "Bedliner"] },
-  "Toyota Corolla e170": { variants: ["G", "V", "Hybrid"], features: ["Sunroof", "Reverse Camera", "Keyless Entry"] },
-  "Toyota Land Cruiser": { variants: ["ZX", "VX", "GR Sport"], features: ["4WD", "360 Camera", "ADAS", "Cool Box", "Rear Entertainment"] },
-  "Toyota GR Supra": { variants: ["2.0L", "3.0L", "3.0L Pro"], features: ["RWD", "Sports Exhaust", "Carbon Fiber Trim", "Alcantara Seats"] }
-};
-
-const COMPETITORS_DATA = [
-  { name: "Ford Endeavour", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" },
-  { name: "MG Gloster", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098485/inventory/competitors/competitor_asset_0.jpg" },
-  { name: "Honda City", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098490/inventory/competitors/competitor_asset_2.jpg" },
-  { name: "Hyundai Verna", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098494/inventory/competitors/competitor_asset_4.jpg" },
-  { name: "BMW Z4", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" },
-  { name: "Porsche 718", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098494/inventory/competitors/competitor_asset_4.jpg" },
-  { name: "Maruti Jimny", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098487/inventory/competitors/competitor_asset_1.jpg" },
-  { name: "Force Gurkha", image: "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" }
-];
+import { initCar, uploadFrames, publishCar as publishCarApi, fetchModels, uploadBulkModels, fetchFormSchema } from '@/api/inventoryApi';
 
 export default function CmsAddVehicle() {
   const [step, setStep] = useState(1);
@@ -44,6 +25,12 @@ export default function CmsAddVehicle() {
   const [pin, setPin] = useState('');
   const [isUploadingBulk, setIsUploadingBulk] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
+  const [formSchema, setFormSchema] = useState({ customFields: [], competitors: [], features: [] });
+
+  useEffect(() => {
+    fetchFormSchema().then(setFormSchema);
+  }, []);
+
 
   const { data: models = [], isLoading: modelsLoading } = useQuery({
     queryKey: ['models'],
@@ -149,6 +136,7 @@ export default function CmsAddVehicle() {
     try {
       const payload = {
         ...carDetails,
+        attributes: (formSchema.customFields || []).reduce((acc, field) => { acc[field.name] = carDetails[field.name]; return acc; }, {}),
         specs: JSON.stringify({
           brand: (carDetails.name || '').split(' ')[0],
           year: carDetails.year,
@@ -240,22 +228,23 @@ export default function CmsAddVehicle() {
       {/* Top Nav */}
       <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center px-10 w-full max-w-[1280px] mx-auto h-20">
-          <div className="flex items-center gap-2 font-label-sm text-[14px] uppercase tracking-wider font-bold">
+          <div className="flex items-center gap-2 shrink-0 whitespace-nowrap font-label-sm text-[14px] uppercase tracking-wider font-bold">
             <Link href="/" className="text-secondary hover:text-primary transition-colors">Home</Link>
             <span className="text-secondary/50">&gt;</span>
             <Link href="/cms/dashboard" className="text-primary hover:text-[#93000e] transition-colors">CMS</Link>
             <span className="text-secondary/50">&gt;</span>
             <span className="text-on-surface">Add Vehicle</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/dashboard">Dashboard</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/inventory">Inventory</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms">Add Vehicle</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/enquiries">Enquiries</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
+          <nav className="hidden lg:flex shrink-0 whitespace-nowrap overflow-x-auto items-center gap-4 xl:gap-8">
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/dashboard">Dashboard</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/inventory">Inventory</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms">Add Vehicle</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/enquiries">Enquiries</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/settings">Form Editor</Link>
           </nav>
-          <div className="flex items-center gap-6">
-            <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
+          <div className="flex items-center gap-3 xl:gap-6">
+            <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-bold text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
               Enquire
             </Link>
           </div>
@@ -284,7 +273,10 @@ export default function CmsAddVehicle() {
           <>
             {/* Bulk Upload Card */}
             <div className="bg-white p-6 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] mb-6">
-              <h3 className="font-headline-md text-headline-md uppercase mb-2">Admin Dashboard</h3>
+              <div className="flex justify-between items-center mb-2">
+                 <h3 className="font-headline-md text-headline-md uppercase">Admin Dashboard</h3>
+                 <Link href="/cms/settings" className="border-2 border-primary text-primary px-4 py-2 rounded-[6px] font-headline-md text-[14px] uppercase tracking-wide hover:bg-surface-container transition-all">Form Editor</Link>
+              </div>
               <p className="text-secondary font-body-md text-[14px] mb-4">Bulk upload car models (Excel/CSV) to populate the dropdown below.</p>
               <label className="bg-on-background text-on-primary px-6 py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-secondary transition-all inline-block cursor-pointer active:opacity-80">
                 {isUploadingBulk ? "Uploading..." : "Upload Inventory Sheet"}
@@ -338,7 +330,7 @@ export default function CmsAddVehicle() {
                         <label className="block font-label-sm uppercase text-secondary mb-2">Variant / Trim</label>
                         <input name="variant" list="variant-list" placeholder="e.g., 1.5 SX Opt" value={carDetails.variant} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
                         <datalist id="variant-list">
-                          {CAR_DATA[carDetails.name]?.variants?.map(v => <option key={v} value={v} />)}
+                          {/* Dynamic variants not currently in schema, user types manually */}
                         </datalist>
                       </div>
                       <div>
@@ -381,6 +373,21 @@ export default function CmsAddVehicle() {
                       </div>
                     </div>
                   </div>
+                  {/* Dynamic Custom Fields */}
+                  {formSchema.customFields?.length > 0 && (
+                    <div className="mt-8">
+                      <h4 className="font-headline-md text-[18px] uppercase border-b border-outline/20 pb-3 mb-5">Custom Details</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        {formSchema.customFields.map((field, i) => (
+                          <div key={i}>
+                            <label className="block font-label-sm uppercase text-secondary mb-2">{field.name}</label>
+                            <input name={field.name} type={field.type} value={carDetails[field.name] || ''} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   
                   {/* Features & Extras Expandable (Optional) */}
                   <div className="border border-outline/30 p-5 rounded-[8px] bg-surface-container-lowest">
@@ -388,10 +395,10 @@ export default function CmsAddVehicle() {
                      
                      <div className="mb-4">
                         <label className="block font-label-sm uppercase text-secondary mb-3">Features</label>
-                        {CAR_DATA[carDetails.name]?.features?.length > 0 && (
+                        {formSchema.features?.length > 0 && (
                           <div className="mb-3">
                             <span className="text-[12px] text-secondary mr-2">Suggested:</span>
-                            {CAR_DATA[carDetails.name].features.filter(f => !features.includes(f)).map(f => (
+                            {formSchema.features.filter(f => !features.includes(f)).map(f => (
                               <button key={f} onClick={(e) => { e.preventDefault(); setFeatures([...features, f]); }} className="bg-surface-container-low border border-outline/30 rounded-[4px] px-2 py-1 text-[12px] cursor-pointer mr-1 mb-1 hover:bg-primary hover:text-white transition-colors">+ {f}</button>
                             ))}
                           </div>
@@ -436,7 +443,7 @@ export default function CmsAddVehicle() {
                            <select
                              className="w-full px-4 py-2 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none appearance-none"
                              onChange={(e) => {
-                               const selected = COMPETITORS_DATA.find(c => c.name === e.target.value);
+                               const selected = formSchema.competitors.find(c => c.name === e.target.value);
                                if (selected && !competitors.find(c => c.name === selected.name)) {
                                  setCompetitors([...competitors, { ...selected, price: 'Rs. ' }]);
                                }
@@ -444,7 +451,7 @@ export default function CmsAddVehicle() {
                              }}
                            >
                              <option value="">-- Add Competitor --</option>
-                             {COMPETITORS_DATA.map((c, i) => (
+                             {(formSchema.competitors || []).map((c, i) => (
                                <option key={i} value={c.name}>{c.name}</option>
                              ))}
                            </select>
@@ -549,11 +556,11 @@ export default function CmsAddVehicle() {
                     <h4 className="font-headline-md text-[18px] uppercase border-b border-outline/20 pb-3 mb-5">Pricing & Inventory</h4>
                     <div className="space-y-5 bg-surface-container-lowest border border-outline/30 p-5 rounded-[8px]">
                       <div>
-                        <label className="block font-label-sm uppercase text-secondary mb-2">Selling Price (USD)</label>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Selling Price (INR)</label>
                         <input name="price" placeholder="e.g., 56900" value={carDetails.price} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-bold text-[18px] text-primary" />
                       </div>
                       <div>
-                        <label className="block font-label-sm uppercase text-secondary mb-2">Acquisition Cost (USD)</label>
+                        <label className="block font-label-sm uppercase text-secondary mb-2">Acquisition Cost (INR)</label>
                         <input name="acquisition_cost" placeholder="e.g., 45000" value={carDetails.acquisition_cost} onChange={handleInputChange} className="w-full px-4 py-3 border border-outline/30 rounded-[6px] focus:ring-2 focus:ring-primary focus:border-primary bg-white outline-none font-body-md" />
                       </div>
                       <div>

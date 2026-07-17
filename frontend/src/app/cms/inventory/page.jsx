@@ -39,13 +39,13 @@ export default function CmsInventory() {
       if (selectedPriceRange !== 'Any Price') {
         const numericPrice = parseFloat((car.price || '0').replace(/[^0-9.]/g, ''));
         switch (selectedPriceRange) {
-          case '$50k - $100k':
+          case 'INR 50k - 100k':
             priceMatch = numericPrice >= 50000 && numericPrice <= 100000;
             break;
-          case '$100k - $250k':
+          case 'INR 100k - 250k':
             priceMatch = numericPrice >= 100000 && numericPrice <= 250000;
             break;
-          case '$250k+':
+          case 'INR 250k+':
             priceMatch = numericPrice >= 250000;
             break;
         }
@@ -87,22 +87,22 @@ export default function CmsInventory() {
       {/* Top Nav */}
       <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center px-10 w-full max-w-[1280px] mx-auto h-20">
-          <div className="flex items-center gap-2 font-label-sm text-[14px] uppercase tracking-wider font-bold">
+          <div className="flex items-center gap-2 shrink-0 whitespace-nowrap font-label-sm text-[14px] uppercase tracking-wider font-bold">
             <Link href="/" className="text-secondary hover:text-primary transition-colors">Home</Link>
             <span className="text-secondary/50">&gt;</span>
             <Link href="/cms/dashboard" className="text-primary hover:text-[#93000e] transition-colors">CMS</Link>
             <span className="text-secondary/50">&gt;</span>
             <span className="text-on-surface">Inventory</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/dashboard">Dashboard</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms/inventory">Inventory</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms">Add Vehicle</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/enquiries">Enquiries</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
+          <nav className="hidden lg:flex shrink-0 whitespace-nowrap overflow-x-auto items-center gap-4 xl:gap-8">
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/dashboard">Dashboard</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms/inventory">Inventory</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms">Add Vehicle</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/enquiries">Enquiries</Link>
+            <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
           </nav>
-          <div className="flex items-center gap-6">
-            <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
+          <div className="flex items-center gap-3 xl:gap-6">
+            <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-bold text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
               Enquire
             </Link>
           </div>
@@ -178,9 +178,9 @@ export default function CmsInventory() {
                 onChange={(e) => { setSelectedPriceRange(e.target.value); setCurrentPage(1); }}
               >
                 <option>Any Price</option>
-                <option>$50k - $100k</option>
-                <option>$100k - $250k</option>
-                <option>$250k+</option>
+                <option>INR 50k - 100k</option>
+                <option>INR 100k - 250k</option>
+                <option>INR 250k+</option>
               </select>
             </div>
             <div className="flex gap-2">
@@ -342,9 +342,9 @@ function parseSpecs(specs) {
 }
 
 function formatCurrency(value) {
-  if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-  if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
-  return `$${value.toFixed(0)}`;
+  if (value >= 1000000) return `INR ${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `INR ${(value / 1000).toFixed(0)}k`;
+  return `INR ${value.toFixed(0)}`;
 }
 
 function StatusBadge({ status }) {

@@ -1,0 +1,20 @@
+{
+  "customFields": [],
+  "competitors": [
+    { "name": "Ford Endeavour", "image": "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" },
+    { "name": "MG Gloster", "image": "https://res.cloudinary.com/vdofesxh/image/upload/v1784098485/inventory/competitors/competitor_asset_0.jpg" },
+    { "name": "Honda City", "image": "https://res.cloudinary.com/vdofesxh/image/upload/v1784098490/inventory/competitors/competitor_asset_2.jpg" },
+    { "name": "Hyundai Verna", "image": "https://res.cloudinary.com/vdofesxh/image/upload/v1784098494/inventory/competitors/competitor_asset_4.jpg" },
+    { "name": "BMW Z4", "image": "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" },
+    { "name": "Porsche 718", "image": "https://res.cloudinary.com/vdofesxh/image/upload/v1784098494/inventory/competitors/competitor_asset_4.jpg" },
+    { "name": "Maruti Jimny", "image": "https://res.cloudinary.com/vdofesxh/image/upload/v1784098487/inventory/competitors/competitor_asset_1.jpg" },
+    { "name": "Force Gurkha", "image": "https://res.cloudinary.com/vdofesxh/image/upload/v1784098492/inventory/competitors/competitor_asset_3.jpg" }
+  ],
+  "features": [
+    "4WD", "Ventilated Seats", "Touchscreen", "Leather Seats", "Cruise Control",
+    "4x4", "Canopy", "Offroad Tires", "Bedliner",
+    "Sunroof", "Reverse Camera", "Keyless Entry",
+    "360 Camera", "ADAS", "Cool Box", "Rear Entertainment",
+    "RWD", "Sports Exhaust", "Carbon Fiber Trim", "Alcantara Seats"
+  ]
+}

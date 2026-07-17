@@ -3,13 +3,5 @@ uvicorn==0.30.1
 supabase==2.5.0
 cloudinary==1.40.0
 python-dotenv==1.0.1
-celery==5.4.0
-redis==5.0.4
-Pillow==10.3.0
 python-multipart==0.0.9
-sse-starlette==2.1.0
 pydantic==2.7.4
-pandas
-openpyxl
-pillow-avif-plugin
-requests

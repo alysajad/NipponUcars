@@ -2,7 +2,6 @@ import os
 import uuid
 import base64
 from fastapi import FastAPI, HTTPException, Body, UploadFile, File, BackgroundTasks
-import pandas as pd
 import io
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -10,8 +9,6 @@ from supabase import create_client, Client
 import cloudinary
 import cloudinary.uploader
 from dotenv import load_dotenv
-from sse_starlette.sse import EventSourceResponse
-import redis
 import json
 import asyncio
 from bg_tasks import remove_background_task
@@ -40,7 +37,6 @@ async def startup_event():
         return
     try:
         # Resume any stuck tasks on startup
-        # ponytail: blindly resuming all historical queued tasks clogs the single-threaded lock. 
         # Mark them as failed so the queue is clean for new uploads.
         res = supabase.table("listing_frames").select("*").in_("status", ["queued", "processing"]).execute()
         if res.data:
@@ -61,9 +57,6 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 supabase: Client = None
 if SUPABASE_URL and SUPABASE_KEY:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
-redis_client = redis.from_url(REDIS_URL)
 
 # Configure Cloudinary
 cloudinary.config(
@@ -120,7 +113,7 @@ async def get_inventory():
 @app.post("/api/models/bulk")
 async def bulk_upload_models(file: UploadFile = File(...)):
     """
-    Accepts a CSV or Excel file containing car models and bulk upserts them to the database.
+    Accepts a CSV file containing car models and bulk upserts them to the database.
     Required columns: id, name, specs.
     """
     if not supabase:
@@ -128,21 +121,27 @@ async def bulk_upload_models(file: UploadFile = File(...)):
         
     contents = await file.read()
     try:
-        if file.filename.endswith('.csv'):
-            df = pd.read_csv(io.BytesIO(contents))
-        elif file.filename.endswith(('.xlsx', '.xls')):
-            df = pd.read_excel(io.BytesIO(contents))
-        else:
-            raise HTTPException(status_code=400, detail="Only CSV or Excel files are allowed")
+        if not file.filename.endswith('.csv'):
+            raise HTTPException(status_code=400, detail="Only CSV files are allowed")
             
-        # Ensure correct columns exist
+        import csv
+        content_str = contents.decode('utf-8')
+        reader = csv.DictReader(io.StringIO(content_str))
+        
         required_cols = {'id', 'name', 'specs'}
-        if not required_cols.issubset(set(df.columns)):
+        if not reader.fieldnames or not required_cols.issubset(set(reader.fieldnames)):
             raise HTTPException(status_code=400, detail=f"File must contain columns: {', '.join(required_cols)}")
             
-        # Replace NaN with empty strings and convert to dict
-        df = df.fillna('')
-        records = df[['id', 'name', 'specs']].to_dict(orient='records')
+        records = []
+        for row in reader:
+            records.append({
+                'id': row.get('id', ''),
+                'name': row.get('name', ''),
+                'specs': row.get('specs', '')
+            })
+            
+        if not records:
+            return {"status": "success", "inserted": 0, "data": []}
         
         # Upsert into supabase
         response = supabase.table("car_models").upsert(records).execute()
@@ -151,6 +150,49 @@ async def bulk_upload_models(file: UploadFile = File(...)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+
+class ModelPayload(BaseModel):
+    name: str
+    specs: str
+
+@app.post("/api/models")
+async def add_model(payload: ModelPayload):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database not configured")
+    try:
+        import re
+        model_id = re.sub(r'[^a-z0-9]', '_', payload.name.lower())
+        record = {
+            "id": model_id,
+            "name": payload.name,
+            "specs": payload.specs
+        }
+        response = supabase.table("car_models").upsert(record).execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/form-schema")
+async def get_form_schema():
+    try:
+        with open("data/form_schema.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"customFields": [], "competitors": [], "features": []}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/form-schema")
+async def update_form_schema(payload: dict = Body(...)):
+    try:
+        # Ensure data dir exists
+        import os
+        os.makedirs("data", exist_ok=True)
+        with open("data/form_schema.json", "w") as f:
+            json.dump(payload, f, indent=2)
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/cars")
 async def init_car(car: CarPayload):

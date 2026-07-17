@@ -2,12 +2,12 @@ import os
 import io
 import time
 import json
-import requests
+import urllib.request
+import urllib.error
+import urllib.parse
 import cloudinary
 import cloudinary.uploader
 import asyncio
-from PIL import Image
-import pillow_avif
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
@@ -41,15 +41,10 @@ def sync_remove_background(frame_id: str, raw_url: str, inventory_id: str, frame
         api_url = 'https://api4ai.cloud/img-bg-removal/v1/results'
         
         safe_url = raw_url.replace("/upload/", "/upload/w_1024,c_limit/")
-        api_resp = requests.post(
-            api_url,
-            headers={'X-API-KEY': api_key},
-            data={'url': safe_url},
-            timeout=60
-        )
-        api_resp.raise_for_status()
-        
-        data = api_resp.json()
+        req_data = urllib.parse.urlencode({'url': safe_url}).encode('utf-8')
+        req = urllib.request.Request(api_url, data=req_data, headers={'X-API-KEY': api_key})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
         b64_image = data['results'][0]['entities'][0]['image']
         
         import base64

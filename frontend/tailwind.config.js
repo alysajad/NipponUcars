@@ -75,12 +75,12 @@ module.exports = {
         "stack-md": "16px",
       },
       fontFamily: {
-        "headline-lg-mobile": ["Oswald"],
-        "headline-lg": ["Oswald"],
-        "body-lg": ["Oswald"],
-        "label-sm": ["Oswald"],
-        "headline-md": ["Oswald"],
-        "body-md": ["Oswald"],
+        "headline-lg-mobile": ["Montserrat", "sans-serif"],
+        "headline-lg": ["Montserrat", "sans-serif"],
+        "body-lg": ["Montserrat", "sans-serif"],
+        "label-sm": ["Montserrat", "sans-serif"],
+        "headline-md": ["Montserrat", "sans-serif"],
+        "body-md": ["Montserrat", "sans-serif"],
       },
       fontSize: {
         "headline-lg-mobile": ["32px", { lineHeight: "1.2", fontWeight: "600" }],

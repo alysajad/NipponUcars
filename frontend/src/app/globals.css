@@ -1,22 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'Dekatron';
-  src: url('/Dekatron-SemiBold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Dekatron';
-  src: url('/Dekatron-SemiBoldItalic.otf') format('opentype');
-  font-weight: 600;
-  font-style: italic;
-}
+/* ponytail: deleted custom fonts, user wanted Montserrat entirely */
 
 /* ─── CMS Dashboard Glass Card ─── */
 .glass-card {
@@ -61,8 +49,8 @@ tr:hover td {
   --pure-white: #FFFFFF;
   --light-grey: #F8F9FA;
   
-  --font-sailors: 'Dekatron', 'Sailors', sans-serif;
-  --font-proxima: 'Dekatron', 'Proxima Nova Condensed', 'Oswald', sans-serif;
+  --font-sailors: 'Montserrat', sans-serif;
+  --font-proxima: 'Montserrat', sans-serif;
 }
 
 * {
