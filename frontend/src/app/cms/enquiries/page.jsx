@@ -52,7 +52,7 @@ export default function CmsEnquiries() {
     <div className="min-h-screen bg-surface text-on-surface font-body-md">
       {/* Top Nav */}
       <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
-        <div className="flex justify-between items-center px-10 w-full max-w-[1280px] mx-auto h-20">
+        <div className="flex flex-col md:flex-row justify-between md:items-center px-4 md:px-10 py-3 md:py-0 w-full max-w-[1280px] mx-auto min-h-[5rem] gap-3 md:gap-0">
           <div className="flex items-center gap-4 xl:gap-8">
             <div className="flex items-center gap-2 shrink-0 whitespace-nowrap font-label-sm text-[14px] uppercase tracking-wider font-bold">
               <Link href="/" className="text-secondary hover:text-primary transition-colors">Home</Link>
@@ -61,7 +61,7 @@ export default function CmsEnquiries() {
               <span className="text-secondary/50">&gt;</span>
               <span className="text-on-surface">Enquiries</span>
             </div>
-            <nav className="hidden lg:flex shrink-0 whitespace-nowrap overflow-x-auto gap-3 xl:gap-6 items-center h-full">
+            <nav className="flex shrink-0 whitespace-nowrap overflow-x-auto gap-3 xl:gap-6 items-center h-full w-full md:w-auto pb-1 md:pb-0 scrollbar-hide">
               <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/dashboard">Dashboard</Link>
               <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/inventory">Inventory</Link>
               <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms">Add Vehicle</Link>
@@ -148,6 +148,7 @@ export default function CmsEnquiries() {
           ) : (
             <>
               <div className="overflow-x-auto">
+              <div className="overflow-x-auto w-full">
                 <table className="w-full text-left">
                   <thead className="bg-surface-container-low border-b border-outline/10">
                     <tr>
@@ -205,6 +206,7 @@ export default function CmsEnquiries() {
                     )}
                   </tbody>
                 </table>
+              </div>
               </div>
 
               {/* Pagination */}
