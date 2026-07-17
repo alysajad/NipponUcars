@@ -21,6 +21,7 @@ export default function InventoryList() {
   const [ageRange, setAgeRange] = useState({ min: 0, max: 15 }); // In Years
   const [bodyTypeFilter, setBodyTypeFilter] = useState('');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isBudgetFilterEnabled, setIsBudgetFilterEnabled] = useState(false);
 
   // Read query params from homepage search on mount
   useEffect(() => {
@@ -35,6 +36,7 @@ export default function InventoryList() {
       const [min, max] = budgetParam.split('-').map(Number);
       if (!isNaN(min) && !isNaN(max)) {
         setBudgetRange({ min, max });
+        setIsBudgetFilterEnabled(true);
       }
     }
     if (bodyTypeParam) {
@@ -61,7 +63,7 @@ export default function InventoryList() {
       const numericPrice = parseFloat(car.price.replace(/,/g, ''));
       if (!isNaN(numericPrice)) priceInLakhs = numericPrice / 100000;
     }
-    const budgetMatch = priceInLakhs >= budgetRange.min && priceInLakhs <= budgetRange.max;
+    const budgetMatch = !isBudgetFilterEnabled || (priceInLakhs >= budgetRange.min && priceInLakhs <= budgetRange.max);
 
     // Parse Age (current year - manufacturing year)
     let carAge = 0; // Default to new if no year
@@ -184,7 +186,7 @@ export default function InventoryList() {
               Filters
             </h3>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              <button onClick={() => {setSelectedModels([]); setBudgetRange({min:0, max:200})}} style={{ background: 'none', border: 'none', color: 'var(--primary-red)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>Clear All</button>
+              <button onClick={() => {setSelectedModels([]); setBudgetRange({min:0, max:200}); setIsBudgetFilterEnabled(false);}} style={{ background: 'none', border: 'none', color: 'var(--primary-red)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>Clear All</button>
               <button className="mobile-filter-close" onClick={() => setIsMobileFilterOpen(false)} style={{ background: 'none', border: 'none', fontSize: '2rem', lineHeight: 0.5, cursor: 'pointer', color: '#888' }}>&times;</button>
             </div>
           </div>
@@ -219,8 +221,14 @@ export default function InventoryList() {
           </div>
           
           <div className="filter-group" style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid #eee' }}>
-            <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: 'var(--dark-grey)' }}>Budget (Lakh)</h4>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--dark-grey)' }}>Budget (Lakh)</h4>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.8rem', color: '#555' }}>
+                <input type="checkbox" checked={isBudgetFilterEnabled} onChange={(e) => setIsBudgetFilterEnabled(e.target.checked)} style={{ width: '14px', height: '14px', accentColor: 'var(--primary-red)' }} />
+                Apply Filter
+              </label>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', opacity: isBudgetFilterEnabled ? 1 : 0.5, pointerEvents: isBudgetFilterEnabled ? 'auto' : 'none' }}>
                <input type="number" value={budgetRange.min} onChange={(e) => setBudgetRange({...budgetRange, min: Number(e.target.value)})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }} />
                <span>-</span>
                <input type="number" value={budgetRange.max} onChange={(e) => setBudgetRange({...budgetRange, max: Number(e.target.value)})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }} />
