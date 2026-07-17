@@ -1,10 +1,9 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const optimizeCloudinaryUrl = (url) => {
-  if (typeof url !== 'string' || !url.includes('cloudinary.com/')) return url;
-  if (url.includes('/upload/v')) return url.replace('/upload/v', '/upload/e_trim/v');
-  if (url.includes('/upload/') && !url.includes('e_trim')) return url.replace('/upload/', '/upload/e_trim/');
-  return url;
+  if (typeof url !== 'string' || !url.includes('cloudinary.com/') || url.includes('e_trim')) return url;
+  if (url.match(/\/v\d+\//)) return url.replace(/\/(v\d+\/)/, '/e_trim/$1');
+  return url.replace('/upload/', '/upload/e_trim/');
 };
 
 /**
