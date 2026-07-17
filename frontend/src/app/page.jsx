@@ -181,8 +181,8 @@ export default function Home() {
       {/* The U-Trust Advantage Section */}
       <section className="pt-10 pb-24 bg-white">
         <div className="px-margin-desktop max-w-container-max mx-auto">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-10 mb-16">
-            <h2 className="font-headline-lg text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-nowrap">The Toyota Promise</h2>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10 mb-16">
+            <h2 className="font-headline-lg text-headline-md md:text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-normal md:whitespace-nowrap text-center md:text-left w-full md:w-auto">The Toyota Promise</h2>
             <p className="font-body-md text-body-md text-secondary/70 max-w-2xl leading-relaxed">
               At Toyota U-Trust, we offer a range of advantages to help you buy and sell with confidence. These include our comprehensive evaluation, manufacturer-backed warranties, and fully transparent history.
             </p>
