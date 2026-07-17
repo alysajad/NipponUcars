@@ -180,7 +180,7 @@ export default function Home() {
       </div>
       {/* The U-Trust Advantage Section */}
       <section className="pt-10 pb-24 bg-white">
-        <div className="px-margin-desktop max-w-container-max mx-auto">
+        <div className="px-4 md:px-8 w-full max-w-full mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10 mb-16">
             <h2 className="font-headline-lg text-headline-md md:text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-normal md:whitespace-nowrap text-center md:text-left w-full md:w-auto">The Toyota Promise</h2>
             <p className="font-body-md text-body-md text-secondary/70 max-w-2xl leading-relaxed">
@@ -188,7 +188,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
             {/* Card 1 */}
             <div className="bg-surface-container-low p-10 rounded-[2.5rem] border border-outline-variant flex justify-between items-center group hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-64 md:h-72">
               <div className="flex flex-col justify-between h-full z-10">
@@ -302,7 +302,7 @@ export default function Home() {
 
       {/* Featured Cars Grid */}
       <section className="py-24 bg-white">
-        <div className="px-margin-desktop max-w-container-max mx-auto">
+        <div className="px-4 md:px-8 w-full max-w-full mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-baseline mb-12 border-b border-outline-variant pb-6">
             <div>
               <span className="text-primary font-label-bold text-label-bold tracking-[0.2em] uppercase">Handpicked Selection</span>
@@ -313,7 +313,7 @@ export default function Home() {
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
             {/* Card 1: Fortuner */}
             <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
               <div className="relative h-72 overflow-hidden">
@@ -430,6 +430,85 @@ export default function Home() {
                 </Link>
               </div>
             </article>
+
+            {/* Card 4: Innova Crysta */}
+            <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+              <div className="relative h-72 overflow-hidden">
+                <img className="w-full h-full object-cover" alt="A Toyota Innova Crysta" src="https://res.cloudinary.com/vdofesxh/image/upload/v1784192650/inventory/corolla/corolla_main.jpg" />
+                <div className="absolute top-4 left-4">
+                  <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
+                    <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                    Certified
+                  </span>
+                </div>
+              </div>
+              <div className="p-8">
+                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
+                  <div className="flex-1">
+                    <h4 className="font-headline-md text-headline-md uppercase">Toyota Innova</h4>
+                    <p className="text-secondary/50 font-label-sm uppercase tracking-wider">2.4L Diesel AT</p>
+                  </div>
+                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹22.00 Lakh</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
+                  <div className="text-center">
+                    <span className="material-symbols-outlined text-secondary/40 block mb-1">calendar_today</span>
+                    <span className="font-label-bold text-secondary">2021</span>
+                  </div>
+                  <div className="text-center border-x border-outline-variant">
+                    <span className="material-symbols-outlined text-secondary/40 block mb-1">speed</span>
+                    <span className="font-label-bold text-secondary">45k km</span>
+                  </div>
+                  <div className="text-center">
+                    <span className="material-symbols-outlined text-secondary/40 block mb-1">settings</span>
+                    <span className="font-label-bold text-secondary">Auto</span>
+                  </div>
+                </div>
+                <Link href="/inventory" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
+                  View Details
+                </Link>
+              </div>
+            </article>
+
+            {/* Card 5: Glanza */}
+            <article className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+              <div className="relative h-72 overflow-hidden">
+                <img className="w-full h-full object-cover" alt="A Toyota Glanza" src="https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191696/utrust_assets/utrust_asset_page_0.jpg" />
+                <div className="absolute top-4 left-4">
+                  <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
+                    <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                    Certified
+                  </span>
+                </div>
+              </div>
+              <div className="p-8">
+                <div className="flex flex-col xl:flex-row justify-between items-start gap-2 xl:gap-4 mb-6">
+                  <div className="flex-1">
+                    <h4 className="font-headline-md text-headline-md uppercase">Toyota Glanza</h4>
+                    <p className="text-secondary/50 font-label-sm uppercase tracking-wider">1.2L Petrol AT</p>
+                  </div>
+                  <p className="font-headline-md text-headline-md text-primary whitespace-nowrap">₹7.50 Lakh</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2 mb-8 py-4 border-y border-outline-variant">
+                  <div className="text-center">
+                    <span className="material-symbols-outlined text-secondary/40 block mb-1">calendar_today</span>
+                    <span className="font-label-bold text-secondary">2022</span>
+                  </div>
+                  <div className="text-center border-x border-outline-variant">
+                    <span className="material-symbols-outlined text-secondary/40 block mb-1">speed</span>
+                    <span className="font-label-bold text-secondary">12k km</span>
+                  </div>
+                  <div className="text-center">
+                    <span className="material-symbols-outlined text-secondary/40 block mb-1">settings</span>
+                    <span className="font-label-bold text-secondary">Auto</span>
+                  </div>
+                </div>
+                <Link href="/inventory" className="w-full bg-primary text-white font-label-bold text-label-bold py-4 uppercase rounded-lg hover:brightness-110 transition-all shadow-md block text-center">
+                  View Details
+                </Link>
+              </div>
+            </article>
+
           </div>
         </div>
       </section>
