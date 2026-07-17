@@ -342,7 +342,7 @@ export default function BookInspection() {
           <div>
             <h5 className="font-label-bold text-label-bold uppercase mb-8 text-primary tracking-widest">Services</h5>
             <ul className="space-y-4">
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">About U-Trust</Link></li>
+              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">About U-CARS</Link></li>
               <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">203-Point Inspection</Link></li>
               <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Warranty Policy</Link></li>
               <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Privacy Policy</Link></li>

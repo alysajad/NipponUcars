@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Nippon U-Trust | Certified Pre-Owned Vehicles",
+  title: "Nippon U-CARS | Certified Pre-Owned Vehicles",
   description: "Nippon certified pre-owned vehicles with transparent history, comprehensive warranty, and hassle-free ownership transfer.",
 };
 

@@ -300,13 +300,13 @@ export default function AboutPage() {
         </section>
 
         {/* ═══════════════════════════════════════════════
-            The U-Trust Promise
+            The U-CARS Promise
         ═══════════════════════════════════════════════ */}
-        <section id="utrust-promise" className="py-24 bg-background">
+        <section id="ucars-promise" className="py-24 bg-background">
           <div className="max-w-[1280px] mx-auto px-margin-desktop">
             <div className="text-center mb-16 animate-on-scroll">
               <h2 className="font-headline-lg text-headline-lg uppercase mb-4 tracking-tight">
-                The U-Trust Promise
+                The U-CARS Promise
               </h2>
               <div className="w-20 h-1 bg-primary mx-auto mb-6" />
             </div>

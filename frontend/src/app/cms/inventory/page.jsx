@@ -226,7 +226,6 @@ export default function CmsInventory() {
           ) : (
             <>
               <div className="overflow-x-auto table-scrollbar">
-              <div className="overflow-x-auto w-full">
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-surface-container-low border-b border-outline-variant/30">
                     <tr>
@@ -313,7 +312,6 @@ export default function CmsInventory() {
                     )}
                   </tbody>
                 </table>
-              </div>
               </div>
 
               {/* Pagination */}
