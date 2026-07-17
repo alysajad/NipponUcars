@@ -262,6 +262,32 @@ async def init_car(car: CarPayload):
 
     return {"status": "success", "id": car_id}
 
+@app.put("/api/cars/{car_id}")
+async def update_car(car_id: str, car: CarPayload):
+    """
+    Updates an existing car entry in the database.
+    """
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+
+    record = {
+        "name": car.name,
+        "desc": car.desc,
+        "specs": json.dumps(car.attributes) if car.attributes else car.specs,
+        "price": car.price
+    }
+
+    try:
+        supabase.table("inventory").update(record).eq("id", car_id).execute()
+        # Invalidate caches
+        cache_delete("inventory:all")
+        cache_delete("cms:inventory")
+        cache_delete("cms:dashboard")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    return {"status": "success", "id": car_id}
+
 @app.post("/api/cars/{car_id}/frames")
 async def upload_frames(car_id: str, background_tasks: BackgroundTasks, files: list[UploadFile] = File(...)):
     if not supabase:

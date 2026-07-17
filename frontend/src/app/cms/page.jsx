@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Camera, Upload, CheckCircle } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { initCar, uploadFrames, publishCar as publishCarApi, fetchModels, uploadBulkModels, fetchFormSchema } from '@/api/inventoryApi';
+import { initCar, uploadFrames, publishCar as publishCarApi, fetchModels, uploadBulkModels, fetchFormSchema, fetchCmsInventory, updateCar } from '@/api/inventoryApi';
 
 export default function CmsAddVehicle() {
   const [step, setStep] = useState(1);
@@ -26,9 +26,35 @@ export default function CmsAddVehicle() {
   const [isUploadingBulk, setIsUploadingBulk] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [formSchema, setFormSchema] = useState({ customFields: [], competitors: [], features: [] });
+  const [editCarId, setEditCarId] = useState(null);
 
   useEffect(() => {
     fetchFormSchema().then(setFormSchema);
+    
+    // Check for edit mode
+    const query = new URLSearchParams(window.location.search);
+    const editId = query.get('edit');
+    if (editId) {
+      setEditCarId(editId);
+      fetchCmsInventory().then(inventory => {
+        const car = inventory.find(c => c.id === editId);
+        if (car) {
+          let specs = {};
+          try { specs = typeof car.specs === 'string' ? JSON.parse(car.specs) : car.specs; } catch(e){}
+          setCarDetails({
+             name: car.name || '', desc: car.desc || '', price: (car.price || '').replace(/[^0-9]/g, ''),
+             year: specs.year || '', fuel: specs.fuel || '', transmission: specs.transmission || '', 
+             km: specs.km || '', engineCC: specs.engineCC || '', owner: specs.owner || '', variant: specs.variant || '',
+             vin: specs.vin || car.id?.slice(-8).toUpperCase(), stock_id: specs.stock_id || '', status: specs.status || 'Available', 
+             acquisition_cost: specs.acquisition_cost || '', color: specs.color || ''
+          });
+          setFeatures(specs.features || []);
+          setCompetitors(specs.competitors || []);
+          setReviews(specs.reviews || []);
+          setFaqs(specs.faqs || []);
+        }
+      });
+    }
   }, []);
 
 
@@ -128,7 +154,7 @@ export default function CmsAddVehicle() {
   };
 
   const handlePublish = async () => {
-    if (frames.length === 0) {
+    if (frames.length === 0 && !editCarId) {
       alert("Please upload at least one image.");
       return;
     }
@@ -157,33 +183,50 @@ export default function CmsAddVehicle() {
           faqs: faqs
         })
       };
-      const res = await initCar(payload);
-      const newCarId = res.id;
-      const formData = new FormData();
-      frames.forEach(f => formData.append("files", f.file));
-      await uploadFrames(newCarId, formData);
-      setUploadProgress({ done: 0, total: frames.length });
-      const pollInterval = setInterval(async () => {
-        try {
-          const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cars/${newCarId}/status`;
-          const response = await fetch(url);
-          const data = await response.json();
-          setUploadProgress({ done: data.total_done, total: data.total_frames });
-          if (data.status === "done" && data.total_done === data.total_frames) {
-            clearInterval(pollInterval);
-            try {
-              await publishCarApi(newCarId);
-              alert(`Success! ${payload.name} is now live in the inventory!`);
-              queryClient.invalidateQueries({ queryKey: ['inventory'] });
-            } catch (publishErr) {
-              alert("Processing finished but failed to publish: " + publishErr.message);
+      
+      let targetCarId = editCarId;
+      
+      if (editCarId) {
+        await updateCar(editCarId, payload);
+      } else {
+        const res = await initCar(payload);
+        targetCarId = res.id;
+      }
+      
+      if (frames.length > 0) {
+        const formData = new FormData();
+        frames.forEach(f => formData.append("files", f.file));
+        await uploadFrames(targetCarId, formData);
+        setUploadProgress({ done: 0, total: frames.length });
+        
+        const pollInterval = setInterval(async () => {
+          try {
+            const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cars/${targetCarId}/status`;
+            const response = await fetch(url);
+            const data = await response.json();
+            setUploadProgress({ done: data.total_done, total: data.total_frames });
+            if (data.status === "done" && data.total_done === data.total_frames) {
+              clearInterval(pollInterval);
+              try {
+                await publishCarApi(targetCarId);
+                alert(`Success! ${payload.name} is now live in the inventory!`);
+                queryClient.invalidateQueries({ queryKey: ['inventory'] });
+              } catch (publishErr) {
+                alert("Processing finished but failed to publish: " + publishErr.message);
+              }
             }
+          } catch (err) {
+            console.error("Polling error", err);
           }
-        } catch (err) {
-          console.error("Polling error", err);
-        }
-      }, 30000);
-      setStep(3);
+        }, 15000);
+        setStep(3);
+      } else {
+         alert(`Success! ${payload.name} updated successfully.`);
+         queryClient.invalidateQueries({ queryKey: ['inventory'] });
+         router.push('/cms/inventory');
+      }
+      
+      setEditCarId(null);
       setCarDetails({ name: '', desc: '', price: '', year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: '', vin: '', stock_id: '', status: 'Available', acquisition_cost: '', color: '' });
       setFeatures([]);
       setCompetitors([]);
@@ -258,7 +301,7 @@ export default function CmsAddVehicle() {
             <p className="font-label-sm text-label-sm uppercase text-secondary mb-1">
               <Link href="/cms/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
               <span className="mx-2">/</span>
-              <span>Add New Vehicle</span>
+              <span>{editCarId ? 'Edit Vehicle' : 'Add New Vehicle'}</span>
             </p>
             <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg uppercase text-on-surface">Vehicle Onboarding</h1>
           </div>
@@ -266,6 +309,8 @@ export default function CmsAddVehicle() {
             <button onClick={() => {
               if (window.confirm("Are you sure you want to discard this draft? All entered details will be lost.")) {
                 setStep(1);
+                setEditCarId(null);
+                router.replace('/cms');
                 setCarDetails({ name: '', desc: '', price: '', year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: '', vin: '', stock_id: '', status: 'Available', acquisition_cost: '', color: '' });
                 setFeatures([]);
                 setCompetitors([]);
@@ -299,7 +344,7 @@ export default function CmsAddVehicle() {
             {/* Unified Vehicle Form */}
             <div className="bg-white p-6 md:p-8 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
               <div className="mb-8">
-                <h3 className="font-headline-md text-headline-md uppercase mb-2">Add New Vehicle</h3>
+                <h3 className="font-headline-md text-headline-md uppercase mb-2">{editCarId ? 'Edit Vehicle Details' : 'Add New Vehicle'}</h3>
                 <p className="text-secondary font-body-md text-[14px]">Enter the vehicle specifications and upload images for AI background removal.</p>
               </div>
 
@@ -629,8 +674,8 @@ export default function CmsAddVehicle() {
               {/* Submit Action */}
               <div className="mt-10 pt-6 border-t border-outline/20 flex flex-col sm:flex-row justify-end items-center gap-4">
                 <span className="text-[13px] text-secondary font-body-md">Make sure all details are correct before publishing.</span>
-                <button onClick={handlePublish} disabled={isProcessing || frames.length === 0} className="w-full sm:w-auto bg-primary text-on-primary px-10 py-3.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_10px_rgba(214,0,15,0.2)]">
-                  {isProcessing ? "Submitting..." : "Submit to Inventory"}
+                <button onClick={handlePublish} disabled={isProcessing || (frames.length === 0 && !editCarId)} className="w-full sm:w-auto bg-primary text-on-primary px-10 py-3.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_10px_rgba(214,0,15,0.2)]">
+                  {isProcessing ? "Submitting..." : (editCarId ? "Save Changes" : "Submit to Inventory")}
                 </button>
               </div>
             </div>

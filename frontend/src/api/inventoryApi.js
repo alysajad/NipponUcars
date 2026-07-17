@@ -51,6 +51,21 @@ export const initCar = async (newCar) => {
   }
 };
 
+export const updateCar = async (carId, updatedCar) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cars/${carId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedCar),
+    });
+    if (!res.ok) throw new Error("Failed to update car");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const uploadFrames = async (carId, formData) => {
   try {
     const res = await fetch(`${API_BASE_URL}/api/cars/${carId}/frames`, {
