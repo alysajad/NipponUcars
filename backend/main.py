@@ -694,6 +694,41 @@ async def create_certification(payload: CertificationPayload):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+class CertificationUpdatePayload(BaseModel):
+    stage: str = None
+    status: str = None
+
+@app.put("/api/cms/certifications/{cert_id}")
+async def update_certification(cert_id: str, payload: CertificationUpdatePayload):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    try:
+        update_data = {}
+        if payload.stage is not None:
+            update_data["stage"] = payload.stage
+        if payload.status is not None:
+            update_data["status"] = payload.status
+        if not update_data:
+            return {"status": "success"}
+        response = supabase.table("certifications").update(update_data).eq("id", cert_id).execute()
+        cache_delete("cms:certifications")
+        return {"status": "success", "data": response.data[0] if response.data else {}}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/cms/enquiries/{enquiry_id}")
+async def delete_enquiry(enquiry_id: str):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+    try:
+        supabase.table("enquiries").delete().eq("id", enquiry_id).execute()
+        cache_delete("cms:dashboard")
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

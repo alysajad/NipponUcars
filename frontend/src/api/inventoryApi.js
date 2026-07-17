@@ -259,6 +259,34 @@ export const createCertification = async (data) => {
   }
 };
 
+export const updateCertification = async (certId, payload) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/certifications/${certId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("Failed to update certification");
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to update certification:", err);
+    throw err;
+  }
+};
+
+export const deleteEnquiry = async (enquiryId) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/cms/enquiries/${enquiryId}`, {
+      method: "DELETE"
+    });
+    if (!res.ok) throw new Error("Failed to delete enquiry");
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to delete enquiry:", err);
+    throw err;
+  }
+};
+
 export const fetchFormSchema = async () => {
   try {
     const res = await fetch(`${API_BASE_URL}/api/form-schema`);

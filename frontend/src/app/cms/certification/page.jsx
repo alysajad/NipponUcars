@@ -2,14 +2,67 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
-import { fetchCmsCertifications, fetchCmsEnquiries } from '@/api/inventoryApi';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchCmsCertifications, fetchCmsEnquiries, createCertification, updateCertification, deleteEnquiry } from '@/api/inventoryApi';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function CmsCertification() {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  const queryClient = useQueryClient();
+
+  const approveMutation = useMutation({
+    mutationFn: async (cert) => {
+      if (cert.isEnquiry) {
+        // First create the certification record
+        await createCertification({
+          vehicle_name: cert.vehicle_name,
+          vin: cert.vin || "",
+          technician: "Unassigned",
+          points_checked: 0,
+          total_points: 203,
+          stage: "inspection"
+        });
+        // Best-effort delete the enquiry (ignore 404 if already gone)
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cms/enquiries/${cert.id}`, { method: 'DELETE' });
+          // 200 or 404 both acceptable
+        } catch (_) {}
+      } else {
+        let nextStage, nextStatus;
+        if (cert.stage === 'inspection') {
+          nextStage = 'refurbishment'; nextStatus = 'in-progress';
+        } else if (cert.stage === 'refurbishment') {
+          nextStage = 'final-audit'; nextStatus = 'in-progress';
+        } else {
+          nextStage = 'final-audit'; nextStatus = 'completed';
+        }
+        await updateCertification(cert.id, { stage: nextStage, status: nextStatus });
+      }
+    },
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['cms-certifications'] });
+      queryClient.refetchQueries({ queryKey: ['cms-enquiries', 'inspection'] });
+    }
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async (cert) => {
+      if (cert.isEnquiry) {
+        try {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cms/enquiries/${cert.id}`, { method: 'DELETE' });
+        } catch (_) {}
+      } else {
+        await updateCertification(cert.id, { status: 'rejected' });
+      }
+    },
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['cms-certifications'] });
+      queryClient.refetchQueries({ queryKey: ['cms-enquiries', 'inspection'] });
+    }
+  });
 
   const { data: certifications = [], isLoading: isLoadingCerts } = useQuery({
     queryKey: ['cms-certifications'],
@@ -55,11 +108,12 @@ export default function CmsCertification() {
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  // Stats
-  const totalInProcess = combinedCertifications.filter(c => c.status === 'in-progress' || c.status === 'pending').length;
-  const stageInspection = combinedCertifications.filter(c => c.stage === 'inspection').length;
-  const stageRefurbishment = combinedCertifications.filter(c => c.stage === 'refurbishment').length;
-  const stageFinalAudit = combinedCertifications.filter(c => c.stage === 'final-audit').length;
+  // Stats — only count active (not rejected/completed)
+  const activeCerts = combinedCertifications.filter(c => c.status !== 'rejected' && c.status !== 'completed');
+  const totalInProcess = activeCerts.length;
+  const stageInspection = activeCerts.filter(c => c.stage === 'inspection').length;
+  const stageRefurbishment = activeCerts.filter(c => c.stage === 'refurbishment').length;
+  const stageFinalAudit = activeCerts.filter(c => c.stage === 'final-audit').length;
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-body-md">
@@ -160,8 +214,10 @@ export default function CmsCertification() {
           ) : (
             <div className="divide-y divide-outline-variant/20">
               {paginated.length > 0 ? paginated.map((cert) => {
-                const pct = cert.total_points > 0 ? Math.round((cert.points_checked / cert.total_points) * 100) : 0;
-                const barColor = pct >= 90 ? 'bg-green-600' : 'bg-primary';
+                // Progress based on stage so it advances when approved
+                const stageProgress = { 'inspection': 33, 'refurbishment': 66, 'final-audit': 100, 'done': 100 };
+                const pct = cert.status === 'completed' ? 100 : (stageProgress[cert.stage] ?? (cert.total_points > 0 ? Math.round((cert.points_checked / cert.total_points) * 100) : 0));
+                const barColor = pct >= 100 ? 'bg-green-600' : pct >= 66 ? 'bg-blue-500' : 'bg-primary';
 
                 return (
                   <div key={cert.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-8 md:py-6 items-center hover:bg-white/50 transition-colors">
@@ -187,7 +243,9 @@ export default function CmsCertification() {
                     {/* Progress */}
                     <div className="col-span-4">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-label-sm text-[11px] text-secondary">{cert.points_checked} / {cert.total_points} Points Checked</span>
+                        <span className="font-label-sm text-[11px] text-secondary">
+                          {cert.stage === 'inspection' ? 'Inspection In Progress' : cert.stage === 'refurbishment' ? 'Refurbishment In Progress' : cert.stage === 'final-audit' ? 'Final Audit' : 'Pending'}
+                        </span>
                         <span className="font-label-sm text-[11px] font-bold text-primary">{pct}%</span>
                       </div>
                       <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
@@ -201,8 +259,27 @@ export default function CmsCertification() {
                     </div>
 
                     {/* Actions */}
-                    <div className="col-span-1 text-right">
-                      <button className="material-symbols-outlined text-secondary hover:text-primary transition-colors">more_vert</button>
+                    <div className="col-span-1 text-right flex justify-end gap-2">
+                      {cert.stage !== 'done' && cert.status !== 'rejected' && (
+                        <>
+                          <button 
+                            onClick={() => approveMutation.mutate(cert)} 
+                            disabled={approveMutation.isPending}
+                            className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition-colors disabled:opacity-50" 
+                            title="Approve & Next Stage"
+                          >
+                            <span className="material-symbols-outlined text-sm">check</span>
+                          </button>
+                          <button 
+                            onClick={() => rejectMutation.mutate(cert)} 
+                            disabled={rejectMutation.isPending}
+                            className="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition-colors disabled:opacity-50" 
+                            title="Reject"
+                          >
+                            <span className="material-symbols-outlined text-sm">close</span>
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 );

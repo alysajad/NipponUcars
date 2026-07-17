@@ -34,6 +34,7 @@ export default function MobileMenu() {
           <Link href="/inventory" onClick={() => setIsOpen(false)} className="font-label-bold uppercase text-lg tracking-wider text-secondary hover:text-primary">Buy</Link>
           <Link href="/sell" onClick={() => setIsOpen(false)} className="font-label-bold uppercase text-lg tracking-wider text-secondary hover:text-primary">Sell</Link>
           <Link href="/exchange" onClick={() => setIsOpen(false)} className="font-label-bold uppercase text-lg tracking-wider text-secondary hover:text-primary">Exchange</Link>
+          <Link href="/inventory" onClick={() => setIsOpen(false)} className="font-label-bold uppercase text-lg tracking-wider text-secondary hover:text-primary">Inventory</Link>
           <Link href="/certified" onClick={() => setIsOpen(false)} className="font-label-bold uppercase text-lg tracking-wider text-secondary hover:text-primary">Certified</Link>
           <Link href="/about" onClick={() => setIsOpen(false)} className="font-label-bold uppercase text-lg tracking-wider text-secondary hover:text-primary">About Us</Link>
         </div>
