@@ -13,6 +13,24 @@ function parseSpecs(specs) {
   try { return JSON.parse(specs); } catch(e) { return {}; }
 }
 
+const reorderForCenter = (arr) => {
+  if (!arr || arr.length === 0) return [];
+  const result = new Array(arr.length);
+  const mid = Math.floor((arr.length - 1) / 2);
+  let left = mid - 1;
+  let right = mid + 1;
+  result[mid] = arr[0];
+  
+  for (let i = 1; i < arr.length; i++) {
+    if (i % 2 !== 0) {
+      result[right++] = arr[i];
+    } else {
+      result[left--] = arr[i];
+    }
+  }
+  return result;
+};
+
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -326,23 +344,23 @@ export default function Home() {
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+          <div className="flex flex-wrap justify-center gap-8">
             {isLoadingFeatured ? (
               // Skeletons
               Array.from({ length: 5 }).map((_, i) => (
-                <article key={i} className="bg-white rounded-xl overflow-hidden border border-outline-variant animate-pulse h-[450px]">
+                <article key={i} className="bg-white rounded-xl overflow-hidden border border-outline-variant animate-pulse h-[450px] w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.333rem)] xl:w-[calc(20%-1.6rem)]">
                   <div className="w-full h-72 bg-surface-container-high" />
                   <div className="p-8"><div className="h-4 bg-surface-container-high mb-4 w-1/2" /></div>
                 </article>
               ))
             ) : featuredCars.length > 0 ? (
-              featuredCars.map(car => {
+              reorderForCenter(featuredCars).map(car => {
                 const specs = parseSpecs(car.specs);
                 const coverImage = car.frames?.[0] || 'https://res.cloudinary.com/vdofesxh/image/upload/f_auto,q_auto/v1784191696/utrust_assets/utrust_asset_page_0.jpg';
                 return (
-                  <article key={car.id} className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-                    <div className="relative h-72 overflow-hidden">
-                      <img className="w-full h-full object-cover" alt={car.name} src={coverImage} />
+                  <article key={car.id} className="bg-white rounded-xl card-hover overflow-hidden border border-outline-variant transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(215,25,33,0.15)] shadow-[0_4px_12px_rgba(0,0,0,0.05)] w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.333rem)] xl:w-[calc(20%-1.6rem)] flex-shrink-0">
+                    <div className="relative h-72 overflow-hidden bg-surface-container-low">
+                      <img className="w-full h-full object-contain p-4" alt={car.name} src={coverImage} />
                       <div className="absolute top-4 left-4">
                         <span className="text-secondary text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest flex items-center gap-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 0, 0, 0.05)' }}>
                           <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
