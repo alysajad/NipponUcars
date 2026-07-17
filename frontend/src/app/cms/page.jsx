@@ -23,6 +23,7 @@ export default function CmsAddVehicle() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [pin, setPin] = useState('');
+  const [isUploadingBulk, setIsUploadingBulk] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [formSchema, setFormSchema] = useState({ customFields: [], competitors: [], features: [] });
   const [editCarId, setEditCarId] = useState(null);
