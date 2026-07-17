@@ -153,20 +153,20 @@ export default function ExchangePage() {
                 <form className="space-y-4 relative z-10">
                   <div>
                     <label className="font-label-sm text-secondary mb-1 block uppercase">Vehicle Make</label>
-                    <select className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                      <option>Select Make</option>
-                      <option>Toyota</option>
-                      <option>Honda</option>
-                      <option>Nissan</option>
+                    <select name="currentMake" value={formData.currentMake} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                      <option value="">Select Make</option>
+                      <option value="Toyota">Toyota</option>
+                      <option value="Honda">Honda</option>
+                      <option value="Nissan">Nissan</option>
                     </select>
                   </div>
                   <div>
                     <label className="font-label-sm text-secondary mb-1 block uppercase">Registration Year</label>
-                    <select className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
-                      <option>Select Year</option>
-                      <option>2023</option>
-                      <option>2022</option>
-                      <option>2021</option>
+                    <select name="currentYear" value={formData.currentYear} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                      <option value="">Select Year</option>
+                      <option value="2023">2023</option>
+                      <option value="2022">2022</option>
+                      <option value="2021">2021</option>
                     </select>
                   </div>
                   <button type="button" onClick={() => document.getElementById('exchange-form')?.scrollIntoView({ behavior: 'smooth' })} className="w-full bg-primary text-white font-label-bold uppercase rounded-lg px-6 py-3.5 mt-4 hover:opacity-90 transition-all shadow-md">
