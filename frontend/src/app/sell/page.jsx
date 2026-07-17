@@ -316,10 +316,9 @@ export default function SellPage() {
                     <br/>
                     <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm mt-2 text-secondary">Pricing</span>
                   </div>
-                  <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
-                    <span className="material-symbols-outlined bg-white text-secondary group-hover:text-white group-hover:bg-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
-                    Learn More
-                  </Link>
+                  <p className="font-body-md text-sm text-secondary/80 mt-6 leading-relaxed max-w-[80%]">
+                    Our algorithmic valuation ensures you get the most accurate, data-driven market price for your Toyota without any low-ball offers.
+                  </p>
                 </div>
                 <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
                   <span className="material-symbols-outlined text-primary" style={{ fontSize: '100px' }}>analytics</span>
@@ -334,10 +333,9 @@ export default function SellPage() {
                     <br/>
                     <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm mt-2">Fees</span>
                   </div>
-                  <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
-                    <span className="material-symbols-outlined bg-white/20 backdrop-blur-md text-white group-hover:bg-white group-hover:text-secondary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
-                    Learn More
-                  </Link>
+                  <p className="font-body-md text-sm text-white/80 mt-6 leading-relaxed max-w-[80%]">
+                    What you see is exactly what you get. We cover all transfer costs, inspection charges, and administrative overheads.
+                  </p>
                 </div>
                 <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4">
                   <span className="material-symbols-outlined text-white" style={{ fontSize: '100px' }}>visibility_off</span>
@@ -352,10 +350,9 @@ export default function SellPage() {
                     <br/>
                     <span className="font-headline-md text-headline-md uppercase bg-primary text-white px-4 py-2 rounded-md inline-block shadow-sm mt-2">Payment</span>
                   </div>
-                  <Link href="#" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-primary group-hover:brightness-110 transition-colors">
-                    <span className="material-symbols-outlined bg-primary text-white group-hover:bg-white group-hover:text-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
-                    Learn More
-                  </Link>
+                  <p className="font-body-md text-sm text-primary/80 mt-6 leading-relaxed max-w-[70%]">
+                    The moment you hand over the keys, the funds are wired directly to your bank account. No waiting periods, no clearance delays.
+                  </p>
                 </div>
                 <div className="w-40 h-40 opacity-80 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center -mr-4 md:mr-10">
                   <span className="material-symbols-outlined text-primary" style={{ fontSize: '100px' }}>account_balance_wallet</span>
