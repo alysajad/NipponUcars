@@ -14,14 +14,14 @@ export default function MobileMenu() {
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] transition-opacity" 
+          className="fixed top-0 left-0 w-screen h-[100dvh] bg-black/40 backdrop-blur-sm z-[9998] transition-opacity" 
           onClick={() => setIsOpen(false)} 
         />
       )}
       
       {/* Side Slider */}
       <div 
-        className={`fixed top-0 left-0 h-full w-[280px] max-w-[80vw] shadow-2xl z-[9999] transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed top-0 left-0 h-[100dvh] w-[280px] max-w-[80vw] shadow-2xl z-[9999] transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ backgroundColor: 'var(--pure-white, #ffffff)' }}
       >
         <div className="flex justify-between items-center p-6 border-b border-gray-100">
