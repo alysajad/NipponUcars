@@ -176,7 +176,7 @@ export default function InventoryList() {
         </Link>
       </header>
 
-      <div className="flex flex-col lg:flex-row gap-4 md:gap-8 px-4 md:px-8 py-8 w-full max-w-[1440px] mx-auto">
+      <div className="flex flex-col lg:flex-row gap-4 md:gap-8 px-4 md:px-8 py-8 w-full max-w-full mx-auto">
         
         <div className={`inventory-overlay ${isMobileFilterOpen ? 'open' : ''}`} onClick={() => setIsMobileFilterOpen(false)} />
 
@@ -321,7 +321,7 @@ export default function InventoryList() {
           {isLoading ? (
             <div className="showcase-loading">Loading inventory...</div>
           ) : filteredCars.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 w-full">
               {filteredCars.map((car) => {
                 let specs = {};
                 try { specs = typeof car.specs === 'object' ? car.specs : JSON.parse(car.specs); } catch(e) { }
