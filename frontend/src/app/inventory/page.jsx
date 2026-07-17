@@ -88,74 +88,27 @@ export default function InventoryList() {
   return (
     <div className="inventory-list-page" style={{ minHeight: '100vh', background: 'var(--light-grey)' }}>
       <style>{`
-        .multi-range::-webkit-slider-thumb {
-          pointer-events: auto;
+        .multi-range {
           -webkit-appearance: none;
-          width: 18px;
-          height: 18px;
-          background: var(--primary-red);
+          background: transparent;
+        }
+        .multi-range::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          height: 16px;
+          width: 16px;
           border-radius: 50%;
-          border: 2px solid white;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-          cursor: pointer;
-        }
-        .multi-range::-moz-range-thumb {
-          pointer-events: auto;
-          width: 18px;
-          height: 18px;
           background: var(--primary-red);
-          border-radius: 50%;
-          border: 2px solid white;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.4);
           cursor: pointer;
+          margin-top: -6px;
+          box-shadow: 0 0 5px rgba(0,0,0,0.2);
+          position: relative;
+          z-index: 10;
         }
-        .mobile-filter-btn {
-          display: none !important;
-        }
-        .mobile-filter-close {
-          display: none !important;
-        }
-        .inventory-overlay {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
+        .multi-range::-webkit-slider-runnable-track {
           width: 100%;
-          height: 100vh;
-          background: rgba(0,0,0,0.5);
-          z-index: 999;
-          backdrop-filter: blur(4px);
-        }
-        @media (max-width: 768px) {
-          .inventory-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 85%;
-            max-width: 350px;
-            height: 100%;
-            z-index: 1000;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            overflow-y: auto;
-            border-radius: 0 !important;
-            box-shadow: 5px 0 25px rgba(0,0,0,0.1);
-          }
-          .inventory-sidebar.open {
-            transform: translateX(0);
-          }
-          .mobile-filter-btn {
-            display: flex !important;
-          }
-          .mobile-filter-close {
-            display: block !important;
-          }
-          .inventory-overlay.open {
-            display: block;
-          }
-          .inventory-layout {
-            padding: 1rem !important;
-          }
+          height: 4px;
+          cursor: pointer;
+          background: transparent;
         }
       `}</style>
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between px-4 md:px-16 py-6 bg-white border-b border-black/5 gap-4 w-full">
@@ -178,18 +131,21 @@ export default function InventoryList() {
 
       <div className="flex flex-col lg:flex-row gap-4 md:gap-8 px-4 md:px-8 py-8 w-full max-w-full mx-auto">
         
-        <div className={`inventory-overlay ${isMobileFilterOpen ? 'open' : ''}`} onClick={() => setIsMobileFilterOpen(false)} />
+        {/* Mobile Overlay */}
+        {isMobileFilterOpen && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] lg:hidden" onClick={() => setIsMobileFilterOpen(false)} />
+        )}
 
         {/* Left Sidebar Filters */}
-        <aside className={`inventory-sidebar ${isMobileFilterOpen ? 'open' : ''}`} style={{ width: '280px', flexShrink: 0, background: 'var(--pure-white)', padding: '1.5rem', borderRadius: '12px', border: '1px solid #eee', height: 'fit-content' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.2rem' }}>
+        <aside className={`fixed inset-y-0 left-0 z-[1000] w-[85%] max-w-[350px] bg-white shadow-2xl p-6 overflow-y-auto transition-transform duration-300 transform ${isMobileFilterOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:translate-x-0 lg:w-[280px] lg:flex-shrink-0 lg:shadow-none lg:rounded-xl lg:border lg:border-gray-200 lg:h-fit lg:p-6`}>
+          <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+            <h3 className="m-0 flex items-center gap-2 text-xl">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
               Filters
             </h3>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              <button onClick={() => {setSelectedModels([]); setBudgetRange({min:0, max:200}); setIsBudgetFilterEnabled(false);}} style={{ background: 'none', border: 'none', color: 'var(--primary-red)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>Clear All</button>
-              <button className="mobile-filter-close" onClick={() => setIsMobileFilterOpen(false)} style={{ background: 'none', border: 'none', fontSize: '2rem', lineHeight: 0.5, cursor: 'pointer', color: '#888' }}>&times;</button>
+            <div className="flex gap-4 items-center">
+              <button onClick={() => {setSelectedModels([]); setBudgetRange({min:0, max:200}); setIsBudgetFilterEnabled(false);}} className="bg-transparent border-none text-primary cursor-pointer text-sm font-bold">Clear All</button>
+              <button className="lg:hidden bg-transparent border-none text-3xl leading-[0.5] cursor-pointer text-gray-500" onClick={() => setIsMobileFilterOpen(false)}>&times;</button>
             </div>
           </div>
           
@@ -309,9 +265,8 @@ export default function InventoryList() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--dark-grey)' }}>{filteredCars.length} Used Cars in India</h2>
             <button 
-              className="mobile-filter-btn"
+              className="lg:hidden flex items-center gap-2 font-bold text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded-lg cursor-pointer"
               onClick={() => setIsMobileFilterOpen(true)}
-              style={{ background: 'var(--pure-white)', border: '1px solid #ddd', padding: '0.5rem 1rem', borderRadius: '8px', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold', color: 'var(--dark-grey)', cursor: 'pointer' }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
               Filters
