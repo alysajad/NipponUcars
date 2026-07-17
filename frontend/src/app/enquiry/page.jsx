@@ -49,15 +49,29 @@ function EnquiryContent() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setFormStatus('submitting');
-    setTimeout(() => {
+    try {
+      await createEnquiry({
+        customer_name: formData.fullName,
+        customer_email: formData.email,
+        customer_phone: formData.phone,
+        vehicle_interest: car ? car.name : 'Unknown',
+        vehicle_specs: {
+          city: formData.city !== 'Select City' ? formData.city : '',
+          preferred_date: formData.preferredDate,
+          car_id: car?.id
+        },
+        lead_type: 'sales',
+        notes: formData.message
+      });
       setFormStatus('success');
-      setTimeout(() => {
-        setFormStatus('idle');
-      }, 3000);
-    }, 1500);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to submit enquiry. Please try again.');
+      setFormStatus('idle');
+    }
   };
 
   if (isLoading) {
