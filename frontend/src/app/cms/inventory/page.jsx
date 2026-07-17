@@ -17,11 +17,18 @@ export default function CmsInventory() {
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const queryClient = useQueryClient();
 
+  const [toastMessage, setToastMessage] = useState('');
+  const showToast = (message) => {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(''), 3000);
+  };
+
   const deleteMutation = useMutation({
     mutationFn: deleteCar,
     onSuccess: () => {
       queryClient.invalidateQueries(['cms-inventory']);
       setOpenDropdownId(null);
+      showToast("Vehicle deleted successfully.");
     }
   });
 
@@ -30,7 +37,7 @@ export default function CmsInventory() {
     onSuccess: () => {
       queryClient.invalidateQueries(['cms-inventory']);
       setOpenDropdownId(null);
-      alert("Featured status updated successfully.");
+      showToast("Featured status updated successfully.");
     }
   });
 
@@ -369,6 +376,14 @@ export default function CmsInventory() {
           </div>
         </div>
       </footer>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 bg-surface-container-highest text-on-surface px-6 py-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-3 border border-outline-variant/30 transition-all duration-300">
+          <span className="material-symbols-outlined text-primary">check_circle</span>
+          <span className="font-label-md uppercase tracking-wider">{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 }
