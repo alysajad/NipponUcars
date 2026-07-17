@@ -207,6 +207,13 @@ function EnquiryContent() {
                                 <option>Delhi</option>
                                 <option>Bangalore</option>
                                 <option>Chennai</option>
+                                <option>Hyderabad</option>
+                                <option>Pune</option>
+                                <option>Kolkata</option>
+                                <option>Ahmedabad</option>
+                                <option>Jaipur</option>
+                                <option>Surat</option>
+                                <option>Other</option>
                             </select>
                         </div>
                     </div>
