@@ -34,6 +34,7 @@ export default function CmsEnquiries() {
   // Stats derived from data
   const totalEnquiries = enquiries.length;
   const pendingValuations = enquiries.filter(e => e.lead_type === 'valuation').length;
+  const pendingExchanges = enquiries.filter(e => e.lead_type === 'exchange').length;
   const conversionRate = totalEnquiries > 0 ? ((enquiries.filter(e => e.status === 'converted').length / totalEnquiries) * 100).toFixed(1) : '0.0';
 
   const getInitials = (name) => {
@@ -81,7 +82,7 @@ export default function CmsEnquiries() {
         </header>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-5 mb-12">
           <div className="glass-card p-6 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline/10">
             <span className="font-label-sm text-secondary uppercase block mb-1">Total Enquiries</span>
             <div className="text-headline-md text-primary">{totalEnquiries}</div>
@@ -93,6 +94,11 @@ export default function CmsEnquiries() {
             <span className="font-label-sm text-secondary uppercase block mb-1">Pending Valuations</span>
             <div className="text-headline-md text-primary">{pendingValuations}</div>
             <div className="text-[12px] text-secondary mt-2">Requires inspection</div>
+          </div>
+          <div className="glass-card p-6 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline/10">
+            <span className="font-label-sm text-secondary uppercase block mb-1">Pending Exchanges</span>
+            <div className="text-headline-md text-primary">{pendingExchanges}</div>
+            <div className="text-[12px] text-secondary mt-2">Trade-in evaluation</div>
           </div>
           <div className="glass-card p-6 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline/10">
             <span className="font-label-sm text-secondary uppercase block mb-1">Conversion Rate</span>
@@ -122,6 +128,12 @@ export default function CmsEnquiries() {
               onClick={() => { setActiveTab('valuation'); setCurrentPage(1); }}
             >
               Valuation Requests
+            </button>
+            <button
+              className={`flex-1 md:w-48 py-3 px-6 rounded-[6px] font-label-sm text-[14px] uppercase transition-all duration-300 ${activeTab === 'exchange' ? 'bg-white text-primary shadow-sm' : 'text-secondary hover:text-primary'}`}
+              onClick={() => { setActiveTab('exchange'); setCurrentPage(1); }}
+            >
+              Exchange Requests
             </button>
           </div>
           <div className="flex items-center gap-3 w-full md:w-auto">
@@ -199,8 +211,8 @@ export default function CmsEnquiries() {
                       );
                     }) : (
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-secondary">
-                          No enquiries found. {activeTab === 'valuation' ? 'No valuation requests yet.' : 'No sales leads yet.'}
+                        <td colSpan="5" className="p-16 text-center text-secondary">
+                          No enquiries found. {activeTab === 'valuation' ? 'No valuation requests yet.' : activeTab === 'exchange' ? 'No exchange requests yet.' : 'No sales leads yet.'}
                         </td>
                       </tr>
                     )}
