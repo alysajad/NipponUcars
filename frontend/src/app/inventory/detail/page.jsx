@@ -95,11 +95,11 @@ function CarDetail() {
         <div className="bg-white rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden mb-8">
           <div className="flex flex-col lg:flex-row">
             {/* Image Gallery */}
-            <div className="flex-[1.5] bg-surface-container-low min-h-[400px] flex items-center justify-center relative">
+            <div className="flex-[1.5] bg-surface-container-low min-h-[400px] flex items-center justify-center relative p-8">
               {car.frames && car.frames.length > 1 ? (
                 <ImageGallery frames={car.frames} initialScale={1} />
               ) : (
-                <img src={coverImage} alt={car.name} className="w-full h-full object-contain" />
+                <img src={coverImage} alt={car.name} className="w-full h-full object-contain p-4" />
               )}
             </div>
 

@@ -329,7 +329,7 @@ export default function InventoryList() {
                 return (
                   <Link href={`/inventory/detail?id=${car.id}`} className="block h-full" style={{ textDecoration: 'none', color: 'inherit' }} key={car.id}>
                     <div className="showcase-card flex flex-col h-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100">
-                      <div className="showcase-img-wrap relative bg-gray-50 p-2" style={{ height: '180px' }}>
+                      <div className="showcase-img-wrap relative bg-gray-50 p-4" style={{ height: '180px' }}>
                         <img src={coverImage} alt={car.name} className="w-full h-full object-contain hover:scale-105 transition-transform duration-500" />
                       </div>
                       <div className="showcase-card-content flex flex-col flex-1 p-4">
