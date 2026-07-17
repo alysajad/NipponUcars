@@ -282,7 +282,7 @@ export default function CmsInventory() {
                                   e.stopPropagation();
                                   toggleFeaturedMutation.mutate(car.id);
                                 }}>
-                                  {car.extra_details?.is_featured ? 'Remove from Featured' : 'Promote to Featured'}
+                                  {specs?.is_featured ? 'Remove from Featured' : 'Promote to Featured'}
                                 </button>
                                 <button className="w-full px-4 py-2 text-sm text-[#D71921] hover:bg-surface-container-low text-left" onClick={(e) => {
                                   e.stopPropagation();

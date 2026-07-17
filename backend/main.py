@@ -162,13 +162,28 @@ async def get_featured_inventory():
         raise HTTPException(status_code=500, detail="Supabase not configured")
     
     try:
-        response = supabase.table("inventory").select("*").contains("extra_details", {"is_featured": True}).execute()
-        result = [car for car in response.data if car.get("frames")]
+        # Fetch all inventory and filter in python to avoid relying on extra_details column
+        response = supabase.table("inventory").select("*").execute()
+        result = []
+        for car in response.data:
+            if not car.get("frames"):
+                continue
+            specs_str = car.get("specs", "{}")
+            try:
+                specs_dict = json.loads(specs_str)
+            except:
+                specs_dict = {}
+            if specs_dict.get("is_featured"):
+                car["parsed_specs"] = specs_dict
+                result.append(car)
         
         # Sort by featured_at descending and take top 5
-        result.sort(key=lambda c: c.get("extra_details", {}).get("featured_at", ""), reverse=True)
+        result.sort(key=lambda c: c["parsed_specs"].get("featured_at", ""), reverse=True)
         result = result[:5]
         
+        for c in result:
+            del c["parsed_specs"]
+            
         cache_set("inventory:featured", result, 60)
         return result
     except Exception as e:
@@ -193,31 +208,43 @@ async def toggle_featured_car(id: str):
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     try:
-        res = supabase.table("inventory").select("extra_details").eq("id", id).execute()
+        res = supabase.table("inventory").select("specs").eq("id", id).execute()
         if not res.data:
             raise HTTPException(status_code=404, detail="Car not found")
         
         car = res.data[0]
-        extra = car.get("extra_details") or {}
+        specs_str = car.get("specs", "{}")
+        try:
+            specs = json.loads(specs_str)
+        except:
+            specs = {}
         
-        if extra.get("is_featured"):
-            extra["is_featured"] = False
-            supabase.table("inventory").update({"extra_details": extra}).eq("id", id).execute()
+        if specs.get("is_featured"):
+            specs["is_featured"] = False
+            supabase.table("inventory").update({"specs": json.dumps(specs)}).eq("id", id).execute()
         else:
-            featured_res = supabase.table("inventory").select("id, extra_details").contains("extra_details", {"is_featured": True}).execute()
-            featured_cars = featured_res.data
+            all_res = supabase.table("inventory").select("id, specs").execute()
+            featured_cars = []
+            for c in all_res.data:
+                try:
+                    c_specs = json.loads(c.get("specs", "{}"))
+                except:
+                    c_specs = {}
+                if c_specs.get("is_featured"):
+                    c["parsed_specs"] = c_specs
+                    featured_cars.append(c)
             
             if len(featured_cars) >= 5:
                 def get_time(c):
-                    return c.get("extra_details", {}).get("featured_at", "")
+                    return c["parsed_specs"].get("featured_at", "")
                 oldest_car = min(featured_cars, key=get_time)
-                oldest_extra = oldest_car.get("extra_details", {})
-                oldest_extra["is_featured"] = False
-                supabase.table("inventory").update({"extra_details": oldest_extra}).eq("id", oldest_car["id"]).execute()
+                oldest_specs = oldest_car["parsed_specs"]
+                oldest_specs["is_featured"] = False
+                supabase.table("inventory").update({"specs": json.dumps(oldest_specs)}).eq("id", oldest_car["id"]).execute()
             
-            extra["is_featured"] = True
-            extra["featured_at"] = datetime.utcnow().isoformat()
-            supabase.table("inventory").update({"extra_details": extra}).eq("id", id).execute()
+            specs["is_featured"] = True
+            specs["featured_at"] = datetime.utcnow().isoformat()
+            supabase.table("inventory").update({"specs": json.dumps(specs)}).eq("id", id).execute()
             
         cache_delete("inventory:all")
         cache_delete("inventory:featured")
