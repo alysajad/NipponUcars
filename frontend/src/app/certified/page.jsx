@@ -67,7 +67,7 @@ export default function Certified() {
                         Experience precision and peace of mind with the industry's most rigorous certification standard. Every vehicle undergoes a forensic evaluation by our certified master technicians.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <button className="bg-primary text-white px-8 py-4 font-label-bold text-[16px] tracking-widest rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-md uppercase">Book an Inspection</button>
+                        <Link href="/certified/book" className="inline-block bg-primary text-white px-8 py-4 font-label-bold text-[16px] tracking-widest rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-md uppercase text-center">Book an Inspection</Link>
                         <button className="border-2 border-primary text-primary px-8 py-4 font-label-bold text-[16px] tracking-widest rounded-lg hover:bg-white/50 active:scale-95 transition-all shadow-sm uppercase">Learn More</button>
                     </div>
                 </div>
@@ -213,7 +213,7 @@ export default function Certified() {
                 <h2 className="font-headline-lg text-headline-lg-mobile md:text-[56px] text-white uppercase mb-10 drop-shadow-md">Ready to Elevate Your Standard?</h2>
                 <div className="flex flex-col sm:flex-row justify-center gap-6">
                     <button className="bg-white text-primary font-label-bold tracking-widest text-[16px] px-12 py-5 rounded-lg hover:bg-surface-container-low transition-colors uppercase shadow-xl hover:-translate-y-1">Find Your Certified Car</button>
-                    <button className="bg-transparent border-2 border-white text-white font-label-bold tracking-widest text-[16px] px-12 py-5 rounded-lg hover:bg-white/10 transition-colors uppercase shadow-xl hover:-translate-y-1">Book an Inspection</button>
+                    <Link href="/certified/book" className="inline-block bg-transparent border-2 border-white text-white font-label-bold tracking-widest text-[16px] px-12 py-5 rounded-lg hover:bg-white/10 transition-colors uppercase shadow-xl hover:-translate-y-1 text-center">Book an Inspection</Link>
                 </div>
             </div>
         </section>
