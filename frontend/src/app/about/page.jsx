@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import MobileMenu from '@/components/MobileMenu';
 
 export default function AboutPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -83,6 +84,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <MobileMenu />
             <button className="material-symbols-outlined text-on-surface p-2 hover:bg-surface-container-low rounded-full transition-all">
               search
             </button>

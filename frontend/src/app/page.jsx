@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import MobileMenu from '@/components/MobileMenu';
 import { useRouter } from 'next/navigation';
 
 export default function Landing() {
@@ -44,6 +45,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="flex items-center gap-stack-md">
+            <MobileMenu />
             <button className="material-symbols-outlined text-on-surface p-2 hover:bg-surface-container-low rounded-full transition-all">search</button>
 
           </div>

@@ -1,6 +1,7 @@
 "use client";
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
+import MobileMenu from '@/components/MobileMenu';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { fetchInventory, createEnquiry } from '@/api/inventoryApi';
@@ -92,6 +93,7 @@ function EnquiryContent() {
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="#">Locations</Link>
         </nav>
         <div className="flex items-center gap-6">
+            <MobileMenu />
             <button className="bg-primary text-white px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 duration-100 hover:brightness-110 shadow-md">
                 Enquire Now
             </button>

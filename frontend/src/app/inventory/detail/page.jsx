@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
+import MobileMenu from '@/components/MobileMenu';
 import { useQuery } from '@tanstack/react-query';
 import { fetchInventory } from '@/api/inventoryApi';
 import ImageGallery from '@/components/ImageGallery';
@@ -72,6 +73,7 @@ function CarDetail() {
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/">About</Link>
           </nav>
           <div className="flex items-center gap-6">
+            <MobileMenu />
             <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
               Enquire
             </Link>
