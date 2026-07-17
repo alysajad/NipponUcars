@@ -80,8 +80,6 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-center gap-stack-md">
-            <button className="material-symbols-outlined text-on-surface p-2 hover:bg-surface-container-low rounded-full transition-all">search</button>
-
           </div>
         </div>
       </nav>
