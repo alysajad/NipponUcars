@@ -50,6 +50,7 @@ async def startup_event():
     except Exception as e:
         print(f"[startup] Failed to clear stuck tasks: {e}")
 
+@app.head("/health")
 @app.get("/health")
 async def health_check():
     """Uptime monitor endpoint to keep Redis and DB connections warm."""

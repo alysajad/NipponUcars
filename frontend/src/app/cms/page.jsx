@@ -263,7 +263,18 @@ export default function CmsAddVehicle() {
             <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg uppercase text-on-surface">Vehicle Onboarding</h1>
           </div>
           <div className="flex gap-4">
-            <button onClick={() => setStep(1)} className="border-2 border-primary text-primary px-6 py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-surface-container transition-all active:scale-[0.98]">
+            <button onClick={() => {
+              if (window.confirm("Are you sure you want to discard this draft? All entered details will be lost.")) {
+                setStep(1);
+                setCarDetails({ name: '', desc: '', price: '', year: '', fuel: '', transmission: '', km: '', engineCC: '', owner: '', variant: '', vin: '', stock_id: '', status: 'Available', acquisition_cost: '', color: '' });
+                setFeatures([]);
+                setCompetitors([]);
+                setReviews([]);
+                setFaqs([]);
+                setFrames([]);
+                if (fileInputRef.current) fileInputRef.current.value = "";
+              }
+            }} className="border-2 border-primary text-primary px-6 py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-surface-container transition-all active:scale-[0.98]">
               Discard Draft
             </button>
           </div>
