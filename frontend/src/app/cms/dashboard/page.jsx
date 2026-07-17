@@ -51,11 +51,7 @@ export default function CmsDashboard() {
               <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
             </nav>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/" className="bg-primary text-white px-6 py-2 rounded-[6px] font-bold text-[12px] xl:text-[14px] uppercase tracking-wider hover:opacity-90 transition-opacity">
-              Enquire
-            </Link>
-          </div>
+          {/* Removed Enquire Button */}
         </div>
       </header>
 

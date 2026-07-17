@@ -312,11 +312,7 @@ export default function CmsAddVehicle() {
             <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/certification">Certified</Link>
             <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/cms/settings">Form Editor</Link>
           </nav>
-          <div className="flex items-center gap-3 xl:gap-6">
-            <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-bold text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
-              Enquire
-            </Link>
-          </div>
+          {/* Removed Enquire Button */}
         </div>
       </header>
 

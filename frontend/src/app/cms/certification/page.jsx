@@ -56,11 +56,6 @@ export default function CmsCertification() {
               <Link className="font-bold text-[12px] xl:text-[14px] uppercase tracking-wider text-primary border-b-2 border-primary pb-1" href="/cms/certification">Certified</Link>
             </nav>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/" className="bg-primary text-white px-6 py-2 rounded-[6px] font-bold text-[16px] uppercase hover:opacity-90 transition-opacity">
-              Enquire
-            </Link>
-          </div>
         </div>
       </header>
 
