@@ -115,9 +115,9 @@ export default function SellPage() {
       {/* TopNavBar */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 border-b border-gray-200 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-white/80 backdrop-blur-md'}`}>
         <div className="flex justify-between items-center h-16 px-margin-desktop max-w-container-max mx-auto">
-          <div className="text-2xl font-bold text-primary tracking-tighter uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>
+          <Link href="/" className="text-2xl font-bold text-primary tracking-tighter uppercase font-headline-md hover:opacity-80 transition-opacity cursor-pointer" style={{ fontFamily: 'var(--font-sailors)' }}>
             Toyota U-Trust
-          </div>
+          </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/inventory">Buy</Link>
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-primary border-b-2 border-primary" href="/sell">Sell</Link>
@@ -129,9 +129,7 @@ export default function SellPage() {
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
               <input className="pl-10 pr-4 py-1.5 bg-gray-100 border-none rounded-lg focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="SEARCH INVENTORY" type="text" />
             </div>
-            <button className="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-all">
-              LOGIN
-            </button>
+
           </div>
         </div>
       </nav>

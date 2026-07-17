@@ -160,7 +160,9 @@ export default function InventoryList() {
       `}</style>
       <header className="inventory-header" style={{ padding: '1.5rem 4rem', background: 'var(--pure-white)', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontFamily: 'var(--font-sailors)', fontSize: '2rem', margin: 0 }}><span className="text-red">U-Trust</span> Used Cars</h1>
+          <h1 style={{ fontFamily: 'var(--font-sailors)', fontSize: '2rem', margin: 0 }}>
+            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:opacity-80 transition-opacity"><span className="text-red">U-Trust</span> Used Cars</Link>
+          </h1>
           <p style={{ color: '#888', margin: 0, fontSize: '0.9rem', marginTop: '0.2rem' }}>
             <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} onMouseOver={e => e.target.style.color='var(--primary-red)'} onMouseOut={e => e.target.style.color='inherit'}>Home</Link> 
             <ChevronRight size={14} style={{ display: 'inline', verticalAlign: 'middle', margin: '0 4px' }} /> 

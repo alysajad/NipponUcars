@@ -45,9 +45,7 @@ export default function Certified() {
           </div>
           <div className="flex items-center gap-stack-md">
             <button className="material-symbols-outlined text-on-surface p-2 hover:bg-surface-container-low rounded-full transition-all">search</button>
-            <button className="bg-primary text-on-primary font-label-bold text-label-bold px-8 py-3 uppercase tracking-widest rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-md">
-                LOGIN
-            </button>
+
           </div>
         </div>
       </nav>
