@@ -5,16 +5,20 @@ import Link from 'next/link';
 import MobileMenu from '@/components/MobileMenu';
 import { useRouter } from 'next/navigation';
 
-export default function Landing() {
-  const router = useRouter();
+export default function Home() {
+  const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  // Search State
   const [searchModel, setSearchModel] = useState('');
   const [searchBudget, setSearchBudget] = useState('');
   const [searchBodyType, setSearchBodyType] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -22,15 +26,14 @@ export default function Landing() {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (searchModel) params.set('model', searchModel);
-    if (searchBudget) params.set('budget', searchBudget);
-    if (searchBodyType) params.set('bodyType', searchBodyType);
-    const qs = params.toString();
-    router.push(`/inventory${qs ? `?${qs}` : ''}`);
+    if (searchModel) params.append('model', searchModel);
+    if (searchBudget) params.append('budget', searchBudget);
+    if (searchBodyType) params.append('bodyType', searchBodyType);
+    router.push(`/inventory?${params.toString()}`);
   };
 
   return (
-    <div className="bg-surface text-on-surface">
+    <div className="bg-surface text-on-surface w-full overflow-x-hidden">
       {/* TopNavBar */}
       <nav className={`fixed top-0 w-full z-50 border-b border-outline-variant transition-all duration-300 ${scrolled ? 'bg-white shadow-xl' : 'bg-white/95 backdrop-blur-sm'}`}>
         <div className="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto">
