@@ -111,31 +111,25 @@ export default function BookInspection() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Form Section */}
             <div className="lg:col-span-8 bg-surface-container-lowest rounded-xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20">
-              <div className="mb-10 flex justify-between items-center overflow-x-auto pb-4">
-                <div className="flex items-center gap-4 min-w-max">
-                  <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">1</span>
-                    <span className="font-label-sm uppercase text-primary">Vehicle</span>
+              {status === 'confirmed' ? (
+                <div className="text-center py-16 px-4 animate-fade-in-up">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="material-symbols-outlined text-green-600 text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                   </div>
-                  <div className="h-[1px] w-8 bg-outline-variant"></div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-surface-container-high text-secondary flex items-center justify-center font-bold">2</span>
-                    <span className="font-label-sm uppercase text-secondary">Service Center</span>
-                  </div>
-                  <div className="h-[1px] w-8 bg-outline-variant"></div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-surface-container-high text-secondary flex items-center justify-center font-bold">3</span>
-                    <span className="font-label-sm uppercase text-secondary">Schedule</span>
-                  </div>
-                  <div className="h-[1px] w-8 bg-outline-variant"></div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-surface-container-high text-secondary flex items-center justify-center font-bold">4</span>
-                    <span className="font-label-sm uppercase text-secondary">Contact</span>
-                  </div>
+                  <h2 className="font-headline-lg text-primary uppercase mb-4">Thank You!</h2>
+                  <p className="font-body-lg text-secondary mb-8">
+                    Your inspection booking request has been successfully received. 
+                    Our concierge team will review your details and call you back shortly to confirm your appointment and make you feel right at home with Nippon U-Trust.
+                  </p>
+                  <Link 
+                    href="/inventory"
+                    className="inline-block bg-primary text-white px-8 py-3 font-label-bold tracking-widest rounded-lg hover:brightness-110 transition-all uppercase shadow-md"
+                  >
+                    Browse Inventory
+                  </Link>
                 </div>
-              </div>
-
-              <form className="space-y-8" onSubmit={handleSubmit}>
+              ) : (
+                <form className="space-y-8" onSubmit={handleSubmit}>
                 {/* Step 1: Vehicle Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2 group">
@@ -228,6 +222,7 @@ export default function BookInspection() {
                   {status === 'confirmed' && 'BOOKING CONFIRMED'}
                 </button>
               </form>
+              )}
             </div>
 
             {/* Sidebar Info Section */}
