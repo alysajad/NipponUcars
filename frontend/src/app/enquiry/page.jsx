@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import MobileMenu from '@/components/MobileMenu';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { fetchInventory, createEnquiry } from '@/api/inventoryApi';
 
@@ -24,6 +24,7 @@ export default function EnquiryPage() {
 
 function EnquiryContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const id = searchParams.get('id');
 
   const { data: cars = [], isLoading } = useQuery({
@@ -175,8 +176,8 @@ function EnquiryContent() {
                     <p className="text-lg text-secondary mb-8 max-w-md mx-auto leading-relaxed">
                       Your enquiry for the {car.name} has been successfully sent. Our expert team will review your details and contact you within 24 hours.
                     </p>
-                    <button onClick={() => { setFormStatus('idle'); setFormData({ fullName: '', phone: '', email: '', city: 'Select City', preferredDate: '', message: '' }); }} className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
-                      Submit Another Enquiry
+                    <button onClick={() => router.push('/inventory')} className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
+                      Back to Inventory
                     </button>
                   </div>
                 ) : (
