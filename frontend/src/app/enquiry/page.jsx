@@ -46,6 +46,11 @@ function EnquiryContent() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'phone') {
+      const sanitized = value.replace(/[^\+0-9\s\-]/g, '');
+      setFormData(prev => ({ ...prev, [name]: sanitized }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
