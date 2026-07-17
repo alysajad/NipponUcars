@@ -158,15 +158,23 @@ export default function ExchangePage() {
                       <option value="Toyota">Toyota</option>
                       <option value="Honda">Honda</option>
                       <option value="Nissan">Nissan</option>
+                      <option value="Maruti Suzuki">Maruti Suzuki</option>
+                      <option value="Hyundai">Hyundai</option>
+                      <option value="Tata">Tata</option>
+                      <option value="Mahindra">Mahindra</option>
+                      <option value="Kia">Kia</option>
+                      <option value="Ford">Ford</option>
+                      <option value="Volkswagen">Volkswagen</option>
+                      <option value="Others">Others</option>
                     </select>
                   </div>
                   <div>
                     <label className="font-label-sm text-secondary mb-1 block uppercase">Registration Year</label>
                     <select name="currentYear" value={formData.currentYear} onChange={handleInputChange} className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
                       <option value="">Select Year</option>
-                      <option value="2023">2023</option>
-                      <option value="2022">2022</option>
-                      <option value="2021">2021</option>
+                      {Array.from({length: 15}, (_, i) => new Date().getFullYear() - i).map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
                     </select>
                   </div>
                   <button type="button" onClick={() => document.getElementById('exchange-form')?.scrollIntoView({ behavior: 'smooth' })} className="w-full bg-primary text-white font-label-bold uppercase rounded-lg px-6 py-3.5 mt-4 hover:opacity-90 transition-all shadow-md">
