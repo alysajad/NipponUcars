@@ -16,12 +16,51 @@ export default function BookInspection() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSubmit = (e) => {
+  const [formData, setFormData] = useState({
+    make: '',
+    model: '',
+    year: '2024',
+    vin: '',
+    serviceCenter: 'Tokyo Central Flagship Center',
+    date: '',
+    fullName: '',
+    phone: '',
+    email: '',
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('processing');
-    setTimeout(() => {
+    
+    try {
+      const payload = {
+        customer_name: formData.fullName,
+        customer_email: formData.email,
+        customer_phone: formData.phone,
+        vehicle_interest: `${formData.year} ${formData.make} ${formData.model}`,
+        priority: "high",
+        lead_type: "inspection",
+        notes: `Inspection Booking\nVIN: ${formData.vin || 'N/A'}\nService Center: ${formData.serviceCenter}\nDate: ${formData.date}\nTime: ${timeSlot}`
+      };
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/cms/enquiries`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("Failed to submit");
       setStatus('confirmed');
-    }, 1500);
+    } catch (err) {
+      console.error(err);
+      setStatus('idle');
+      alert("Failed to book inspection. Please try again.");
+    }
   };
 
   return (
@@ -101,15 +140,15 @@ export default function BookInspection() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Make</label>
-                    <input className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary uppercase px-4 py-3 font-body-md" placeholder="e.g. LEXUS" type="text" required/>
+                    <input name="make" value={formData.make} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary uppercase px-4 py-3 font-body-md" placeholder="e.g. LEXUS" type="text" required/>
                   </div>
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Model</label>
-                    <input className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary uppercase px-4 py-3 font-body-md" placeholder="e.g. LS 500" type="text" required/>
+                    <input name="model" value={formData.model} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary uppercase px-4 py-3 font-body-md" placeholder="e.g. LS 500" type="text" required/>
                   </div>
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Year</label>
-                    <select className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md">
+                    <select name="year" value={formData.year} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md">
                       <option>2024</option>
                       <option>2023</option>
                       <option>2022</option>
@@ -118,14 +157,14 @@ export default function BookInspection() {
                   </div>
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">VIN (Chassis Number)</label>
-                    <input className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary uppercase px-4 py-3 font-body-md" placeholder="17-CHARACTER IDENTIFIER" type="text"/>
+                    <input name="vin" value={formData.vin} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary uppercase px-4 py-3 font-body-md" placeholder="17-CHARACTER IDENTIFIER" type="text"/>
                   </div>
                 </div>
 
                 {/* Step 2: Service Center */}
                 <div className="space-y-2 group">
                   <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Preferred Service Center</label>
-                  <select className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md">
+                  <select name="serviceCenter" value={formData.serviceCenter} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md">
                     <option>Tokyo Central Flagship Center</option>
                     <option>Yokohama Performance Hub</option>
                     <option>Osaka Technical Center</option>
@@ -137,7 +176,7 @@ export default function BookInspection() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Date Selection</label>
-                    <input className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="date" required/>
+                    <input name="date" value={formData.date} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="date" required/>
                   </div>
                   <div className="space-y-2">
                     <label className="font-label-sm uppercase text-secondary">Time Slot</label>
@@ -160,15 +199,15 @@ export default function BookInspection() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-outline-variant/20">
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Full Name</label>
-                    <input className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="text" required/>
+                    <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="text" required/>
                   </div>
                   <div className="space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Phone Number</label>
-                    <input className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="tel" required/>
+                    <input name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="tel" required/>
                   </div>
                   <div className="md:col-span-2 space-y-2 group">
                     <label className="font-label-sm uppercase text-secondary group-focus-within:text-primary transition-colors">Email Address</label>
-                    <input className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="email" required/>
+                    <input name="email" value={formData.email} onChange={handleInputChange} className="w-full border-outline-variant/40 rounded-[6px] focus:ring-primary focus:border-primary px-4 py-3 font-body-md" type="email" required/>
                   </div>
                 </div>
 
