@@ -1,5 +1,12 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+const optimizeCloudinaryUrl = (url) => {
+  if (typeof url !== 'string' || !url.includes('cloudinary.com/')) return url;
+  if (url.includes('/upload/v')) return url.replace('/upload/v', '/upload/e_trim/v');
+  if (url.includes('/upload/') && !url.includes('e_trim')) return url.replace('/upload/', '/upload/e_trim/');
+  return url;
+};
+
 /**
  * Fetches the inventory list.
  * For now, this still returns a mock list, but in a real scenario
@@ -10,7 +17,10 @@ export const fetchInventory = async () => {
     const res = await fetch(`${API_BASE_URL}/api/inventory`, { next: { revalidate: 30 } });
     if (!res.ok) throw new Error("Failed to fetch inventory");
     const data = await res.json();
-    return data;
+    return data.map(car => ({
+      ...car,
+      frames: (car.frames || []).map(optimizeCloudinaryUrl)
+    }));
   } catch (err) {
     console.error("Failed to load inventory:", err);
     return [];
@@ -144,7 +154,10 @@ export const fetchCmsInventory = async ({ page = 1, limit = 10 } = {}) => {
     const res = await fetch(`${API_BASE_URL}/api/cms/inventory`, { next: { revalidate: 30 } });
     if (!res.ok) throw new Error("Failed to fetch CMS inventory");
     const data = await res.json();
-    return data;
+    return data.map(car => ({
+      ...car,
+      frames: (car.frames || []).map(optimizeCloudinaryUrl)
+    }));
   } catch (err) {
     console.error("Failed to load CMS inventory:", err);
     return [];
