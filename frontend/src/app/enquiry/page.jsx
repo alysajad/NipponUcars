@@ -222,7 +222,16 @@ function EnquiryContent() {
                     <div className="flex flex-col gap-2">
                         <label className="font-bold text-sm text-secondary uppercase tracking-wider">Preferred Date for Test Drive</label>
                         <div className="relative">
-                          <input name="preferredDate" value={formData.preferredDate} onChange={handleInputChange} min={new Date().toISOString().split('T')[0]} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" type="date" required />
+                          <input 
+                            name="preferredDate" 
+                            value={formData.preferredDate} 
+                            onChange={handleInputChange} 
+                            onClick={(e) => { try { e.target.showPicker(); } catch(err) {} }}
+                            min={new Date().toISOString().split('T')[0]} 
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                            type="date" 
+                            required 
+                          />
                           <div className={`w-full p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between transition-all ${formData.preferredDate ? 'focus-within:border-primary focus-within:ring-1 focus-within:ring-primary' : ''}`}>
                             <span className={formData.preferredDate ? "text-gray-900 font-medium" : "text-gray-400 font-medium"}>{formatDate(formData.preferredDate) || "DD/MM/YYYY"}</span>
                             <span className="material-symbols-outlined text-gray-400">calendar_month</span>
