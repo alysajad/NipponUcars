@@ -23,10 +23,10 @@ export default function CmsAddVehicle() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [pin, setPin] = useState('');
-  const [isUploadingBulk, setIsUploadingBulk] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [formSchema, setFormSchema] = useState({ customFields: [], competitors: [], features: [] });
   const [editCarId, setEditCarId] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     fetchFormSchema().then(setFormSchema);
@@ -151,6 +151,31 @@ export default function CmsAddVehicle() {
     }));
     setFrames(prev => [...prev, ...localPreviews]);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (frames.length >= 7 || isProcessing) return;
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"));
+    const availableSlots = 7 - frames.length;
+    const filesToUpload = files.slice(0, availableSlots);
+    if (filesToUpload.length === 0) return;
+    const localPreviews = filesToUpload.map(file => ({
+      url: URL.createObjectURL(file),
+      file: file
+    }));
+    setFrames(prev => [...prev, ...localPreviews]);
   };
 
   const handlePublish = async () => {
@@ -651,7 +676,12 @@ export default function CmsAddVehicle() {
                         disabled={frames.length >= 7 || isProcessing}
                       />
 
-                      <label htmlFor="multi-camera-input" className={`w-full flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed rounded-[8px] cursor-pointer transition-all ${frames.length >= 7 ? 'bg-surface-container border-outline/30 text-secondary pointer-events-none' : 'bg-primary/5 border-primary text-primary hover:bg-primary/10'}`}>
+                      <label 
+                        htmlFor="multi-camera-input" 
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`w-full flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed rounded-[8px] cursor-pointer transition-all ${frames.length >= 7 ? 'bg-surface-container border-outline/30 text-secondary pointer-events-none' : (isDragging ? 'bg-primary/20 border-primary text-primary scale-[1.02]' : 'bg-primary/5 border-primary text-primary hover:bg-primary/10')}`}>
                         <Upload size={32} className={frames.length >= 7 ? 'text-secondary' : 'text-primary'} />
                         <span className="font-headline-md uppercase tracking-wide text-[14px]">Select Images ({frames.length}/7)</span>
                         <span className="text-[12px] opacity-70">Drag and drop or click to browse</span>
