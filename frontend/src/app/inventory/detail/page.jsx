@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import MobileMenu from '@/components/MobileMenu';
 import { useQuery } from '@tanstack/react-query';
@@ -19,6 +19,11 @@ export default function CarDetailPage() {
 function CarDetail() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
+
+  const [hasEnquired, setHasEnquired] = useState(false);
+  useEffect(() => {
+    if (id) setHasEnquired(!!localStorage.getItem(`enquired_${id}`));
+  }, [id]);
 
   const { data: cars = [], isLoading } = useQuery({
     queryKey: ['inventory'],
@@ -66,7 +71,7 @@ function CarDetail() {
         <div className="flex justify-between items-center px-10 w-full max-w-[1280px] mx-auto h-20">
           <div className="flex items-center gap-4">
             <MobileMenu />
-            <Link href="/" className="font-headline-md text-[20px] font-bold text-primary uppercase tracking-wider hover:opacity-80 transition-opacity cursor-pointer">PREMIER AUTO</Link>
+          <Link href="/" className="font-headline-md text-[20px] font-bold text-primary uppercase tracking-wider hover:opacity-80 transition-opacity cursor-pointer">Nippon Used Cars</Link>
           </div>
           <nav className="hidden md:flex items-center gap-8">
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/inventory">Inventory</Link>
@@ -76,9 +81,16 @@ function CarDetail() {
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/">About</Link>
           </nav>
           <div className="flex items-center gap-6">
-            <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
-              Enquire
-            </Link>
+            {!hasEnquired ? (
+              <Link href={`/enquiry?id=${car.id}`} className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
+                Enquire Now
+              </Link>
+            ) : (
+              <span className="text-green-600 font-bold text-sm uppercase tracking-wider flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                Enquiry Sent
+              </span>
+            )}
           </div>
         </div>
       </header>
@@ -149,9 +161,16 @@ function CarDetail() {
               )}
 
               <div className="mt-8 flex gap-3">
-                <Link href={`/enquiry?id=${car.id}`} className="flex-1 bg-primary text-on-primary py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide text-center hover:bg-[#93000e] transition-all active:opacity-80">
-                  Enquire Now
-                </Link>
+                {!hasEnquired ? (
+                  <Link href={`/enquiry?id=${car.id}`} className="flex-1 bg-primary text-on-primary py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide text-center hover:bg-[#93000e] transition-all active:opacity-80">
+                    Enquire Now
+                  </Link>
+                ) : (
+                  <div className="flex-1 bg-green-50 border border-green-600 text-green-600 py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide text-center flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                    Enquiry Sent
+                  </div>
+                )}
                 <Link href="/inventory" className="flex-1 border-2 border-primary text-primary py-3 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide text-center hover:bg-surface-container transition-all active:opacity-80">
                   Back to Inventory
                 </Link>

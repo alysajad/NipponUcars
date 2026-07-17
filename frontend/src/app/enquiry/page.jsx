@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import MobileMenu from '@/components/MobileMenu';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -58,6 +58,15 @@ function EnquiryContent() {
     }
   };
 
+  const [hasEnquired, setHasEnquired] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      const submitted = localStorage.getItem(`enquired_${id}`);
+      if (submitted) setHasEnquired(true);
+    }
+  }, [id]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormStatus('submitting');
@@ -75,6 +84,8 @@ function EnquiryContent() {
         lead_type: 'sales',
         notes: formData.message
       });
+      if (id) localStorage.setItem(`enquired_${id}`, '1');
+      setHasEnquired(true);
       setFormStatus('success');
     } catch (err) {
       console.error(err);
@@ -109,9 +120,9 @@ function EnquiryContent() {
       <header className="sticky top-0 w-full z-50 flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto bg-white/95 backdrop-blur-sm border-b border-gray-200">
         <div className="flex items-center gap-4">
             <MobileMenu />
-            <div className="text-2xl font-bold text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>
-                Nippon U-CARS
-            </div>
+            <Link href="/" className="text-2xl font-bold text-primary uppercase font-headline-md hover:opacity-80 transition-opacity" style={{ fontFamily: 'var(--font-sailors)' }}>
+                Nippon Used Cars
+            </Link>
         </div>
         <nav className="hidden md:flex items-center gap-8">
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/inventory">Buy</Link>
@@ -120,9 +131,16 @@ function EnquiryContent() {
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/certified">Certified</Link>
         </nav>
         <div className="flex items-center gap-6">
-            <button className="bg-primary text-white px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 duration-100 hover:brightness-110 shadow-md">
-                Enquire Now
-            </button>
+            {!hasEnquired ? (
+              <a href="#enquiry-form" className="bg-primary text-white px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 duration-100 hover:brightness-110 shadow-md">
+                  Enquire Now
+              </a>
+            ) : (
+              <span className="text-green-600 font-bold text-sm uppercase tracking-wider flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                Enquiry Sent
+              </span>
+            )}
         </div>
       </header>
 
@@ -181,7 +199,7 @@ function EnquiryContent() {
         </section>
 
         {/* Enquiry Form Section */}
-        <section className="max-w-3xl mx-auto py-12">
+        <section id="enquiry-form" className="max-w-3xl mx-auto py-12">
             <div className="bg-white p-8 md:p-12 shadow-sm border border-gray-200 rounded-xl relative overflow-hidden">
                 {/* Branding Accent */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
@@ -320,9 +338,9 @@ function EnquiryContent() {
       {/* Footer Component */}
       <footer className="w-full py-12 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-secondary text-white border-t border-gray-800 mt-auto">
         <div className="flex flex-col gap-4 text-center md:text-left">
-            <div className="text-2xl font-black text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon U-CARS</div>
+            <div className="text-2xl font-black text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon Used Cars</div>
             <p className="text-sm text-gray-400 max-w-sm">
-                © 2024 Nippon U-CARS. Certified Pre-Owned Excellence. All rights reserved.
+                © 2024 Nippon Used Cars. Certified Pre-Owned Excellence. All rights reserved.
             </p>
         </div>
         <div className="flex flex-wrap justify-center gap-6">

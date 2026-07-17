@@ -80,7 +80,7 @@ export default function BookInspection() {
         <div className="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto">
           <div className="flex items-center gap-stack-lg">
             <MobileMenu />
-            <Link href="/" className="font-headline-md text-headline-md font-semibold text-primary uppercase hover:opacity-80 transition-opacity cursor-pointer">Nippon U-CARS</Link>
+            <Link href="/" className="font-headline-md text-headline-md font-semibold text-primary uppercase hover:opacity-80 transition-opacity cursor-pointer">Nippon Used Cars</Link>
             <div className="hidden md:flex items-center gap-8 ml-12">
               <Link href="#" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Buy</Link>
               <Link href="/sell" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Sell</Link>
@@ -129,7 +129,7 @@ export default function BookInspection() {
                   <h2 className="font-headline-lg text-primary uppercase mb-4">Thank You!</h2>
                   <p className="font-body-lg text-secondary mb-8">
                     Your inspection booking request has been successfully received. 
-                    Our concierge team will review your details and call you back shortly to confirm your appointment and make you feel right at home with Nippon U-CARS.
+                    Our concierge team will review your details and call you back shortly to confirm your appointment and make you feel right at home with Nippon Used Cars.
                   </p>
                   <Link 
                     href="/inventory"
@@ -266,7 +266,7 @@ export default function BookInspection() {
                   </div>
                   <div>
                     <h4 className="font-body-lg font-bold uppercase mb-1">Increased Resale Value</h4>
-                    <p className="text-secondary-fixed-dim text-sm opacity-80 font-body-md">Official NIPPON U-CARS certification significantly boosts your vehicle's market appeal.</p>
+                    <p className="text-secondary-fixed-dim text-sm opacity-80 font-body-md">Official NIPPON USED CARS certification significantly boosts your vehicle's market appeal.</p>
                   </div>
                 </div>
               </div>
@@ -336,7 +336,7 @@ export default function BookInspection() {
       <footer className="bg-secondary text-white py-20 mt-auto">
         <div className="px-margin-desktop max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1">
-            <span className="font-headline-md text-headline-md text-white font-semibold uppercase">Nippon U-CARS</span>
+            <span className="font-headline-md text-headline-md text-white font-semibold uppercase">Nippon Used Cars</span>
             <p className="font-body-md text-body-md opacity-60 max-w-xs mt-4">
               The trusted name for certified pre-owned cars. Reliability you can count on, value you can trust.
             </p>
@@ -382,7 +382,7 @@ export default function BookInspection() {
           </div>
         </div>
         <div className="border-t border-white/5 py-10 px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <span className="font-body-md text-body-md text-white/40">© 2024 Nippon U-CARS. All Rights Reserved. Certified Excellence.</span>
+          <span className="font-body-md text-body-md text-white/40">© 2024 Nippon Used Cars. All Rights Reserved. Certified Excellence.</span>
           <div className="flex gap-10 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em]">
             <Link href="#" className="hover:text-primary transition-colors">Legal</Link>
             <Link href="#" className="hover:text-primary transition-colors">Sitemap</Link>

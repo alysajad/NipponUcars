@@ -27,7 +27,7 @@ export default function SellPage() {
     countryCode: '+91',
     phone: '',
     preferredDate: '',
-    center: 'Nippon U-CARS Main Hub'
+    center: 'Nippon Used Cars Main Hub'
   });
 
   const handleNextStep = (e, nextIdx) => {
@@ -114,7 +114,7 @@ export default function SellPage() {
       setIsSubmitted(true);
       setFormData({
         regNumber: '', year: '', mileage: '', condition: 'Excellent (Showroom quality)',
-        fullName: '', email: '', countryCode: '+91', phone: '', preferredDate: '', center: 'Nippon U-CARS Main Hub'
+        fullName: '', email: '', countryCode: '+91', phone: '', preferredDate: '', center: 'Nippon Used Cars Main Hub'
       });
     } catch (err) {
       alert("Failed to submit request. Please try again.");
@@ -133,7 +133,7 @@ export default function SellPage() {
           <div className="flex items-center gap-2">
             <MobileMenu />
             <Link href="/" className="text-2xl font-bold text-primary tracking-tighter uppercase font-headline-md hover:opacity-80 transition-opacity cursor-pointer" style={{ fontFamily: 'var(--font-sailors)' }}>
-              Nippon U-CARS
+              Nippon Used Cars
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-8">
@@ -304,7 +304,7 @@ export default function SellPage() {
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Nearest Center</label>
                       <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
-                        <option>Nippon U-CARS Main Hub</option>
+                        <option>Nippon Used Cars Main Hub</option>
                         <option>North City Service Center</option>
                         <option>South Plaza Workshop</option>
                       </select>
@@ -445,7 +445,7 @@ export default function SellPage() {
       <footer className="bg-inverse-surface text-white pt-20 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-margin-desktop py-12 max-w-container-max mx-auto border-b border-white/10">
           <div className="col-span-1 md:col-span-1">
-            <div className="text-2xl font-bold text-primary mb-6 uppercase tracking-tighter" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon U-CARS</div>
+            <div className="text-2xl font-bold text-primary mb-6 uppercase tracking-tighter" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon Used Cars</div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">Reliability and precision in every transaction. Your partner for certified pre-owned excellence.</p>
           </div>
           <div>
@@ -476,7 +476,7 @@ export default function SellPage() {
           </div>
         </div>
         <div className="px-margin-desktop pt-8 max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-gray-500 text-xs uppercase tracking-[0.2em]">© 2024 Nippon U-CARS. Certified Excellence.</p>
+          <p className="text-gray-500 text-xs uppercase tracking-[0.2em]">© 2024 Nippon Used Cars. Certified Excellence.</p>
           <div className="flex gap-8 text-gray-500">
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">facebook</span>
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">public</span>
