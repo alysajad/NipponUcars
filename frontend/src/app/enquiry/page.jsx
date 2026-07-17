@@ -88,7 +88,7 @@ function EnquiryContent() {
         <nav className="hidden md:flex items-center gap-8">
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/inventory">Buy</Link>
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/sell">Sell</Link>
-            <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="#">Exchange</Link>
+            <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/exchange">Exchange</Link>
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="#">Locations</Link>
         </nav>
         <div className="flex items-center gap-6">
