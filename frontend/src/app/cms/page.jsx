@@ -221,9 +221,9 @@ export default function CmsAddVehicle() {
         }, 15000);
         setStep(3);
       } else {
-         alert(`Success! ${payload.name} updated successfully.`);
          queryClient.invalidateQueries({ queryKey: ['inventory'] });
-         router.push('/cms/inventory');
+         setUploadProgress(null);
+         setStep(3);
       }
       
       setEditCarId(null);
@@ -685,8 +685,14 @@ export default function CmsAddVehicle() {
         {step === 3 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <CheckCircle size={64} className="text-green-500 mb-4" />
-            <h2 className="font-headline-md text-headline-md uppercase mb-2">Car Submitted!</h2>
-            <p className="text-secondary font-body-md mb-4">It is currently being processed by AI in the background.</p>
+            <h2 className="font-headline-md text-headline-md uppercase mb-2">
+              {uploadProgress ? "Car Submitted!" : "Changes Saved!"}
+            </h2>
+            <p className="text-secondary font-body-md mb-4">
+              {uploadProgress 
+                ? "It is currently being processed by AI in the background."
+                : "Your edits have been successfully published to the live inventory."}
+            </p>
 
             {uploadProgress && uploadProgress.total > 0 && (
               <div className="w-full max-w-[300px] mb-4">
