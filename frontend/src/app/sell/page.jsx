@@ -25,7 +25,7 @@ export default function SellPage() {
     email: '',
     phone: '',
     preferredDate: '',
-    center: 'Nippon Used Cars Main Hub'
+    center: 'Nippon U-CARS Main Hub'
   });
 
   const handleNextStep = (e, nextIdx) => {
@@ -100,7 +100,7 @@ export default function SellPage() {
       setIsSubmitted(true);
       setFormData({
         regNumber: '', mileage: '', condition: 'Excellent (Showroom quality)',
-        fullName: '', email: '', phone: '', preferredDate: '', center: 'Nippon Used Cars Main Hub'
+        fullName: '', email: '', phone: '', preferredDate: '', center: 'Nippon U-CARS Main Hub'
       });
     } catch (err) {
       alert("Failed to submit request. Please try again.");
@@ -119,7 +119,7 @@ export default function SellPage() {
           <div className="flex items-center gap-2">
             <MobileMenu />
             <Link href="/" className="text-2xl font-bold text-primary tracking-tighter uppercase font-headline-md hover:opacity-80 transition-opacity cursor-pointer" style={{ fontFamily: 'var(--font-sailors)' }}>
-              Nippon Used Cars
+              Nippon U-CARS
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-8">
@@ -278,7 +278,7 @@ export default function SellPage() {
                     <div>
                       <label className="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Nearest Center</label>
                       <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full p-4 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
-                        <option>Nippon Used Cars Main Hub</option>
+                        <option>Nippon U-CARS Main Hub</option>
                         <option>North City Service Center</option>
                         <option>South Plaza Workshop</option>
                       </select>
@@ -303,7 +303,7 @@ export default function SellPage() {
         <section className="py-24 bg-white">
           <div className="max-w-container-max mx-auto px-margin-desktop">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-10 mb-16">
-              <h2 className="font-headline-lg text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-nowrap">The U-Trust Promise</h2>
+              <h2 className="font-headline-lg text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-nowrap">The U-CARS Promise</h2>
               <p className="font-body-md text-body-md text-secondary/70 max-w-2xl leading-relaxed">
                 Experience a seamless selling process with our core guarantees. We ensure fair pricing, zero hidden costs, and immediate payouts directly to your account.
               </p>
@@ -403,7 +403,7 @@ export default function SellPage() {
           <div className="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row-reverse items-center gap-20">
             <div className="w-full md:w-1/2">
               <h2 className="text-5xl font-bold uppercase mb-8 text-on-surface font-headline-xl" style={{ fontFamily: 'var(--font-sailors)', lineHeight: '1.1' }}>Precision Engineering in Every Inspection</h2>
-              <p className="text-xl text-gray-500 mb-10 leading-relaxed">We don't just sell cars. We build confidence. Every vehicle that passes through U-Trust undergoes a rigorous physical and digital health check to ensure it meets our heritage of reliability.</p>
+              <p className="text-xl text-gray-500 mb-10 leading-relaxed">We don't just sell cars. We build confidence. Every vehicle that passes through U-CARS undergoes a rigorous physical and digital health check to ensure it meets our heritage of reliability.</p>
               <button className="border-2 border-primary text-primary px-10 py-4 rounded-lg font-bold text-sm uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Learn About Process</button>
             </div>
             <div className="w-full md:w-1/2">
@@ -419,13 +419,13 @@ export default function SellPage() {
       <footer className="bg-inverse-surface text-white pt-20 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-margin-desktop py-12 max-w-container-max mx-auto border-b border-white/10">
           <div className="col-span-1 md:col-span-1">
-            <div className="text-2xl font-bold text-primary mb-6 uppercase tracking-tighter" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon Used Cars</div>
+            <div className="text-2xl font-bold text-primary mb-6 uppercase tracking-tighter" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon U-CARS</div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">Reliability and precision in every transaction. Your partner for certified pre-owned excellence.</p>
           </div>
           <div>
             <h5 className="font-bold mb-6 uppercase tracking-widest text-xs">Quick Links</h5>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">About U-Trust</Link></li>
+              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">About U-CARS</Link></li>
               <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">203-Point Inspection</Link></li>
               <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">Warranty Policy</Link></li>
             </ul>
@@ -450,7 +450,7 @@ export default function SellPage() {
           </div>
         </div>
         <div className="px-margin-desktop pt-8 max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-gray-500 text-xs uppercase tracking-[0.2em]">© 2024 Nippon Used Cars. Certified Excellence.</p>
+          <p className="text-gray-500 text-xs uppercase tracking-[0.2em]">© 2024 Nippon U-CARS. Certified Excellence.</p>
           <div className="flex gap-8 text-gray-500">
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">facebook</span>
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">public</span>

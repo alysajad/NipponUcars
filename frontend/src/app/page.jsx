@@ -70,7 +70,7 @@ export default function Home() {
         <div className="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto">
           <div className="flex items-center gap-stack-lg">
             <MobileMenu />
-            <Link href="/" className="font-headline-md text-headline-md font-semibold text-primary uppercase hover:opacity-80 transition-opacity cursor-pointer">Nippon U-Trust</Link>
+            <Link href="/" className="font-headline-md text-headline-md font-semibold text-primary uppercase hover:opacity-80 transition-opacity cursor-pointer">Nippon U-CARS</Link>
             <div className="hidden md:flex items-center gap-8 ml-12">
               <Link href="#" className="nav-link font-label-bold text-label-bold uppercase text-primary relative after:content-[''] after:absolute after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary">Buy</Link>
               <Link href="/sell" className="nav-link font-label-bold text-label-bold uppercase text-on-surface hover:text-primary relative after:content-[''] after:absolute after:w-0 hover:after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary after:transition-all after:duration-300">Sell</Link>
@@ -209,13 +209,13 @@ export default function Home() {
           ))}
         </div>
       </div>
-      {/* The U-Trust Advantage Section */}
+      {/* The U-CARS Advantage Section */}
       <section className="pt-10 pb-24 bg-white">
         <div className="px-4 md:px-8 w-full max-w-full mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10 mb-16">
             <h2 className="font-headline-lg text-headline-md md:text-headline-lg uppercase bg-primary text-white px-6 py-3 rounded-lg shadow-sm whitespace-normal md:whitespace-nowrap text-center md:text-left w-full md:w-auto">The Nippon Promise</h2>
             <p className="font-body-md text-body-md text-secondary/70 max-w-2xl leading-relaxed">
-              At Nippon Used Cars, we offer a range of advantages to help you buy and sell with confidence. These include our comprehensive evaluation, manufacturer-backed warranties, and fully transparent history.
+              At Nippon U-CARS, we offer a range of advantages to help you buy and sell with confidence. These include our comprehensive evaluation, manufacturer-backed warranties, and fully transparent history.
             </p>
           </div>
           
@@ -246,7 +246,7 @@ export default function Home() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm mt-2">Warranty</span>
                 </div>
-                <Link href="/about#utrust-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
+                <Link href="/about#ucars-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
                   <span className="material-symbols-outlined bg-white/20 backdrop-blur-md text-white group-hover:bg-white group-hover:text-secondary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>
@@ -282,7 +282,7 @@ export default function Home() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-white text-secondary px-4 py-2 rounded-md inline-block shadow-sm mt-2">Financing</span>
                 </div>
-                <Link href="/about#utrust-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
+                <Link href="/about#ucars-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-white group-hover:text-gray-300 transition-colors">
                   <span className="material-symbols-outlined bg-white/20 backdrop-blur-md text-white group-hover:bg-white group-hover:text-secondary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>
@@ -300,7 +300,7 @@ export default function Home() {
                   <br/>
                   <span className="font-headline-md text-headline-md uppercase bg-white px-4 py-2 rounded-md inline-block shadow-sm mt-2 text-secondary">Assistance</span>
                 </div>
-                <Link href="/about#utrust-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
+                <Link href="/about#ucars-promise" className="flex items-center gap-3 font-label-bold text-label-bold uppercase mt-auto text-secondary group-hover:text-primary transition-colors">
                   <span className="material-symbols-outlined bg-white text-secondary group-hover:text-white group-hover:bg-primary transition-colors rounded-full p-2 shadow-sm">arrow_outward</span>
                   Learn More
                 </Link>
@@ -430,7 +430,7 @@ export default function Home() {
       <footer className="bg-secondary text-white border-t border-white/5">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-margin-desktop py-24 max-w-container-max mx-auto">
           <div className="space-y-8">
-            <span className="font-headline-md text-headline-md text-white font-semibold uppercase">Nippon Used Cars</span>
+            <span className="font-headline-md text-headline-md text-white font-semibold uppercase">Nippon U-CARS</span>
             <p className="font-body-md text-body-md opacity-60 max-w-xs">
               The trusted name for certified pre-owned cars. Reliability you can count on, value you can trust.
             </p>
@@ -449,7 +449,7 @@ export default function Home() {
           <div>
             <h5 className="font-label-bold text-label-bold uppercase mb-8 text-primary tracking-widest">Services</h5>
             <ul className="space-y-4">
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">About U-Trust</Link></li>
+              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">About U-CARS</Link></li>
               <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">203-Point Inspection</Link></li>
               <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Warranty Policy</Link></li>
               <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Privacy Policy</Link></li>
@@ -476,7 +476,7 @@ export default function Home() {
           </div>
         </div>
         <div className="border-t border-white/5 py-10 px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <span className="font-body-md text-body-md text-white/40">© 2024 Nippon Used Cars. All Rights Reserved. Certified Excellence.</span>
+          <span className="font-body-md text-body-md text-white/40">© 2024 Nippon U-CARS. All Rights Reserved. Certified Excellence.</span>
           <div className="flex gap-10 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em]">
             <Link href="#" className="hover:text-primary transition-colors">Legal</Link>
             <Link href="#" className="hover:text-primary transition-colors">Sitemap</Link>

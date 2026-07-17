@@ -106,7 +106,7 @@ function EnquiryContent() {
         <div className="flex items-center gap-4">
             <MobileMenu />
             <div className="text-2xl font-bold text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>
-                Nippon Used Cars
+                Nippon U-CARS
             </div>
         </div>
         <nav className="hidden md:flex items-center gap-8">
@@ -265,7 +265,7 @@ function EnquiryContent() {
                         <textarea name="message" value={formData.message} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-medium" placeholder="Mention any specific requirements or questions..." rows={4}></textarea>
                     </div>
                     
-                    {/* Trust Signals Overlay */}
+                    {/* U-CARS Signals Overlay */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-surface-container-low border border-gray-200 rounded-lg mt-2">
                         <div className="flex items-start gap-3">
                             <span className="material-symbols-outlined text-primary text-xl">schedule</span>
@@ -302,9 +302,9 @@ function EnquiryContent() {
       {/* Footer Component */}
       <footer className="w-full py-12 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-secondary text-white border-t border-gray-800 mt-auto">
         <div className="flex flex-col gap-4 text-center md:text-left">
-            <div className="text-2xl font-black text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon Used Cars</div>
+            <div className="text-2xl font-black text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon U-CARS</div>
             <p className="text-sm text-gray-400 max-w-sm">
-                © 2024 Nippon Used Cars. Certified Pre-Owned Excellence. All rights reserved.
+                © 2024 Nippon U-CARS. Certified Pre-Owned Excellence. All rights reserved.
             </p>
         </div>
         <div className="flex flex-wrap justify-center gap-6">

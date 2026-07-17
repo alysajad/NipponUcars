@@ -235,7 +235,7 @@ export default function CmsDashboard() {
           <div className="flex flex-col gap-4">
             <span className="font-headline-md text-headline-md text-on-primary uppercase tracking-wider font-bold">PREMIER AUTO</span>
             <p className="font-label-sm text-label-sm uppercase text-surface-variant max-w-md opacity-80">
-              © 2024 PREMIER AUTO. ALL RIGHTS RESERVED. HIGH-PERFORMANCE PRE-OWNED. NIPPON U-TRUST CERTIFIED CMS SYSTEM.
+              © 2024 PREMIER AUTO. ALL RIGHTS RESERVED. HIGH-PERFORMANCE PRE-OWNED. NIPPON U-CARS CERTIFIED CMS SYSTEM.
             </p>
           </div>
           <div className="flex flex-wrap md:justify-end gap-x-8 gap-y-4">

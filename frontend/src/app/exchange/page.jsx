@@ -102,7 +102,7 @@ export default function ExchangePage() {
           <div className="flex items-center gap-2">
             <MobileMenu />
             <Link href="/" className="text-2xl font-bold text-primary tracking-tighter uppercase font-headline-md hover:opacity-80 transition-opacity cursor-pointer" style={{ fontFamily: 'var(--font-sailors)' }}>
-              Nippon Used Cars
+              Nippon U-CARS
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-8">
@@ -134,7 +134,7 @@ export default function ExchangePage() {
                 Upgrade to Excellence
               </h1>
               <p className="font-body-lg text-body-lg text-secondary mb-8 max-w-lg">
-                Exchange your vehicle for a certified Nippon U-Trust car with seamless valuation and immediate credit.
+                Exchange your vehicle for a certified Nippon U-CARS car with seamless valuation and immediate credit.
               </p>
               <div className="flex gap-4">
                 <button onClick={() => document.getElementById('exchange-form')?.scrollIntoView({ behavior: 'smooth' })} className="bg-primary text-white font-label-bold uppercase rounded-lg px-8 py-3.5 hover:opacity-90 transition-all shadow-md">
@@ -213,7 +213,7 @@ export default function ExchangePage() {
                   <span className="material-symbols-outlined text-3xl text-primary">car_rental</span>
                 </div>
                 <h3 className="font-headline-md text-on-surface mb-3 text-xl uppercase">3. Seamless Upgrade</h3>
-                <p className="text-secondary text-sm">Apply the exact value of your old car directly as credit towards any certified Nippon U-Trust vehicle.</p>
+                <p className="text-secondary text-sm">Apply the exact value of your old car directly as credit towards any certified Nippon U-CARS vehicle.</p>
               </div>
             </div>
           </div>
@@ -403,13 +403,13 @@ export default function ExchangePage() {
       <footer className="bg-inverse-surface text-white pt-20 pb-10 border-t border-white/10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 px-margin-desktop py-12 max-w-container-max mx-auto">
           <div className="col-span-1 md:col-span-1">
-            <div className="text-2xl font-bold text-primary mb-6 uppercase tracking-tighter" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon U-Trust</div>
+            <div className="text-2xl font-bold text-primary mb-6 uppercase tracking-tighter" style={{ fontFamily: 'var(--font-sailors)' }}>Nippon U-CARS</div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">Reliability and precision in every transaction. Your partner for certified pre-owned excellence.</p>
           </div>
           <div>
             <h5 className="font-bold mb-6 uppercase tracking-widest text-xs">Quick Links</h5>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">About U-Trust</Link></li>
+              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">About U-CARS</Link></li>
               <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">203-Point Inspection</Link></li>
               <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">Warranty Policy</Link></li>
             </ul>
@@ -434,7 +434,7 @@ export default function ExchangePage() {
           </div>
         </div>
         <div className="px-margin-desktop pt-8 max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6 border-t border-white/10">
-          <p className="text-gray-500 text-xs uppercase tracking-[0.2em]">© 2024 Nippon U-Trust. Certified Excellence.</p>
+          <p className="text-gray-500 text-xs uppercase tracking-[0.2em]">© 2024 Nippon U-CARS. Certified Excellence.</p>
           <div className="flex gap-8 text-gray-500">
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">facebook</span>
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">public</span>

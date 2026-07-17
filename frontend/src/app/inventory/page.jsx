@@ -122,7 +122,7 @@ function InventoryListContent() {
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between px-4 md:px-16 py-6 bg-white border-b border-black/5 gap-4 w-full">
         <div>
           <h1 style={{ fontFamily: 'var(--font-sailors)', fontSize: '2rem', margin: 0 }}>
-            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:opacity-80 transition-opacity"><span className="text-red">U-Trust</span> Used Cars</Link>
+            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} className="hover:opacity-80 transition-opacity"><span className="text-red">U-CARS</span></Link>
           </h1>
           <p style={{ color: '#888', margin: 0, fontSize: '0.9rem', marginTop: '0.2rem' }}>
             <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }} onMouseOver={e => e.target.style.color='var(--primary-red)'} onMouseOut={e => e.target.style.color='inherit'}>Home</Link> 

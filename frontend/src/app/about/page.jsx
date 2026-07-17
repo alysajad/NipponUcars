@@ -49,7 +49,7 @@ export default function AboutPage() {
           <div className="flex items-center gap-8">
             <MobileMenu />
             <Link href="/" className="font-headline-md text-headline-md font-semibold text-primary uppercase tracking-tight">
-              Nippon U-Trust
+              Nippon U-CARS
             </Link>
             <div className="hidden md:flex items-center gap-8 ml-4">
               <Link
@@ -150,7 +150,7 @@ export default function AboutPage() {
                 Modern Rigor
               </h2>
               <p className="font-body-lg text-body-lg text-secondary leading-relaxed">
-                Nippon U-Trust was born from a singular vision: to eliminate the ambiguity of the
+                Nippon U-CARS was born from a singular vision: to eliminate the ambiguity of the
                 secondary car market. In an industry where trust is often fragile, we built a fortress
                 of transparency. Every vehicle that enters our fleet is a testament to Japanese
                 engineering heritage.
@@ -371,7 +371,7 @@ export default function AboutPage() {
             </h2>
             <p className="font-body-lg text-body-lg text-white/90 max-w-2xl mx-auto mb-12">
               Experience the precision of Japanese certification. Whether you&apos;re looking to
-              acquire a masterpiece or find a new home for yours, Nippon U-Trust is your partner.
+              acquire a masterpiece or find a new home for yours, Nippon U-CARS is your partner.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link
@@ -398,10 +398,10 @@ export default function AboutPage() {
         <div className="max-w-[1280px] mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col gap-4 text-center md:text-left">
             <div className="font-headline-md text-headline-md text-surface-container-lowest font-bold">
-              Nippon U-Trust
+              Nippon U-CARS
             </div>
             <p className="font-body-md text-label-sm text-surface-variant opacity-80">
-              © 2024 Nippon U-Trust. All Rights Reserved. Premium Pre-Owned Excellence.
+              © 2024 Nippon U-CARS. All Rights Reserved. Premium Pre-Owned Excellence.
             </p>
           </div>
           <div className="flex gap-8 mt-8 md:mt-0">
