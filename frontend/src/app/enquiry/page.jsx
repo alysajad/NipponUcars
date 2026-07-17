@@ -83,8 +83,11 @@ function EnquiryContent() {
     <div className="bg-background text-on-surface font-body-md" style={{ fontFamily: 'var(--font-proxima)' }}>
       {/* TopNavBar Component */}
       <header className="sticky top-0 w-full z-50 flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto bg-white/95 backdrop-blur-sm border-b border-gray-200">
-        <div className="text-2xl font-bold text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>
-            Toyota U-Trust
+        <div className="flex items-center gap-4">
+            <MobileMenu />
+            <div className="text-2xl font-bold text-primary uppercase font-headline-md" style={{ fontFamily: 'var(--font-sailors)' }}>
+                Toyota U-Trust
+            </div>
         </div>
         <nav className="hidden md:flex items-center gap-8">
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/inventory">Buy</Link>
@@ -93,7 +96,6 @@ function EnquiryContent() {
             <Link className="text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="#">Locations</Link>
         </nav>
         <div className="flex items-center gap-6">
-            <MobileMenu />
             <button className="bg-primary text-white px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider transition-all active:scale-95 duration-100 hover:brightness-110 shadow-md">
                 Enquire Now
             </button>

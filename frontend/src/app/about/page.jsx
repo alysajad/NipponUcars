@@ -47,6 +47,7 @@ export default function AboutPage() {
       >
         <div className="flex justify-between items-center h-full px-margin-desktop max-w-[1280px] mx-auto">
           <div className="flex items-center gap-8">
+            <MobileMenu />
             <Link href="/" className="font-headline-md text-headline-md font-semibold text-primary uppercase tracking-tight">
               Nippon U-Trust
             </Link>
@@ -84,7 +85,6 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <MobileMenu />
             <button className="material-symbols-outlined text-on-surface p-2 hover:bg-surface-container-low rounded-full transition-all">
               search
             </button>

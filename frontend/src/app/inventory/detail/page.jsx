@@ -64,16 +64,18 @@ function CarDetail() {
       {/* Top Nav */}
       <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center px-10 w-full max-w-[1280px] mx-auto h-20">
-          <div className="font-headline-md text-headline-md font-bold text-primary uppercase tracking-wider">PREMIER AUTO</div>
+          <div className="flex items-center gap-4">
+            <MobileMenu />
+            <Link href="/" className="font-headline-md text-[20px] font-bold text-primary uppercase tracking-wider hover:opacity-80 transition-opacity cursor-pointer">PREMIER AUTO</Link>
+          </div>
           <nav className="hidden md:flex items-center gap-8">
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/inventory">Inventory</Link>
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/sell">Sell</Link>
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/certified">Certified</Link>
-            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/enquiry?id={car.id}">Finance</Link>
+            <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href={`/enquiry?id=${car.id}`}>Finance</Link>
             <Link className="font-headline-md text-headline-md uppercase tracking-wider text-on-surface hover:text-primary transition-colors duration-300" href="/">About</Link>
           </nav>
           <div className="flex items-center gap-6">
-            <MobileMenu />
             <Link href="/" className="bg-primary text-on-primary px-8 py-2.5 rounded-[6px] font-headline-md text-[16px] uppercase tracking-wide hover:bg-[#93000e] transition-all duration-300 active:opacity-80">
               Enquire
             </Link>

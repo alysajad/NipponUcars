@@ -35,6 +35,7 @@ export default function Landing() {
       <nav className={`fixed top-0 w-full z-50 border-b border-outline-variant transition-all duration-300 ${scrolled ? 'bg-white shadow-xl' : 'bg-white/95 backdrop-blur-sm'}`}>
         <div className="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto">
           <div className="flex items-center gap-stack-lg">
+            <MobileMenu />
             <Link href="/" className="font-headline-md text-headline-md font-semibold text-primary uppercase hover:opacity-80 transition-opacity cursor-pointer">Nippon U-Trust</Link>
             <div className="hidden md:flex items-center gap-8 ml-12">
               <Link href="#" className="nav-link font-label-bold text-label-bold uppercase text-primary relative after:content-[''] after:absolute after:w-full after:h-[2px] after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:bg-primary">Buy</Link>
@@ -45,7 +46,6 @@ export default function Landing() {
             </div>
           </div>
           <div className="flex items-center gap-stack-md">
-            <MobileMenu />
             <button className="material-symbols-outlined text-on-surface p-2 hover:bg-surface-container-low rounded-full transition-all">search</button>
 
           </div>
