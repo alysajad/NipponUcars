@@ -243,19 +243,19 @@ export default function Certified() {
           <div>
             <h5 className="font-label-bold text-label-bold uppercase mb-8 text-primary tracking-widest">Services</h5>
             <ul className="space-y-4">
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">About U-CARS</Link></li>
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">203-Point Inspection</Link></li>
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Warranty Policy</Link></li>
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/about" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">About U-CARS</Link></li>
+              <li><Link href="/certified" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">203-Point Inspection</Link></li>
+              <li><Link href="/warranty" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Warranty Policy</Link></li>
+              <li><Link href="/privacy" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Privacy Policy</Link></li>
             </ul>
           </div>
           <div>
             <h5 className="font-label-bold text-label-bold uppercase mb-8 text-primary tracking-widest">Support</h5>
             <ul className="space-y-4">
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Contact Us</Link></li>
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Terms of Use</Link></li>
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">FAQs</Link></li>
-              <li><Link href="#" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Store Locator</Link></li>
+              <li><Link href="/contact" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Contact Us</Link></li>
+              <li><Link href="/terms" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Terms of Use</Link></li>
+              <li><Link href="/faqs" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">FAQs</Link></li>
+              <li><Link href="/locator" className="font-body-md text-body-md text-white/60 hover:text-primary transition-colors">Store Locator</Link></li>
             </ul>
           </div>
           <div>
@@ -272,9 +272,9 @@ export default function Certified() {
         <div className="border-t border-white/5 py-10 px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <span className="font-body-md text-body-md text-white/40">© 2024 Nippon Used Cars. All Rights Reserved. Certified Excellence.</span>
           <div className="flex gap-10 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em]">
-            <Link href="#" className="hover:text-primary transition-colors">Legal</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Sitemap</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Cookies</Link>
+            <Link href="/terms" className="hover:text-primary transition-colors">Legal</Link>
+            <Link href="/sitemap" className="hover:text-primary transition-colors">Sitemap</Link>
+            <Link href="/cookies" className="hover:text-primary transition-colors">Cookies</Link>
           </div>
         </div>
       </footer>

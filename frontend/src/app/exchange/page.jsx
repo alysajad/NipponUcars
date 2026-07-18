@@ -466,17 +466,17 @@ export default function ExchangePage() {
           <div>
             <h5 className="font-bold mb-6 uppercase tracking-widest text-xs">Quick Links</h5>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">About U-CARS</Link></li>
-              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">203-Point Inspection</Link></li>
-              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">Warranty Policy</Link></li>
+              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="/about">About U-CARS</Link></li>
+              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="/certified">203-Point Inspection</Link></li>
+              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="/warranty">Warranty Policy</Link></li>
             </ul>
           </div>
           <div>
             <h5 className="font-bold mb-6 uppercase tracking-widest text-xs">Support</h5>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">Contact Us</Link></li>
-              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">Terms of Use</Link></li>
-              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="#">Privacy Policy</Link></li>
+              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="/contact">Contact Us</Link></li>
+              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="/terms">Terms of Use</Link></li>
+              <li><Link className="hover:text-primary transition-colors uppercase tracking-wider" href="/privacy">Privacy Policy</Link></li>
             </ul>
           </div>
           <div>
