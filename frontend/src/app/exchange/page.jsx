@@ -158,10 +158,6 @@ export default function ExchangePage() {
             <Link className="nav-link text-sm font-semibold uppercase tracking-wider text-on-surface hover:text-primary transition-colors" href="/certified">Certified</Link>
           </div>
           <div className="flex items-center gap-4">
-            <div className="relative hidden sm:block">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-              <input className="pl-10 pr-4 py-1.5 bg-gray-100 border-none rounded-lg focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="SEARCH INVENTORY" type="text" />
-            </div>
           </div>
         </div>
       </nav>
