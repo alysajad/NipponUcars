@@ -68,10 +68,7 @@ export default function CmsDashboard() {
                 <span className="material-symbols-outlined text-[20px]">add_circle</span>
                 <span className="font-label-sm text-label-sm uppercase tracking-widest">Add Vehicle</span>
               </Link>
-              <Link href="/enquiry" className="flex items-center gap-2 border-2 border-primary text-primary px-6 py-3 rounded-lg hover:bg-surface-container transition-colors">
-                <span className="material-symbols-outlined text-[20px]">event_available</span>
-                <span className="font-label-sm text-label-sm uppercase tracking-widest">Book Inspection</span>
-              </Link>
+
             </div>
           </div>
 
